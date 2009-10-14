@@ -1,0 +1,26 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># myexception.py</FONT>
+
+<FONT COLOR=#3333CC><B>import</B></FONT> exceptions
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Expletive"><FONT COLOR=#CC0000><B> Expletive</B></FONT></A>(exceptions.Exception):
+	<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self):
+		<FONT COLOR=#3333CC><B>return</B></FONT>
+		
+	<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__str__"><FONT COLOR=#CC0000><B> __str__</B></FONT></A>(self):
+		<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>""</FONT>,<FONT COLOR=#115511>"An Expletive occured!"</FONT>
+	
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="main"><FONT COLOR=#CC0000><B> main</B></FONT></A>():
+	<FONT COLOR=#3333CC><B>raise</B></FONT> Expletive
+	
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
+	<FONT COLOR=#3333CC><B>try</B></FONT>:
+		main()
+	<FONT COLOR=#3333CC><B>except</B></FONT> ImportError:
+		<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Unable to import something..."</FONT>
+	<FONT COLOR=#3333CC><B>except</B></FONT> Exception, e:
+		<FONT COLOR=#3333CC><B>raise</B></FONT> e
+</PRE>
+                  <!--footer-->
+                  </BODY>

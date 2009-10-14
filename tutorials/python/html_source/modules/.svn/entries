@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="10"
+   name=""
+   committed-date="2004-01-09T22:55:59.613144Z"
+   url="http://www.ripplefx.net:81/svn/python/html_source/modules"
+   last-author="steder"
+   kind="dir"
+   uuid="996777e2-3ecf-0310-aa64-e0ff611b1bef"
+   revision="17"/>
+<entry
+   committed-rev="10"
+   name="modules.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="27fbc9211db85b06b56653dec318ef26"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+<entry
+   committed-rev="10"
+   name="book.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="05985e71bdb59e68a20b04c802ee60b3"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+<entry
+   committed-rev="10"
+   name="map.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="edee431629d9a484b5aea805180addcc"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+</wc-entries>

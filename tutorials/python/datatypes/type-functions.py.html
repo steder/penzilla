@@ -1,0 +1,95 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#############</FONT>
+<FONT COLOR=#1111CC># Arithmetic</FONT>
+<FONT COLOR=#1111CC>#############</FONT>
+4 + 4 == 8 
+3 - 5 == -2
+16 / 2 == 8
+16 * 4 == 64
+3 % 2 == 1 <FONT COLOR=#1111CC># Modulus</FONT>
+
+<FONT COLOR=#1111CC># Long Int Conversion - Useful for function type mismatches - Not needed here.</FONT>
+100000000000000000000L + long(100) == 100000000000000000100L
+
+<FONT COLOR=#1111CC>##########</FONT>
+<FONT COLOR=#1111CC># Strings</FONT>
+<FONT COLOR=#1111CC>##########</FONT>
+a = <FONT COLOR=#115511>"Hello"</FONT>
+b = <FONT COLOR=#115511>"World!"</FONT>
+
+<FONT COLOR=#1111CC># Concatenation</FONT>
+a + <FONT COLOR=#115511>" "</FONT> + b == <FONT COLOR=#115511>"Hello World!"</FONT>
+<FONT COLOR=#1111CC># Repetition and Concatenation</FONT>
+a * 3 + <FONT COLOR=#115511>" "</FONT> + b == <FONT COLOR=#115511>"HelloHelloHello World!"</FONT>
+(a + <FONT COLOR=#115511>" "</FONT>) * 3 + b == <FONT COLOR=#115511>"Hello Hello Hello World!"</FONT>
+<FONT COLOR=#1111CC># Indexing</FONT>
+b[2] == <FONT COLOR=#115511>"r"</FONT>
+<FONT COLOR=#1111CC># Conversion of data to string - Sesame Street:</FONT>
+c = 7 <FONT COLOR=#1111CC># Backquote ` ` or str() operations</FONT>
+( a + <FONT COLOR=#115511>" number "</FONT> + `c` ) <FONT COLOR=#3333CC><B>and</B></FONT> ( a + <FONT COLOR=#115511>" number "</FONT> + str(c) ) == <FONT COLOR=#115511>"Hello number 7"</FONT>
+
+<FONT COLOR=#1111CC>########</FONT>
+<FONT COLOR=#1111CC># Lists</FONT>
+<FONT COLOR=#1111CC>########</FONT>
+x = [1, 2, 3, 4, 5]
+y = [1, 2.0, (3,4), [5], {<FONT COLOR=#115511>"Hello"</FONT>:<FONT COLOR=#115511>"World!"</FONT>}]
+
+<FONT COLOR=#1111CC># Append </FONT>
+x.append(y) == [ 1, 2, 3, 4, 5, [1, 2.0, (3,4), [5], {<FONT COLOR=#115511>"Hello"</FONT>:<FONT COLOR=#115511>"World!"</FONT>}] ]
+<FONT COLOR=#1111CC># Concatenate - Notice the similarity to Strings</FONT>
+[1,2,3] + [4,5] == [1,2,3,4,5]
+<FONT COLOR=#1111CC># Multiply/Repeat - Again, strings are similar</FONT>
+[1,2] * 3 == [1,2,1,2,1,2]
+<FONT COLOR=#1111CC># Delete</FONT>
+<FONT COLOR=#3333CC><B>del</B></FONT> y[2] == [1, 2.0, [5], {<FONT COLOR=#115511>"Hello"</FONT>:<FONT COLOR=#115511>"World!"</FONT>}]
+<FONT COLOR=#1111CC># Or</FONT>
+y[2] = None
+y == [1, 2.0, {<FONT COLOR=#115511>"Hello"</FONT>:<FONT COLOR=#115511>"World!"</FONT>}]
+<FONT COLOR=#1111CC># Pop - Remove and delete the last element of a list</FONT>
+x.pop() == 5
+x == [1,2,3,4]
+<FONT COLOR=#1111CC># Length of a list</FONT>
+len(x) == 4
+
+<FONT COLOR=#1111CC>##########</FONT>
+<FONT COLOR=#1111CC># Slicing </FONT>
+<FONT COLOR=#1111CC>##########</FONT>
+z = range(100) <FONT COLOR=#1111CC># [0, 99]</FONT>
+z.reverse()
+z[10:19] == [89, 88, 87, 86, 85, 84, 83, 82, 81]
+z.reverse()
+z[:10] == [0,1,2,3,4,5,6,7,8,9]
+z[5:10] == [5,6,7,8,9]
+
+
+<FONT COLOR=#1111CC>###############</FONT>
+<FONT COLOR=#1111CC># Dictionaries</FONT>
+<FONT COLOR=#1111CC>###############</FONT>
+alpha = { <FONT COLOR=#115511>"Red Fish"</FONT>:<FONT COLOR=#115511>"Blue Fish"</FONT>, <FONT COLOR=#115511>"One Fish"</FONT>:<FONT COLOR=#115511>"Two Fish"</FONT>}
+beta = { <FONT COLOR=#115511>"Bob"</FONT>:<FONT COLOR=#115511>"(555)555-5575"</FONT>, <FONT COLOR=#115511>"Carol"</FONT>:<FONT COLOR=#115511>"(555)555-7757"</FONT> }
+
+<FONT COLOR=#1111CC># Keys</FONT>
+alpha.keys() == [<FONT COLOR=#115511>"Red Fish"</FONT>, <FONT COLOR=#115511>"One Fish"</FONT>]
+beta.keys() == [<FONT COLOR=#115511>"Bob"</FONT>, <FONT COLOR=#115511>"Carol"</FONT>]
+<FONT COLOR=#1111CC># Values</FONT>
+alpha.values() == [<FONT COLOR=#115511>"Blue Fish"</FONT>, <FONT COLOR=#115511>"Two Fish"</FONT>]
+<FONT COLOR=#1111CC># Indexing</FONT>
+alpha[<FONT COLOR=#115511>"Red Fish"</FONT>] == <FONT COLOR=#115511>"Blue Fish"</FONT>
+beta[<FONT COLOR=#115511>"Carol"</FONT>] == <FONT COLOR=#115511>"(555)555-7757"</FONT>
+<FONT COLOR=#1111CC># Adding to a Dictionary</FONT>
+beta[<FONT COLOR=#115511>"Dave"</FONT>] = <FONT COLOR=#115511>"100"</FONT>
+beta == { <FONT COLOR=#115511>"Bob"</FONT>:<FONT COLOR=#115511>"(555)555-5575"</FONT>, <FONT COLOR=#115511>"Carol"</FONT>:<FONT COLOR=#115511>"(555)555-7757"</FONT>, <FONT COLOR=#115511>"Dave"</FONT>:<FONT COLOR=#115511>"100"</FONT> }
+<FONT COLOR=#1111CC># Deleting an entry</FONT>
+beta[<FONT COLOR=#115511>"Dave"</FONT>] = None
+<FONT COLOR=#1111CC># Or</FONT>
+<FONT COLOR=#3333CC><B>del</B></FONT> beta[<FONT COLOR=#115511>"Dave"</FONT>]
+beta == { <FONT COLOR=#115511>"Bob"</FONT>:<FONT COLOR=#115511>"(555)555-5575"</FONT>, <FONT COLOR=#115511>"Carol"</FONT>:<FONT COLOR=#115511>"(555)555-7757"</FONT> }
+<FONT COLOR=#1111CC># Length (Size) Of a dictionary</FONT>
+len(alpha) == 2
+<FONT COLOR=#1111CC># Checking for membership in a dictionary</FONT>
+beta.has_key(<FONT COLOR=#115511>"Carol"</FONT>) == 1
+</PRE>
+                  <!--footer-->
+                  </BODY>

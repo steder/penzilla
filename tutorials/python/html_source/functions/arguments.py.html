@@ -1,0 +1,56 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># Simplest Arguments</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="multiprint"><FONT COLOR=#CC0000><B> multiprint</B></FONT></A>( n, txt ):
+    i = 0
+    <FONT COLOR=#3333CC><B>while</B></FONT> i &lt; n:
+        <FONT COLOR=#3333CC><B>print</B></FONT> txt
+
+<FONT COLOR=#1111CC># This throws an error</FONT>
+multiprint()
+
+<FONT COLOR=#1111CC># Default Values</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="multiprint"><FONT COLOR=#CC0000><B> multiprint</B></FONT></A>( n=5, txt=<FONT COLOR=#115511>""</FONT> ):
+    i = 0
+    <FONT COLOR=#3333CC><B>while</B></FONT> i &lt; n:
+        <FONT COLOR=#3333CC><B>print</B></FONT> txt
+        
+<FONT COLOR=#1111CC># This works just fine</FONT>
+multiprint()
+
+<FONT COLOR=#1111CC># Labels</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="multiprint"><FONT COLOR=#CC0000><B> multiprint</B></FONT></A>( n=5, txt=<FONT COLOR=#115511>""</FONT> ):
+    i = 0
+    <FONT COLOR=#3333CC><B>while</B></FONT> i &lt; n:
+        <FONT COLOR=#3333CC><B>print</B></FONT> txt
+
+<FONT COLOR=#1111CC># I want to call multiprint, but I'm happy with</FONT>
+<FONT COLOR=#1111CC># n = 5, so I don't want to reassign it.</FONT>
+<FONT COLOR=#1111CC># I can use the labels to set "txt" without having to set n.</FONT>
+multiprint( txt=<FONT COLOR=#115511>"Hello World!"</FONT> )
+
+<FONT COLOR=#1111CC># You can mix default and required variables</FONT>
+<FONT COLOR=#1111CC># Notice there is a default on list, but since it is</FONT>
+<FONT COLOR=#1111CC># defined in the middle of the list, you can't do this:</FONT>
+<FONT COLOR=#1111CC># fold_right( lambda x y: x + y, 0 )</FONT>
+
+<FONT COLOR=#1111CC># No, you need to specify lst as well, even though you</FONT>
+<FONT COLOR=#1111CC># may be happy with the default value.</FONT>
+<FONT COLOR=#1111CC># fold_right( lambda x y: x + y, [], 0 )</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="fold_right"><FONT COLOR=#CC0000><B> fold_right</B></FONT></A>( fun, list=[], base ):
+    <FONT COLOR=#3333CC><B>if</B></FONT> list == []:
+        <FONT COLOR=#3333CC><B>return</B></FONT> base
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#3333CC><B>return</B></FONT> fun( list[0], fold_right( fun, list[1:], base ) )
+
+<FONT COLOR=#1111CC># Now, let's say I want to just define fun and base, and not list.</FONT>
+<FONT COLOR=#1111CC># I could do this:</FONT>
+fold_right( fun = <FONT COLOR=#3333CC><B>lambda</B></FONT> x y: x + y, base = 0) <FONT COLOR=#1111CC>#Look 'ma, no list!</FONT>
+
+<FONT COLOR=#1111CC># This makes sense if you have a large argument list (5, 10, + variables),</FONT>
+<FONT COLOR=#1111CC># some default and some required.  You can easily specify just the</FONT>
+<FONT COLOR=#1111CC># variables necessary to run the function and leave the defaults alone.  </FONT>
+</PRE>
+                  <!--footer-->
+                  </BODY>

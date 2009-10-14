@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content=
+          "HTML Tidy for Linux/x86 (vers 1st August 2004), see www.w3.org" />
+    <title>Penzilla.net's Python Tutorial: Read Me</title>
+    <link rel="StyleSheet" href="style.css" type="text/css" media="screen" />
+  </head>
+  <body>
+    <div id="header">
+      <h1>Penzilla.net's Python Tutorial: Read Me</h1>
+      <hr /></div>
+    <div id="sidebar">
+      <div id="menu"><a href="index.shtml">&raquo;Tutorial Home</a> 
+        <!--#include virtual="/tutorials/python/menu.html"--></div>
+      <!--#include virtual="/tutorials/python/skyscraper_ads.html"--></div>
+    <div id="content"><!-- Comments -->
+      <!-- Body -->
+      <h3>Mike Steder</h3>
+      <a href="mailto:steder@gmail.com">Contact</a>
+      <hr/>
+      <h4>About the Author</h4>
+      <p>I'm a University of Illinois computer science grad.  I've spent several years working with Python, primarily in the area of Climate Research and Parallel Processing.  Both the University of Chicago and Argonne National Lab have kept me gainfully employed for the last few semesters, and it has been a really enjoyable experience.  Much of my work has been porting of applications written in C/C++ or Fortran to Python, which has provided some unusual challenges.</p>
+      <p>I currently working at the University of Chicago.  I also have a hidden agenda (See below).</p>
+      <h4>What's your hidden agenda?</h4>
+      <p>My hidden agenda is essentially that I _really_ like Python, and think other people should too.  I think that it is a good language for everyday use, and it provides you with a nice toolset when you're sitting in front of just about any computer.  As computers become more and more commonplace and integral to our lives, having simple and powerful programming languages like Python will be very important.</p>  
+      <h4>Why Write this Tutorial?</h4>
+      <p>Original I decided to write this tutorial to help a group of classmates get up to speed in 
+        Python so that we could complete a Engineering Open House project at the University of 
+        Illinois.</p>
+      <p>After the project I still had some of these pages, and I decided that I would try to keep
+        updating and expanding them.  My goal now is to have a place to display and talk about
+        a lot of the little Python programs I've written.  These pages also serve as a reference for
+        myself.  I sometimes come here to refresh my memory about how I might do something,
+        or to point other people at an example.</p>
+      <p>Additionally, I have fun writing and hacking on this page and all the examples.  And
+        ultimately that's the reason I keep working on it:  for fun.</p>
+      <h4><font color="green">I like your tutorial, Can I ...:</font></h4>
+      <ul>
+        <li>... copy it?
+          <ul>
+            Yes.  As long as you credit me.  Feel free to contact me if you have concerns.
+          </ul>
+        </li>
+        <li>... use your code examples in my own project?
+          <ul>
+            Sure.  Again, just credit me somewhere in the code and/or documentation.  
+          </ul>
+        </li>
+        <li>... link/mirror to it?
+          <ul>
+            That's fine.  Let me know and I'll put up a page detailing who's using and/or mirroring this page.  
+          </ul>
+        </li>
+      </ul>
+      <h4><font color="green">Enough hypothetical "i'm so great" questions!  Your tutorial sucks!</font></h4>
+      <P>If that's the case I'd love to know why.  My e-mail address is at the top of the page.  The more detailed your complaint the better.</P>
+    </div>
+    <div id="footer">
+      <!--#include virtual="/tutorials/python/footer.shtml"-->
+    </div>
+  </body>
+</html>

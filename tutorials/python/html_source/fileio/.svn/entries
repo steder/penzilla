@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="10"
+   name=""
+   committed-date="2004-01-09T22:55:59.613144Z"
+   url="http://www.ripplefx.net:81/svn/python/html_source/fileio"
+   last-author="steder"
+   kind="dir"
+   uuid="996777e2-3ecf-0310-aa64-e0ff611b1bef"
+   revision="17"/>
+<entry
+   committed-rev="10"
+   name="grades.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="035104ff0ca8d5116549dbf97ff6ff4e"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+<entry
+   committed-rev="10"
+   name="pickle.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="b580a448b2d67fffcff6de67bfdf7443"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+<entry
+   committed-rev="10"
+   name="read.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="7f3844dbdbcc05199e8ab14e22f165b1"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+<entry
+   committed-rev="10"
+   name="useful.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="ebce29984beddc43cab9513ce0325c86"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+<entry
+   committed-rev="10"
+   name="create.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="9ba3c11b5fb742395865c0dd0f882d94"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+</wc-entries>

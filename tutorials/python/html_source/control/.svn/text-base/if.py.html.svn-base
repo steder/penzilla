@@ -1,0 +1,22 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># basic "If"</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> boolean:
+    x = 1
+<FONT COLOR=#3333CC><B>else</B></FONT>:
+    x = 0
+
+<FONT COLOR=#1111CC># Not so basic "If"</FONT>
+<FONT COLOR=#1111CC># Notice the new keywords!</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> (boolean <FONT COLOR=#3333CC><B>and</B></FONT> otherboolean) <FONT COLOR=#3333CC><B>or</B></FONT> ( <FONT COLOR=#3333CC><B>not</B></FONT> boolean ):  <FONT COLOR=#1111CC>#oops, this is just if(boolean), oh well...  :~)</FONT>
+    x = 1
+<FONT COLOR=#3333CC><B>elif</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> otherboolean:
+    x = 0
+<FONT COLOR=#3333CC><B>else</B></FONT>:
+    x = 100000000000000000000 <FONT COLOR=#1111CC># Big numbers make if statements less boring!</FONT>
+
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

@@ -1,0 +1,29 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># lamba-map.py</FONT>
+<FONT COLOR=#1111CC># Remember our "map" function from a little earlier?</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> map
+list = xrange(0,2,100)
+
+<FONT COLOR=#1111CC># Let's redefine increment as a lambda function.</FONT>
+increment = <FONT COLOR=#3333CC><B>lambda</B></FONT> x: x + 1
+
+<FONT COLOR=#1111CC># This looks like how you would normally do it.</FONT>
+map.map( increment, list )
+
+<FONT COLOR=#1111CC># Or, we're do lazy for that "=" statement above :~)</FONT>
+<FONT COLOR=#1111CC># That and increment is so simple...</FONT>
+map.map( <FONT COLOR=#3333CC><B>lambda</B></FONT> x: x + 1, list )
+
+<FONT COLOR=#1111CC># Where lambda won't work:</FONT>
+<FONT COLOR=#1111CC># Lambda's cannot contain statements.  So although the following</FONT>
+<FONT COLOR=#1111CC># code is almost valid Ocaml, it is _not_ valid Python.  :~)</FONT>
+lmap = ( <FONT COLOR=#3333CC><B>lambda</B></FONT> f, lst:
+    <FONT COLOR=#3333CC><B>if</B></FONT> lst == []:
+        <FONT COLOR=#3333CC><B>return</B></FONT> []
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#3333CC><B>return</B></FONT> [ f( lst[0] ) ] + lmap( f lst[1:] ) )
+</PRE>
+                  <!--footer-->
+                  </BODY>

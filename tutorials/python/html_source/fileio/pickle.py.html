@@ -1,0 +1,58 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># Let's define a class quick:</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Student"><FONT COLOR=#CC0000><B> Student</B></FONT></A>:
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, name=<FONT COLOR=#115511>""</FONT>, school=<FONT COLOR=#115511>""</FONT>, major=<FONT COLOR=#115511>""</FONT>, year=<FONT COLOR=#115511>""</FONT>, gpa=-1):
+        self.name = name
+        self.school = school
+        self.major = major
+        self.year = year
+        self.gpa = gpa
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_Print"><FONT COLOR=#CC0000><B> _Print</B></FONT></A>(self):
+        string = <FONT COLOR=#115511>"++++++++++++++++++++++"</FONT> + \
+                 <FONT COLOR=#115511>"+"</FONT>+name \
+                 <FONT COLOR=#115511>"+"</FONT>+school \
+                 <FONT COLOR=#115511>"+"</FONT>+major \
+                 <FONT COLOR=#115511>"+"</FONT>+year \
+                 <FONT COLOR=#115511>"+"</FONT>+gpa \
+                 <FONT COLOR=#115511>"++++++++++++++++++++++"</FONT>
+        <FONT COLOR=#3333CC><B>return</B></FONT> string
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="Print"><FONT COLOR=#CC0000><B> Print</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>print</B></FONT> self._Print()
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__str__"><FONT COLOR=#CC0000><B> __str__</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> self._Print()
+    
+<FONT COLOR=#1111CC># Now I'll create a student:</FONT>
+Mike = Student(<FONT COLOR=#115511>"Mike"</FONT>,<FONT COLOR=#115511>"UIUC"</FONT>,<FONT COLOR=#115511>"CS"</FONT>,<FONT COLOR=#115511>"Senior"</FONT>,0.6)
+<FONT COLOR=#1111CC># Now, let's Pickle Mike</FONT>
+mike_the_pickle = pickle.dumps(Mike)
+<FONT COLOR=#3333CC><B>print</B></FONT> mike_the_pickle
+<FONT COLOR=#1111CC># Now let's clone mike!</FONT>
+Mike2 = pickle.loads(mike_the_pickle)
+<FONT COLOR=#3333CC><B>if</B></FONT> type(Mike) == type(Mike2):
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Mike and Mike2 are of type:"</FONT>,(str(type(Mike)))
+
+<FONT COLOR=#1111CC># Create A Pickler</FONT>
+P.pickle.Pickler(<FONT COLOR=#115511>"pickle.dat"</FONT>)
+<FONT COLOR=#1111CC># Write to your Pickler</FONT>
+P.dump(Mike)
+<FONT COLOR=#1111CC># OR, combine the last 2 lines</FONT>
+pickle.dump(Mike, <FONT COLOR=#115511>"pickle.dat"</FONT>)
+
+<FONT COLOR=#1111CC># Now, Create an Unpickler, and get Mike back</FONT>
+U = pickle.Unpickler(<FONT COLOR=#115511>"pickle.dat"</FONT>)
+<FONT COLOR=#1111CC># Read from the pickler</FONT>
+Mike = U.load()
+<FONT COLOR=#1111CC># Do it in one line</FONT>
+Mike2 = pickle.load(<FONT COLOR=#115511>"pickle.dat"</FONT>)
+
+<FONT COLOR=#1111CC># Just something to keep in mind:</FONT>
+<FONT COLOR=#1111CC># For more sophisticated usage, you may want to use the Shelve module,</FONT>
+<FONT COLOR=#1111CC># or other Database modules.</FONT>
+</PRE>
+                  <!--footer-->
+                  </BODY>

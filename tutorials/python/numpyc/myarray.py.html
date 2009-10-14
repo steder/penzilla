@@ -1,0 +1,30 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#3333CC><B>import</B></FONT> _myarray
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="identity"><FONT COLOR=#CC0000><B> identity</B></FONT></A>( array ):
+    <FONT COLOR=#115511>"""
+    identity_of_array = identity( array )
+
+    This method simply returns the array unchanged.
+    """</FONT>
+    <FONT COLOR=#3333CC><B>return</B></FONT> _myarray.identity( array )
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="create_array"><FONT COLOR=#CC0000><B> create_array</B></FONT></A>( n ):
+    <FONT COLOR=#115511>"""
+    &gt;&gt;&gt; newArray = create_array( 7 )
+    &gt;&gt;&gt; print newArray
+    array([0, 1, 2, 3, 4, 5, 6],'i')
+
+    This method simply creates a new array and initializes it's values
+    to 0 -&gt; N-1.
+    """</FONT>
+
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
+    <FONT COLOR=#3333CC><B>import</B></FONT> Numeric
+    A = Numeric.zeros((5,5),Numeric.Int32)
+    <FONT COLOR=#3333CC><B>print</B></FONT> identity( A )
+</PRE>
+                  <!--footer-->
+                  </BODY>

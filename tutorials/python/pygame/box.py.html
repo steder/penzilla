@@ -1,0 +1,59 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#3333CC><B>import</B></FONT> pygame
+<FONT COLOR=#3333CC><B>from</B></FONT> pygame.locals <FONT COLOR=#3333CC><B>import</B></FONT> *
+
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Box"><FONT COLOR=#CC0000><B> Box</B></FONT></A>:
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, screen, size, velocities, background, boxcolor):
+        self.screen = screen
+        screensize = self.screen.get_size()
+        self.screenwidth = screensize[0]
+        self.screenheight = screensize[1]
+        <FONT COLOR=#1111CC># Position of Box on the Screen</FONT>
+        <FONT COLOR=#1111CC># Box will start roughly in the middle of the screen.</FONT>
+        self.x = screensize[0]/2
+        self.y = screensize[1]/2
+        self.width = size[0]
+        self.height = size[1]
+        <FONT COLOR=#1111CC># Velocity of the box</FONT>
+        self.vx = velocities[0]
+        self.vy = velocities[1]
+        self.bgcolor = background
+        self.boxcolor = boxcolor
+        self.rect = pygame.rect.Rect(self.x, self.y, self.width, self.height)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="draw"><FONT COLOR=#CC0000><B> draw</B></FONT></A>(self):
+        <FONT COLOR=#1111CC># Erase the previous box</FONT>
+        pygame.draw.rect( self.screen, self.bgcolor, self.rect )
+        <FONT COLOR=#1111CC># Update position or reverse direction</FONT>
+        <FONT COLOR=#1111CC># Check for collision with the sides:</FONT>
+        nx, ny = self.x + self.vx, self.y + self.vy
+        bound_x = nx + self.width
+        bound_y = ny + self.height
+        <FONT COLOR=#3333CC><B>if</B></FONT>( (bound_x &gt;= self.screenwidth) <FONT COLOR=#3333CC><B>or</B></FONT>
+             (nx &lt;= 0) ):
+            self.vx *= -1 * 0.9 <FONT COLOR=#1111CC># Bounces decrease velocity slightly</FONT>
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            self.x = nx
+        <FONT COLOR=#3333CC><B>if</B></FONT>( (bound_y &gt;= self.screenheight) <FONT COLOR=#3333CC><B>or</B></FONT>
+             (ny &lt;= 0 ) ):
+            self.vy *= -1 * 0.9
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            self.y = ny
+        <FONT COLOR=#1111CC># Draw the new box</FONT>
+        self.rect = pygame.rect.Rect(nx, ny, self.width, self.height)
+        pygame.draw.rect( self.screen, self.boxcolor, self.rect )
+        
+        
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="setV"><FONT COLOR=#CC0000><B> setV</B></FONT></A>(self,x,y):
+        self.vx = x
+        self.vy = y
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="setBackgroundColor"><FONT COLOR=#CC0000><B> setBackgroundColor</B></FONT></A>(self, color):
+        self.bgcolor=color
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="setBoxColor"><FONT COLOR=#CC0000><B> setBoxColor</B></FONT></A>(self, color):
+        self.boxcolor=color
+</PRE>
+                  <!--footer-->
+                  </BODY>

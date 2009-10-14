@@ -1,0 +1,239 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#!/usr/bin/env python</FONT>
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC># glock.py:                 Global mutex</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># See __doc__ string below.</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># Requires:</FONT>
+<FONT COLOR=#1111CC>#    - Python 1.5.2 or newer (www.python.org)</FONT>
+<FONT COLOR=#1111CC>#    - On windows: win32 extensions installed</FONT>
+<FONT COLOR=#1111CC>#           (http://www.python.org/windows/win32all/win32all.exe)</FONT>
+<FONT COLOR=#1111CC>#    - OS: Unix, Windows.</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># $Id: //depot/rgutils/rgutils/glock.py#1 $</FONT>
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#115511>'''
+This module defines the class GlobalLock that implements a global
+(inter-process) mutex that works on Windows and Unix, using file-locking on
+Unix (I also tried this approach on Windows but got some tricky problems so I
+ended using a Win32 Mutex).
+
+@see: class L{GlobalLock} for more details.
+'''</FONT>
+__version__ = <FONT COLOR=#115511>'0.2.'</FONT> + <FONT COLOR=#115511>'$Revision: #1 $'</FONT>[12:-2]
+__author__ = <FONT COLOR=#115511>'Richard Gruet'</FONT>, <FONT COLOR=#115511>'rjgruet@yahoo.com'</FONT>
+__date__    = <FONT COLOR=#115511>'$Date: 2003/05/23 $'</FONT>[7:-2], <FONT COLOR=#115511>'$Author: rgruet $'</FONT>[9:-2]
+__since__ = <FONT COLOR=#115511>'2000-01-22'</FONT>
+__doc__ += <FONT COLOR=#115511>'\n@author: %s (U{%s})\n@version: %s'</FONT> % (__author__[0],
+                                            __author__[1], __version__)
+__all__ = [<FONT COLOR=#115511>'GlobalLock'</FONT>, <FONT COLOR=#115511>'GlobalLockError'</FONT>, <FONT COLOR=#115511>'NotOwner'</FONT>]
+
+<FONT COLOR=#1111CC># Imports:</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> sys, string, os
+
+<FONT COLOR=#1111CC># System-dependent imports for locking implementation:</FONT>
+_windows = (sys.platform == <FONT COLOR=#115511>'win32'</FONT>)
+
+<FONT COLOR=#3333CC><B>if</B></FONT> _windows:
+    <FONT COLOR=#3333CC><B>try</B></FONT>:
+        <FONT COLOR=#3333CC><B>import</B></FONT> win32event, win32api, pywintypes
+    <FONT COLOR=#3333CC><B>except</B></FONT> ImportError:
+        sys.stderr.write(<FONT COLOR=#115511>'The win32 extensions need to be installed!'</FONT>)
+<FONT COLOR=#3333CC><B>else</B></FONT>:   <FONT COLOR=#1111CC># assume Unix</FONT>
+    <FONT COLOR=#3333CC><B>try</B></FONT>:
+        <FONT COLOR=#3333CC><B>import</B></FONT> fcntl
+    <FONT COLOR=#3333CC><B>except</B></FONT> ImportError:
+        sys.stderr.write(<FONT COLOR=#115511>"On what kind of OS am I ? (Mac?) I should be on "</FONT>
+                         <FONT COLOR=#115511>"Unix but can't import fcntl.\n"</FONT>)
+        <FONT COLOR=#3333CC><B>raise</B></FONT>
+    <FONT COLOR=#3333CC><B>import</B></FONT> threading
+
+<FONT COLOR=#1111CC># Exceptions :</FONT>
+<FONT COLOR=#1111CC># ----------</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="GlobalLockError"><FONT COLOR=#CC0000><B> GlobalLockError</B></FONT></A>(Exception):
+    <FONT COLOR=#115511>''' Error raised by the glock module.
+    '''</FONT>
+    <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="NotOwner"><FONT COLOR=#CC0000><B> NotOwner</B></FONT></A>(GlobalLockError):
+    <FONT COLOR=#115511>''' Attempt to release somebody else's lock.
+    '''</FONT>
+    <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+
+<FONT COLOR=#1111CC># Constants</FONT>
+<FONT COLOR=#1111CC># ---------:</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> sys.version[:3] &lt; <FONT COLOR=#115511>'2.2'</FONT>:
+    True, False = 1, 0  <FONT COLOR=#1111CC># built-in in Python 2.2</FONT>
+
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="GlobalLock"><FONT COLOR=#CC0000><B> GlobalLock</B></FONT></A>:
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#115511>''' A global mutex.
+
+        B{Specification}
+        
+         - The lock must act as a global mutex, ie block between different
+           candidate processus, but ALSO between different candidate
+           threads of the same process.
+         
+         - It must NOT block in case of reentrant lock request issued by
+           the SAME thread.
+         - Extraneous unlocks should be ideally harmless.
+
+        B{Implementation}
+
+        In Python there is no portable global lock AFAIK. There is only a
+        LOCAL/ in-process Lock mechanism (threading.RLock), so we have to
+        implement our own solution:
+
+         - Unix: use fcntl.flock(). Recursive calls OK. Different process OK.
+           But &lt;&gt; threads, same process don't block so we have to use an extra
+           threading.RLock to fix that point.
+         - Windows: We use WIN32 mutex from Python Win32 extensions. Can't use
+           std module msvcrt.locking(), because global lock is OK, but
+           blocks also for 2 calls from the same thread!
+    '''</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, fpath, lockInitially=False):
+        <FONT COLOR=#115511>''' Creates (or opens) a global lock.
+
+            @param fpath: Path of the file used as lock target. This is also
+                         the global id of the lock. The file will be created
+                         if non existent.
+            @param lockInitially: if True locks initially.
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> _windows:
+            self.name = string.replace(fpath, <FONT COLOR=#115511>'\\'</FONT>, <FONT COLOR=#115511>'_'</FONT>)
+            self.mutex = win32event.CreateMutex(None, lockInitially, self.name)
+        <FONT COLOR=#3333CC><B>else</B></FONT>: <FONT COLOR=#1111CC># Unix</FONT>
+            self.name = fpath
+            self.flock = open(fpath, <FONT COLOR=#115511>'w'</FONT>)
+            self.fdlock = self.flock.fileno()
+            self.threadLock = threading.RLock()
+        <FONT COLOR=#3333CC><B>if</B></FONT> lockInitially:
+            self.acquire()
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__del__"><FONT COLOR=#CC0000><B> __del__</B></FONT></A>(self):
+        <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>'__del__ called'</FONT> <FONT COLOR=#1111CC>##</FONT>
+        <FONT COLOR=#3333CC><B>try</B></FONT>: self.release()
+        <FONT COLOR=#3333CC><B>except</B></FONT>: <FONT COLOR=#3333CC><B>pass</B></FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> _windows:
+            win32api.CloseHandle(self.mutex)
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#3333CC><B>try</B></FONT>: self.flock.close()
+            <FONT COLOR=#3333CC><B>except</B></FONT>: <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__repr__"><FONT COLOR=#CC0000><B> __repr__</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> <FONT COLOR=#115511>'&lt;Global lock @ %s&gt;'</FONT> % self.name
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="acquire"><FONT COLOR=#CC0000><B> acquire</B></FONT></A>(self):
+        <FONT COLOR=#115511>''' Locks. Suspends caller until done.
+
+            On windows an IOError is raised after ~10 sec if the lock
+            can't be acquired.
+            @exception GlobalLockError: if lock can't be acquired (timeout)
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> _windows:
+            r = win32event.WaitForSingleObject(self.mutex, win32event.INFINITE)
+            <FONT COLOR=#3333CC><B>if</B></FONT> r == win32event.WAIT_FAILED:
+                <FONT COLOR=#3333CC><B>raise</B></FONT> GlobalLockError(<FONT COLOR=#115511>"Can't acquire mutex."</FONT>)
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#1111CC># Acquire 1st the global (inter-process) lock:</FONT>
+            <FONT COLOR=#3333CC><B>try</B></FONT>:
+                fcntl.flock(self.fdlock, fcntl.LOCK_EX) <FONT COLOR=#1111CC># blocking</FONT>
+            <FONT COLOR=#3333CC><B>except</B></FONT> IOError: <FONT COLOR=#1111CC>#(errno 13: perm. denied,</FONT>
+                            <FONT COLOR=#1111CC>#       36: Resource deadlock avoided)</FONT>
+                <FONT COLOR=#3333CC><B>raise</B></FONT> GlobalLockError(<FONT COLOR=#115511>'Cannot acquire lock on "file" %s\n'</FONT> %
+                                        self.name)
+            <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>'got file lock.'</FONT> <FONT COLOR=#1111CC>##</FONT>
+            <FONT COLOR=#1111CC># Then acquire the local (inter-thread) lock:</FONT>
+            self.threadLock.acquire()
+            <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>'got thread lock.'</FONT> <FONT COLOR=#1111CC>##</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="release"><FONT COLOR=#CC0000><B> release</B></FONT></A>(self):
+        <FONT COLOR=#115511>''' Unlocks. (caller must own the lock!)
+
+            @return: The lock count.
+            @exception IOError: if file lock can't be released
+            @exception NotOwner: Attempt to release somebody else's lock.
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> _windows:
+            <FONT COLOR=#3333CC><B>try</B></FONT>:
+                win32event.ReleaseMutex(self.mutex)
+            <FONT COLOR=#3333CC><B>except</B></FONT> pywintypes.error, e:
+                errCode, fctName, errMsg =  e.args
+                <FONT COLOR=#3333CC><B>if</B></FONT> errCode == 288:
+                    <FONT COLOR=#3333CC><B>raise</B></FONT> NotOwner(<FONT COLOR=#115511>"Attempt to release somebody else's lock"</FONT>)
+                <FONT COLOR=#3333CC><B>else</B></FONT>:
+                    <FONT COLOR=#3333CC><B>raise</B></FONT> GlobalLockError(<FONT COLOR=#115511>'%s: err#%d: %s'</FONT> % (fctName, errCode,
+                                                              errMsg))
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#1111CC># Acquire 1st the local (inter-thread) lock:</FONT>
+            <FONT COLOR=#3333CC><B>try</B></FONT>:
+                self.threadLock.release()
+            <FONT COLOR=#3333CC><B>except</B></FONT> AssertionError:
+                <FONT COLOR=#3333CC><B>raise</B></FONT> NotOwner(<FONT COLOR=#115511>"Attempt to release somebody else's lock"</FONT>)
+
+            <FONT COLOR=#1111CC># Then release the global (inter-process) lock:</FONT>
+            <FONT COLOR=#3333CC><B>try</B></FONT>:
+                fcntl.flock(self.fdlock, fcntl.LOCK_UN)
+            <FONT COLOR=#3333CC><B>except</B></FONT> IOError: <FONT COLOR=#1111CC># (errno 13: permission denied)</FONT>
+                <FONT COLOR=#3333CC><B>raise</B></FONT> GlobalLockError(<FONT COLOR=#115511>'Unlock of file "%s" failed\n'</FONT> %
+                                                            self.name)
+
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test"><FONT COLOR=#CC0000><B> test</B></FONT></A>():
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Testing glock.py...'</FONT> 
+    
+    <FONT COLOR=#1111CC># unfortunately can't test inter-process lock here!</FONT>
+    lockName = <FONT COLOR=#115511>'myFirstLock'</FONT>
+    l = GlobalLock(lockName)
+    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> _windows:
+        assert os.path.exists(lockName)
+    l.acquire()
+    l.acquire() <FONT COLOR=#1111CC># reentrant lock, must not block</FONT>
+    l.release()
+    l.release()
+    <FONT COLOR=#3333CC><B>if</B></FONT> _windows:
+        <FONT COLOR=#3333CC><B>try</B></FONT>: l.release()
+        <FONT COLOR=#3333CC><B>except</B></FONT> NotOwner: <FONT COLOR=#3333CC><B>pass</B></FONT>
+        <FONT COLOR=#3333CC><B>else</B></FONT>: <FONT COLOR=#3333CC><B>raise</B></FONT> Exception(<FONT COLOR=#115511>'should have raised a NotOwner exception'</FONT>)
+
+    <FONT COLOR=#1111CC># Check that &lt;&gt; threads of same process do block:</FONT>
+    <FONT COLOR=#3333CC><B>import</B></FONT> threading, time
+    thread = threading.Thread(target=threadMain, args=(l,))
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'main: locking...'</FONT>,
+    l.acquire()
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>' done.'</FONT>
+    thread.start()
+    time.sleep(3)
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'\nmain: unlocking...'</FONT>,
+    l.release()
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>' done.'</FONT>
+    time.sleep(0.1)
+    
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'=&gt; Test of glock.py passed.'</FONT>
+    <FONT COLOR=#3333CC><B>return</B></FONT> l
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="threadMain"><FONT COLOR=#CC0000><B> threadMain</B></FONT></A>(lock):
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'thread started(%s).'</FONT> % lock
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'thread: locking (should stay blocked for ~ 3 sec)...'</FONT>,
+    lock.acquire()
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'thread: locking done.'</FONT>
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'thread: unlocking...'</FONT>,
+    lock.release()
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>' done.'</FONT>
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'thread ended.'</FONT>
+
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC>#       M A I N</FONT>
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__ == <FONT COLOR=#115511>"__main__"</FONT>:
+    l = test()
+</PRE>
+                  <!--footer-->
+                  </BODY>

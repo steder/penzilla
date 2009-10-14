@@ -1,0 +1,277 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/mpi-python/pympi/max.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#3333CC><B>import</B></FONT> curses, traceback, string, os
+<FONT COLOR=#3333CC><B>import</B></FONT> dmTxt2Html
+
+<FONT COLOR=#1111CC>#-- Define the appearance of some interface elements</FONT>
+hotkey_attr = curses.A_BOLD | curses.A_UNDERLINE
+menu_attr = curses.A_NORMAL
+
+<FONT COLOR=#1111CC>#-- Define additional constants</FONT>
+EXIT = 0
+CONTINUE = 1
+
+<FONT COLOR=#1111CC>#-- Define default conversion dictionary</FONT>
+cfg_dict = {<FONT COLOR=#115511>'target'</FONT>: <FONT COLOR=#115511>'DEFAULT.HTML'</FONT>,
+            <FONT COLOR=#115511>'source'</FONT>: <FONT COLOR=#115511>'txt2html.txt'</FONT>,
+            <FONT COLOR=#115511>'type'</FONT>:   <FONT COLOR=#115511>'INFER'</FONT>,
+            <FONT COLOR=#115511>'proxy'</FONT>:  <FONT COLOR=#115511>'NONE'</FONT> }
+counter = 0
+dmTxt2Html.promo = string.replace(dmTxt2Html.promo, dmTxt2Html.cgi_home, <FONT COLOR=#115511>''</FONT>)
+
+
+<FONT COLOR=#1111CC>#-- Give screen module scope</FONT>
+screen = None
+
+<FONT COLOR=#1111CC>#-- Create the topbar menu</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="topbar_menu"><FONT COLOR=#CC0000><B> topbar_menu</B></FONT></A>(menus):
+    left = 2
+    <FONT COLOR=#3333CC><B>for</B></FONT> menu <FONT COLOR=#3333CC><B>in</B></FONT> menus:
+        menu_name = menu[0]
+        menu_hotkey = menu_name[0]
+        menu_no_hot = menu_name[1:]
+        screen.addstr(1, left, menu_hotkey, hotkey_attr)
+        screen.addstr(1, left+1, menu_no_hot, menu_attr)
+        left = left + len(menu_name) + 3
+        <FONT COLOR=#1111CC># Add key handlers for this hotkey</FONT>
+        topbar_key_handler((string.upper(menu_hotkey), menu[1]))
+        topbar_key_handler((string.lower(menu_hotkey), menu[1]))
+    <FONT COLOR=#1111CC># Little aesthetic thing to display application title</FONT>
+    screen.addstr(1, left-1, 
+                  <FONT COLOR=#115511>"&gt;"</FONT>*(52-left)+ <FONT COLOR=#115511>" Txt2Html Curses Interface"</FONT>,
+                  curses.A_STANDOUT) 
+    screen.refresh()
+
+<FONT COLOR=#1111CC>#-- Magic key handler both loads and processes keys strokes</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="topbar_key_handler"><FONT COLOR=#CC0000><B> topbar_key_handler</B></FONT></A>(key_assign=None, key_dict={}):
+    <FONT COLOR=#3333CC><B>if</B></FONT> key_assign:
+        key_dict[ord(key_assign[0])] = key_assign[1]
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        c = screen.getch()
+        <FONT COLOR=#3333CC><B>if</B></FONT> c <FONT COLOR=#3333CC><B>in</B></FONT> (curses.KEY_END, ord(<FONT COLOR=#115511>'!'</FONT>)):
+            <FONT COLOR=#3333CC><B>return</B></FONT> 0
+        <FONT COLOR=#3333CC><B>elif</B></FONT> c <FONT COLOR=#3333CC><B>not</B></FONT> <FONT COLOR=#3333CC><B>in</B></FONT> key_dict.keys():
+            curses.beep()
+            <FONT COLOR=#3333CC><B>return</B></FONT> 1
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#3333CC><B>return</B></FONT> eval(key_dict[c])
+
+<FONT COLOR=#1111CC>#-- Handlers for the topbar menus        </FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="help_func"><FONT COLOR=#CC0000><B> help_func</B></FONT></A>(): 
+    help_lines = []
+    offset = 0
+    fh_help = open(<FONT COLOR=#115511>'txt2html.txt'</FONT>)
+    <FONT COLOR=#3333CC><B>for</B></FONT> line <FONT COLOR=#3333CC><B>in</B></FONT> fh_help.readlines():
+        help_lines.append(string.rstrip(line))
+    s = curses.newwin(19, 77, 3, 1)
+    s.box()
+    num_lines = len(help_lines)
+    end = 0
+    <FONT COLOR=#3333CC><B>while</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> end:
+        <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> range(1,18):
+            <FONT COLOR=#3333CC><B>if</B></FONT> i+offset &lt; num_lines:
+                line = string.ljust(help_lines[i+offset],74)[:74]
+            <FONT COLOR=#3333CC><B>else</B></FONT>:
+                line = <FONT COLOR=#115511>" "</FONT>*74
+                end = 1
+            <FONT COLOR=#3333CC><B>if</B></FONT> i&lt;3 <FONT COLOR=#3333CC><B>and</B></FONT> offset&gt;0: s.addstr(i, 2, line, curses.A_BOLD) 
+            <FONT COLOR=#3333CC><B>else</B></FONT>: s.addstr(i, 2, line, curses.A_NORMAL)
+        s.refresh()
+        c = s.getch()
+        offset = offset+15
+    s.erase()
+    <FONT COLOR=#3333CC><B>return</B></FONT> CONTINUE
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="update_txt2html"><FONT COLOR=#CC0000><B> update_txt2html</B></FONT></A>():
+    <FONT COLOR=#1111CC># Check for updated functions (fail gracefully if not fetchable)</FONT>
+    s = curses.newwin(6, 60, 4, 5)
+    s.box()
+    s.addstr(1, 2, <FONT COLOR=#115511>"* PRESS ANY KEY TO CONTINUE *"</FONT>, curses.A_BOLD)
+    s.addstr(3, 2, <FONT COLOR=#115511>"...downloading..."</FONT>)
+    s.refresh()
+    <FONT COLOR=#3333CC><B>try</B></FONT>:
+        <FONT COLOR=#3333CC><B>from</B></FONT> urllib <FONT COLOR=#3333CC><B>import</B></FONT> urlopen
+        updates = urlopen(<FONT COLOR=#115511>'http://gnosis.cx/download/dmTxt2Html.py'</FONT>).read()
+        fh = open(<FONT COLOR=#115511>'dmTxt2Html.py'</FONT>, <FONT COLOR=#115511>'w'</FONT>)
+        fh.write(updates)
+        fh.close()
+        s.addstr(3, 2, <FONT COLOR=#115511>"Module [dmTxt2Html] downloaded to current directory"</FONT>)
+    <FONT COLOR=#3333CC><B>except</B></FONT>:
+        s.addstr(3, 2,  <FONT COLOR=#115511>"Download of updated [dmTxt2Html] module failed!"</FONT>)
+    reload(dmTxt2Html)
+    s.addstr(4, 2, <FONT COLOR=#115511>"Module [dmTxt2Html] reloaded from current directory  "</FONT>)
+    s.refresh()
+    c = s.getch()
+    s.erase()
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="file_func"><FONT COLOR=#CC0000><B> file_func</B></FONT></A>():
+    s = curses.newwin(6,10,2,1)
+    s.box()
+    s.addstr(1,2, <FONT COLOR=#115511>"I"</FONT>, hotkey_attr)
+    s.addstr(1,3, <FONT COLOR=#115511>"nput"</FONT>, menu_attr)
+    s.addstr(2,2, <FONT COLOR=#115511>"O"</FONT>, hotkey_attr)
+    s.addstr(2,3, <FONT COLOR=#115511>"utput"</FONT>, menu_attr)
+    s.addstr(3,2, <FONT COLOR=#115511>"T"</FONT>, hotkey_attr)
+    s.addstr(3,3, <FONT COLOR=#115511>"ype"</FONT>, menu_attr)
+    s.addstr(4,2, <FONT COLOR=#115511>"U"</FONT>, hotkey_attr)
+    s.addstr(4,3, <FONT COLOR=#115511>"pdate"</FONT>, menu_attr)
+    s.addstr(1,2, <FONT COLOR=#115511>""</FONT>, hotkey_attr)
+    s.refresh()
+    c = s.getch()
+    <FONT COLOR=#3333CC><B>if</B></FONT> c <FONT COLOR=#3333CC><B>in</B></FONT> (ord(<FONT COLOR=#115511>'U'</FONT>), ord(<FONT COLOR=#115511>'u'</FONT>)):  <FONT COLOR=#1111CC># Remote function update</FONT>
+        update_txt2html()
+    <FONT COLOR=#3333CC><B>elif</B></FONT> c <FONT COLOR=#3333CC><B>in</B></FONT> (ord(<FONT COLOR=#115511>'I'</FONT>), ord(<FONT COLOR=#115511>'i'</FONT>), curses.KEY_ENTER, 10):
+        curses.echo()
+        s.erase()
+        screen.addstr(5,33, <FONT COLOR=#115511>" "</FONT>*43, curses.A_UNDERLINE)
+        cfg_dict[<FONT COLOR=#115511>'source'</FONT>] = screen.getstr(5,33)
+        curses.noecho()    
+    <FONT COLOR=#3333CC><B>elif</B></FONT> c <FONT COLOR=#3333CC><B>in</B></FONT> (ord(<FONT COLOR=#115511>'O'</FONT>), ord(<FONT COLOR=#115511>'o'</FONT>)):
+        curses.echo()
+        s.erase()
+        screen.addstr(8,33, <FONT COLOR=#115511>" "</FONT>*43, curses.A_UNDERLINE)
+        cfg_dict[<FONT COLOR=#115511>'target'</FONT>] = screen.getstr(8,33)
+        curses.noecho()    
+    <FONT COLOR=#3333CC><B>elif</B></FONT> c <FONT COLOR=#3333CC><B>in</B></FONT> (ord(<FONT COLOR=#115511>'T'</FONT>), ord(<FONT COLOR=#115511>'t'</FONT>)):
+        s.addstr(3,7, <FONT COLOR=#115511>"-&gt;"</FONT>, menu_attr)
+        s.refresh()
+        s2 = curses.newwin(8,15,4,10)
+        s2.box()
+        s2.addstr(1,2, <FONT COLOR=#115511>"H"</FONT>, hotkey_attr)
+        s2.addstr(1,3, <FONT COLOR=#115511>"TML"</FONT>, menu_attr)
+        s2.addstr(2,2, <FONT COLOR=#115511>"P"</FONT>, hotkey_attr)
+        s2.addstr(2,3, <FONT COLOR=#115511>"ython"</FONT>, menu_attr)
+        s2.addstr(3,2, <FONT COLOR=#115511>"F"</FONT>, hotkey_attr)
+        s2.addstr(3,3, <FONT COLOR=#115511>"AQ"</FONT>, menu_attr)
+        s2.addstr(4,2, <FONT COLOR=#115511>"S"</FONT>, hotkey_attr)
+        s2.addstr(4,3, <FONT COLOR=#115511>"mart_ASCII"</FONT>, menu_attr)
+        s2.addstr(5,2, <FONT COLOR=#115511>"R"</FONT>, hotkey_attr)
+        s2.addstr(5,3, <FONT COLOR=#115511>"aw"</FONT>, menu_attr)
+        s2.addstr(6,2, <FONT COLOR=#115511>"I"</FONT>, hotkey_attr)
+        s2.addstr(6,3, <FONT COLOR=#115511>"nfer Type"</FONT>, menu_attr)
+        s2.addstr(6,2, <FONT COLOR=#115511>""</FONT>, hotkey_attr)
+        s2.refresh()
+        c = s2.getch()
+        <FONT COLOR=#3333CC><B>if</B></FONT> c <FONT COLOR=#3333CC><B>in</B></FONT> (ord(<FONT COLOR=#115511>'I'</FONT>), ord(<FONT COLOR=#115511>'i'</FONT>), curses.KEY_ENTER, 10): 
+            cfg_dict[<FONT COLOR=#115511>'type'</FONT>] = <FONT COLOR=#115511>'INFER'</FONT>
+        <FONT COLOR=#3333CC><B>elif</B></FONT> c <FONT COLOR=#3333CC><B>in</B></FONT> (ord(<FONT COLOR=#115511>'H'</FONT>), ord(<FONT COLOR=#115511>'h'</FONT>)): cfg_dict[<FONT COLOR=#115511>'type'</FONT>] = <FONT COLOR=#115511>'HTML'</FONT>
+        <FONT COLOR=#3333CC><B>elif</B></FONT> c <FONT COLOR=#3333CC><B>in</B></FONT> (ord(<FONT COLOR=#115511>'P'</FONT>), ord(<FONT COLOR=#115511>'p'</FONT>)): cfg_dict[<FONT COLOR=#115511>'type'</FONT>] = <FONT COLOR=#115511>'PYTHON'</FONT> 
+        <FONT COLOR=#3333CC><B>elif</B></FONT> c <FONT COLOR=#3333CC><B>in</B></FONT> (ord(<FONT COLOR=#115511>'F'</FONT>), ord(<FONT COLOR=#115511>'f'</FONT>)): cfg_dict[<FONT COLOR=#115511>'type'</FONT>] = <FONT COLOR=#115511>'FAQ'</FONT>
+        <FONT COLOR=#3333CC><B>elif</B></FONT> c <FONT COLOR=#3333CC><B>in</B></FONT> (ord(<FONT COLOR=#115511>'S'</FONT>), ord(<FONT COLOR=#115511>'s'</FONT>)): cfg_dict[<FONT COLOR=#115511>'type'</FONT>] = <FONT COLOR=#115511>'SMART_ASCII'</FONT> 
+        <FONT COLOR=#3333CC><B>elif</B></FONT> c <FONT COLOR=#3333CC><B>in</B></FONT> (ord(<FONT COLOR=#115511>'R'</FONT>), ord(<FONT COLOR=#115511>'r'</FONT>)): cfg_dict[<FONT COLOR=#115511>'type'</FONT>] = <FONT COLOR=#115511>'RAW'</FONT> 
+        <FONT COLOR=#3333CC><B>else</B></FONT>: curses.beep()
+        s2.erase()
+        s.erase()
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        curses.beep()
+        s.erase()        
+    <FONT COLOR=#3333CC><B>return</B></FONT> CONTINUE
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="doit_func"><FONT COLOR=#CC0000><B> doit_func</B></FONT></A>(): 
+    <FONT COLOR=#3333CC><B>global</B></FONT> counter
+    counter = counter+1
+    <FONT COLOR=#3333CC><B>if</B></FONT> cfg_dict[<FONT COLOR=#115511>'type'</FONT>] == <FONT COLOR=#115511>'INFER'</FONT>:
+        cfg_dict[<FONT COLOR=#115511>'type'</FONT>] = dmTxt2Html.infer_type(cfg_dict[<FONT COLOR=#115511>'source'</FONT>])
+    dmTxt2Html.main(cfg_dict)
+    <FONT COLOR=#3333CC><B>return</B></FONT> CONTINUE
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="proxy_func"><FONT COLOR=#CC0000><B> proxy_func</B></FONT></A>(): 
+    s = curses.newwin(6, 15, 2, 8)
+    s.box()
+    s.addstr(1, 2, <FONT COLOR=#115511>"P"</FONT>, hotkey_attr)
+    s.addstr(1, 3, <FONT COLOR=#115511>"roxy Bar"</FONT>, menu_attr)
+    s.addstr(2, 2, <FONT COLOR=#115511>"T"</FONT>, hotkey_attr)
+    s.addstr(2, 3, <FONT COLOR=#115511>"rap Links"</FONT>, menu_attr)
+    s.addstr(3, 2, <FONT COLOR=#115511>"A"</FONT>, hotkey_attr)
+    s.addstr(3, 3, <FONT COLOR=#115511>"ll Proxyes"</FONT>, menu_attr)
+    s.addstr(4, 2, <FONT COLOR=#115511>"N"</FONT>, hotkey_attr)
+    s.addstr(4, 3, <FONT COLOR=#115511>"o Proxies"</FONT>, menu_attr)
+    s.addstr(4, 2, <FONT COLOR=#115511>""</FONT>, hotkey_attr)
+    s.refresh()
+    c = s.getch()
+    s.erase()
+    <FONT COLOR=#3333CC><B>if</B></FONT> c <FONT COLOR=#3333CC><B>in</B></FONT> (ord(<FONT COLOR=#115511>'N'</FONT>), ord(<FONT COLOR=#115511>'n'</FONT>), curses.KEY_ENTER, 10): 
+        cfg_dict[<FONT COLOR=#115511>'proxy'</FONT>] = <FONT COLOR=#115511>'NONE'</FONT>
+    <FONT COLOR=#3333CC><B>elif</B></FONT> c <FONT COLOR=#3333CC><B>in</B></FONT> (ord(<FONT COLOR=#115511>'P'</FONT>), ord(<FONT COLOR=#115511>'p'</FONT>)): cfg_dict[<FONT COLOR=#115511>'proxy'</FONT>] = <FONT COLOR=#115511>'NAVIGATOR'</FONT>
+    <FONT COLOR=#3333CC><B>elif</B></FONT> c <FONT COLOR=#3333CC><B>in</B></FONT> (ord(<FONT COLOR=#115511>'T'</FONT>), ord(<FONT COLOR=#115511>'t'</FONT>)): cfg_dict[<FONT COLOR=#115511>'proxy'</FONT>] = <FONT COLOR=#115511>'TRAP_LINKS'</FONT> 
+    <FONT COLOR=#3333CC><B>elif</B></FONT> c <FONT COLOR=#3333CC><B>in</B></FONT> (ord(<FONT COLOR=#115511>'A'</FONT>), ord(<FONT COLOR=#115511>'a'</FONT>)): cfg_dict[<FONT COLOR=#115511>'proxy'</FONT>] = <FONT COLOR=#115511>'ALL'</FONT>
+    <FONT COLOR=#3333CC><B>else</B></FONT>: curses.beep()
+    <FONT COLOR=#3333CC><B>return</B></FONT> CONTINUE
+
+<FONT COLOR=#1111CC>#-- Display the currently selected options</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="draw_dict"><FONT COLOR=#CC0000><B> draw_dict</B></FONT></A>():
+    screen.addstr(5,33, <FONT COLOR=#115511>" "</FONT>*43, curses.A_NORMAL)
+    screen.addstr(8,33, <FONT COLOR=#115511>" "</FONT>*43, curses.A_NORMAL)
+    screen.addstr(11,33, <FONT COLOR=#115511>" "</FONT>*43, curses.A_NORMAL)
+    screen.addstr(14,33, <FONT COLOR=#115511>" "</FONT>*43, curses.A_NORMAL)
+    screen.addstr(5, 33, cfg_dict[<FONT COLOR=#115511>'source'</FONT>], curses.A_STANDOUT)
+    screen.addstr(8, 33, cfg_dict[<FONT COLOR=#115511>'target'</FONT>], curses.A_STANDOUT)
+    screen.addstr(11,33, cfg_dict[<FONT COLOR=#115511>'type'</FONT>], curses.A_STANDOUT)
+    screen.addstr(14,33, cfg_dict[<FONT COLOR=#115511>'proxy'</FONT>], curses.A_STANDOUT)
+    screen.addstr(17,33, str(counter), curses.A_STANDOUT)
+    screen.refresh()
+    
+
+<FONT COLOR=#1111CC>#-- Top level function call (everything except [curses] setup/cleanup)</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="main"><FONT COLOR=#CC0000><B> main</B></FONT></A>(stdscr):
+    <FONT COLOR=#1111CC># Frame the interface area at fixed VT100 size</FONT>
+    <FONT COLOR=#3333CC><B>global</B></FONT> screen
+    screen = stdscr.subwin(23, 79, 0, 0)
+    screen.box()
+    screen.hline(2, 1, curses.ACS_HLINE, 77)
+    screen.refresh()
+
+    <FONT COLOR=#1111CC># Define the topbar menus</FONT>
+    file_menu = (<FONT COLOR=#115511>"File"</FONT>, <FONT COLOR=#115511>"file_func()"</FONT>)
+    proxy_menu = (<FONT COLOR=#115511>"Proxy Mode"</FONT>, <FONT COLOR=#115511>"proxy_func()"</FONT>)
+    doit_menu = (<FONT COLOR=#115511>"Do It!"</FONT>, <FONT COLOR=#115511>"doit_func()"</FONT>)
+    help_menu = (<FONT COLOR=#115511>"Help"</FONT>, <FONT COLOR=#115511>"help_func()"</FONT>)
+    exit_menu = (<FONT COLOR=#115511>"Exit"</FONT>, <FONT COLOR=#115511>"EXIT"</FONT>)
+
+    <FONT COLOR=#1111CC># Add the topbar menus to screen object</FONT>
+    topbar_menu((file_menu, proxy_menu, doit_menu, help_menu, exit_menu))
+
+    <FONT COLOR=#1111CC># Draw the onscreen field titles</FONT>
+    screen.addstr(5, 4, <FONT COLOR=#115511>"           Source of Input:"</FONT>, curses.A_BOLD)
+    screen.addstr(8, 4, <FONT COLOR=#115511>"        Output Destination:"</FONT>, curses.A_BOLD)
+    screen.addstr(11, 4,<FONT COLOR=#115511>"           Conversion Type:"</FONT>, curses.A_BOLD)
+    screen.addstr(14, 4,<FONT COLOR=#115511>"                Proxy Mode:"</FONT>, curses.A_BOLD)
+    screen.addstr(17, 4,<FONT COLOR=#115511>"Conversions during Session:"</FONT>, curses.A_BOLD)
+    screen.addstr(1, 77, <FONT COLOR=#115511>""</FONT>, curses.A_STANDOUT)
+    draw_dict()
+  
+    <FONT COLOR=#1111CC># Enter the topbar menu loop</FONT>
+    <FONT COLOR=#3333CC><B>while</B></FONT> topbar_key_handler():
+        draw_dict()
+
+
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>'__main__'</FONT>:
+    <FONT COLOR=#3333CC><B>try</B></FONT>:
+        <FONT COLOR=#1111CC># Initialize curses</FONT>
+        stdscr=curses.initscr()
+        <FONT COLOR=#1111CC>#curses.start_color()</FONT>
+        <FONT COLOR=#1111CC># Turn off echoing of keys, and enter cbreak mode,</FONT>
+        <FONT COLOR=#1111CC># where no buffering is performed on keyboard input</FONT>
+        curses.noecho() ; curses.cbreak()
+
+        <FONT COLOR=#1111CC># In keypad mode, escape sequences for special keys</FONT>
+        <FONT COLOR=#1111CC># (like the cursor keys) will be interpreted and</FONT>
+        <FONT COLOR=#1111CC># a special value like curses.KEY_LEFT will be returned</FONT>
+        stdscr.keypad(1)
+        main(stdscr)                    <FONT COLOR=#1111CC># Enter the main loop</FONT>
+        <FONT COLOR=#1111CC># Set everything back to normal</FONT>
+        stdscr.keypad(0)
+        curses.echo() ; curses.nocbreak()
+        curses.endwin()                 <FONT COLOR=#1111CC># Terminate curses</FONT>
+    <FONT COLOR=#3333CC><B>except</B></FONT>:
+        <FONT COLOR=#1111CC># In the event of an error, restore the terminal</FONT>
+        <FONT COLOR=#1111CC># to a sane state.</FONT>
+        stdscr.keypad(0)
+        curses.echo() ; curses.nocbreak()
+        curses.endwin()
+        traceback.print_exc()           <FONT COLOR=#1111CC># Print the exception</FONT>
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

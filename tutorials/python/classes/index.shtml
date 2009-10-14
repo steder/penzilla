@@ -1,0 +1,107 @@
+<html>
+<title>Introduction to Python:  Classes</title>
+<body>
+<h2>An Introduction to Python:  Classes</h2>
+<h3><font color="blue">Python Classes</font></h3>
+<a href="../index.html">Table of Contents</a>
+<hr><!--^Header^-->
+<h4><font color="green">Anatomy of Class</font></h4>
+<P>Let's start with a basic class that illustrates all the pieces:
+<ul><!--#include virtual="anatomy.py.html"--></ul>
+<P>Now it could be a little more basic, for instance, we didn't need to write a display function for this object, but it seemed like a good idea at the time.
+<P><font color="purple">:~)</font>
+<P>So first we have a <font color="blue">class</font> statement, which is essentially just like <font color="blue">def</font> for functions.  The syntax is a little different, you'll notice that there are no paranthesis in this declaration.  Now that you have your class declared it's necessary to fill it with data and create a constructor.  You'll first notice that I declare a variable outside of all the functions (including the constructor).  This data variable will have the same value in all instances of the BaseClass class(an instance being a specific object created from BaseClass).  This is not terribly useful presently, but allows you to incorporate some information into all possible BaseClass objects.  
+<P>Next we can look at the constructor <font color="red">__init__</font>.  Methods with __*__ underscores are usually special methods.  Constructors and operators usually have this notation in Python.  <font color="red">__init__</font> takes as arguments the mandatory self argument, and then the arguments that you'd like to pass to this BaseClass constructor.  So this class will take any 2 objects as arguments, and store them as value1 and value2 in self.  This could possibly be a crude tuple.  It doesn't let you print it using the normal print or string operators, nor does it have any indexing (and it can only hold two objects, not an aribitrary number), but you see that it is primarily a container for any two data items.  
+<P>arg1 and arg2 are just temporary values, if you want to have them stay with the object you need to assign them names with the self.  So we go ahead and give them the names self.value1 and self.value2.  At this point now we can write other BaseClass methods that use these data values, and possibly do something useful.
+<ul><!--#include virtual="instantiate1.py.html"--></ul>
+
+<h4><font color="green">Overloading Operators</font></h4>
+<P>There are a large number of builtin operators for Python classes.  These operators can be overloaded to make more functional and natural objects.  Let's take a quick look:
+<ul>
+  <li><font color="blue">__init__</font>
+    <ul>
+      <p>This is the object constructor.  It is generally necessary, and it's what allows you to instantiate an object.  
+      <pre><code>
+      # Can't do this without a constructor:
+      book = Book(title="There and Back Again")
+      </code></pre>
+    </ul>
+  </li>
+  <li><font color="blue">__getitem__</font>
+    <ul>
+      <p>This is a useful one.  It's implemented in the builtin tuple, list, and dictionary types.  If you wanted to create Bookshelf type, and be able to lookup books by name, you might overload <font color="blue">__getitem__</font>
+      <pre><code>
+      # Get a book from the shelf object:
+      # The [ ] brackets represent the get/set item operator.
+      myfavbook = Bookshelf["There and Back Again"]
+      # This would like be the same as writing the following:
+      myfavbook = Bookshelf.getBook("There and Back Again")
+      </code></pre>
+    </ul>
+  </li>
+  <li><font color="blue">__setitem__</font>
+    <ul>
+      <p>This is a useful one.  It's implemented in the builtin list and dictionary types but not the tuple type, because tuples are immutable.  If you wanted to create Bookshelf type, and be able to add books to it, you might overload <font color="blue">__setitem__</font>
+      <pre><code>
+      # Get a book from the shelf object:
+      # The [ ] brackets represent the get/set item operator.
+      mybook = Book(title="There and Back Again")
+      Bookshelf[mybook] # Put my book on the shelf
+      # This would be like doing the following without __setitem__
+      Bookshelf.add(mybook)
+      </code></pre>
+    </ul>
+  </li>
+  <li><font color="blue">__call__</font>
+    <ul>
+      <p>This is a the property of objects that makes a function a function.  Remember:  functions are just first class types like lists and integers in Python.  They are objects to.  By defining __call__ you can actually make your object callable just as if it were a function.
+      <pre><code>
+      </code></pre>
+    </ul>
+  </li>
+  <li><font color="blue">__cmp__</font></li>
+  <li><font color="blue">__contains__</font></li>
+    <ul>
+    </ul>  
+  <li><font color="blue">__delitem__</font></li>
+    <ul>
+    </ul>  
+  <li><font color="blue">__eq__</font></li>
+    <ul>
+      <p>This is the comparison operator for <font color="purple">==</font>.
+      <pre><code>
+        >>> a = {}
+        >>> b = a
+        >>> a == b
+        True
+        >>> a.__eq__(b)
+        True
+      </code></pre>
+    </ul>
+  <li><font color="blue">__ge__</font></li>
+    <ul>
+    </ul>
+  <li><font color="blue">__gt__</font></li>
+    <ul>
+    </ul>
+  <li><font color="blue">__iter__</font></li>
+    <ul>
+    </ul>
+  <li><font color="blue">__le__</font></li>
+    <ul>
+    </ul>
+  <li><font color="blue">__len__</font></li>
+    <ul>
+    </ul> 
+  <li><font color="blue">__repr__</font></li>
+    <ul>
+    </ul>
+  <li><font color="blue">__str__</font></li>
+    <ul>
+    </ul>
+  <li>And many more that aren't quite as interesting.  Look into some of your favorite objects with <font color="blue">dir</font> and check it out.</li>
+<!--\/Footer\/-->
+<hr>
+<a href="../index.html">Table of Contents</a>
+</body>
+</html>

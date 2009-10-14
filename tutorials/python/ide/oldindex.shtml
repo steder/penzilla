@@ -1,0 +1,44 @@
+<html>
+<title>Introduction to Python:  Python IDE's</title>
+<body>
+<h2>An Introduction to Python:  Python IDE's</h2>
+<h3>Integrated Development Environments</h3>
+<a href="../index.html">Table of Contents</a>
+<hr>
+<!--^Header^-->
+<P>There are a bunch of development environments and editors that support Python, and here's a quick rundown on a number of them for different platforms. 
+
+<h3><font color="green">Linux</font></h3>
+<P><font color="blue">Emacs/VI:</font>  They're all I use.  Well, maybe a little Eric as well (link is in the Cross platform section below).
+<P>A few links to Emacs:
+<ul>
+  <li><a href="http://www.gnu.org/software/emacs/emacs.html">Emacs Homepage</a></li>
+  <li><a href="http://www.XEmacs.org/">XEmacs Homepage</a></li>
+  <li><a href="http://www.lib.uchicago.edu/keith/tcl-course/emacs-tutorial.html">A Emacs Tutorial @ University of Chicago</a></li> 
+</ul></P>
+<P>A few links to Vi(m):
+<ul>
+  <li><a href="http://www.vim.org">Vim's Homepage</a></li>
+  <li><a href="https://engineering.purdue.edu/ECN/Resources/KnowledgeBase/search_results?query=vi">A nice tutorial from the Purdue Engineering webpage.</a></li>
+</ul></P>
+If you choose to delve into either Emacs or Vi it is probably worth reading
+<a href="http://en.wikipedia.org/wiki/Editor_war">The Editor War</a>.  At least for a chuckle.
+</P>
+<P><font color="blue">Anjuta:</font>  Very nice, Visual Studio(or Eclipse) style editor with project management and, syntax highlighting, code completion, and a polished GTK (Gnome) Interface. <a href="http://anjuta.sourceforge.net">(Recommend Version 1.1+)</a>
+<P><font color="blue">KDevelop:</font>  Very nice, Visual Studio(or Eclipse) style editor with project management and, syntax highlighting, code completion, and a polished QT (KDE) Interface. <a href="http://kdevelop.sourceforge.net">(Recommend Version 3.0+)</a>
+ 
+<h3><font color="green">Windows</font></h3>
+<P><font color="blue">Notepad:</font>  Functional, but pretty lame.
+<P><font color="blue">Visual Studio:</font>  Pretty darn nice.  However the Python mode needs to be downloaded seperately, and may require a fee.  <a href="http://activestate.com/Products/Visual_Python/pricing_and_licensing.plex">ActiveState.com</a>
+
+<h3><font color="green">Cross Platform( Windows, Linux, Mac OS X )</font></h3>
+<P><font color="blue">JEdit</font>  It's not really a "Python IDE", but it supports Python and JYthon programming and is really just an excellent all round programming editor.  Get it <a href="http://www.jedit.org">here.</a></P>
+<P><font color="blue">Eric3</font>  An excellent, full featured IDE for Python and written in Python.  <a href="http://www.die-offenbachs.de/detlev/eric3.html">Check it out!</a></P>
+<P><font color="blue">IDLE:</font>  This is THE simplest IDE available for Python, but it comes with basically every Python install.  IDLE has just enough features to work pretty well, but not enough features to sway me from Emacs and a terminal on Linux.  However, on Windows or the Mac, it can do in a pinch.</P>  
+<P><font color="blue">BoaConstructor:</font>  A Gui builder and development environment for Python.  <a href="http://boa-constructor.sourceforge.net/">Boa Constructors Homepage</a></P>
+<P><font color="blue">Eclipse:</font> Shamelessly stolen from <a href="http://www.eclipse.org">www.eclipse.org:</a> "Eclipse is a kind of universal tool platform - an open extensible IDE for anything and nothing in particular."  A lot of people are big fans of this Java based IDE, and it has budding Python support.</P>
+<!--\/Footer\/-->
+<hr>
+<a href="../index.html">Table of Contents</a>
+</body>
+</html>

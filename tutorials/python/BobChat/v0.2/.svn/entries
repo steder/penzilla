@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="1"
+   name=""
+   committed-date="2003-12-24T19:34:15.663229Z"
+   url="http://www.ripplefx.net:81/svn/python/BobChat/v0.2"
+   last-author="steder"
+   kind="dir"
+   uuid="996777e2-3ecf-0310-aa64-e0ff611b1bef"
+   revision="17"/>
+<entry
+   committed-rev="1"
+   name="BobFuncClient.py"
+   text-time="2004-09-20T02:23:09.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="761a89b2154e91c516e5df935deee5d5"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:09.000000Z"/>
+<entry
+   committed-rev="20"
+   name=".htaccess"
+   text-time="2004-10-21T05:05:01.000000Z"
+   committed-date="2004-10-21T05:06:16.729427Z"
+   checksum="bb3c65a1b67735efa59046d82c05b44a"
+   last-author="steder"
+   kind="file"
+   revision="20"/>
+<entry
+   committed-rev="1"
+   name="BobFuncServer.py"
+   text-time="2004-09-20T02:23:09.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="2cd1ea0c7bb73079a7231a80fd590a09"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:09.000000Z"/>
+</wc-entries>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="10"
+   name=""
+   committed-date="2004-01-09T22:55:59.613144Z"
+   url="http://www.ripplefx.net:81/svn/python/html_source/txt2html"
+   last-author="steder"
+   kind="dir"
+   uuid="996777e2-3ecf-0310-aa64-e0ff611b1bef"
+   revision="17"/>
+<entry
+   committed-rev="10"
+   name="PyFontify.py.html"
+   text-time="2004-09-20T02:22:28.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="c5b07a7c1cc348c7f45e8206c0f9b972"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:28.000000Z"/>
+<entry
+   committed-rev="10"
+   name="dmTxt2Html.py.html"
+   text-time="2004-09-20T02:22:28.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="3cae37866dcfc52c295486763bd67ca5"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:28.000000Z"/>
+<entry
+   committed-rev="10"
+   name="curses_txt2html.py.html"
+   text-time="2004-09-20T02:22:29.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="f7f04a35029bf25e1b9affc02009642d"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:29.000000Z"/>
+<entry
+   committed-rev="10"
+   name="mxTypographify.py.html"
+   text-time="2004-09-20T02:22:29.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="e87e95e8870cabd3712832ee365fc2ca"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:29.000000Z"/>
+<entry
+   committed-rev="10"
+   name="py2html.py.html"
+   text-time="2004-09-20T02:22:29.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="54aa03d018d87ba41aac69b3bda8b424"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:29.000000Z"/>
+<entry
+   committed-rev="10"
+   name="fetch_txt2html.py.html"
+   text-time="2004-09-20T02:22:29.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="a250ed2861d5887cc23d091d06be937c"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:29.000000Z"/>
+<entry
+   committed-rev="10"
+   name="dyn_txt2html.py.html"
+   text-time="2004-09-20T02:22:29.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="c0ad968ea9b7e85e776aaa56087e7fa9"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:29.000000Z"/>
+<entry
+   committed-rev="10"
+   name="t2h_textfuncs.py.html"
+   text-time="2004-09-20T02:22:29.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="e6445233ee02a0b010519b5a795aecba"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:29.000000Z"/>
+<entry
+   committed-rev="10"
+   name="tk_txt2html.py.html"
+   text-time="2004-09-20T02:22:29.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="94ee42cb43407374ae4d2ef8b6af8da7"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:29.000000Z"/>
+<entry
+   committed-rev="10"
+   name="txt2html_dir.py.html"
+   text-time="2004-09-20T02:22:29.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="232a34227a467a334ebae661bf1e705d"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:29.000000Z"/>
+</wc-entries>

@@ -1,0 +1,188 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#115511>"""
+BobServer.py v0.4
+---
+Select Based Server Object,
+with a threaded Admin service that allows it
+to read input from the terminal on which it is started,
+so that the Admin can type 'quit', or other commands
+to shut the server down cleanly.
+
+Hopefully this will cut down on the number of manual kills
+(Keyboard Interrupts) that we need to do.
+"""</FONT>
+
+<FONT COLOR=#3333CC><B>import</B></FONT> sys, time, thread
+<FONT COLOR=#3333CC><B>from</B></FONT> select <FONT COLOR=#3333CC><B>import</B></FONT> select
+<FONT COLOR=#3333CC><B>from</B></FONT> socket <FONT COLOR=#3333CC><B>import</B></FONT> socket, AF_INET, SOCK_STREAM
+
+<FONT COLOR=#1111CC># Import Bob Protocol File</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> Protocol
+<FONT COLOR=#3333CC><B>from</B></FONT> Protocol <FONT COLOR=#3333CC><B>import</B></FONT> COMMANDS, COMMANDLIST, MESSAGETYPES
+<FONT COLOR=#1111CC># To pickle and unpickle message objects</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> pickle
+
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Server"><FONT COLOR=#CC0000><B> Server</B></FONT></A>:
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, HOSTNAME, PORTS, PASSWORD):
+        <FONT COLOR=#1111CC># Server Constants</FONT>
+        self.HOSTNAME = HOSTNAME
+        self.PORTS = PORTS
+        self.PASSWORD = PASSWORD
+        <FONT COLOR=#1111CC># Make main sockets for accepting new client requests.</FONT>
+        mainsocks, readsocks = [],[]
+        <FONT COLOR=#3333CC><B>for</B></FONT> PORT <FONT COLOR=#3333CC><B>in</B></FONT> PORTS:
+            portsock = socket(AF_INET, SOCK_STREAM)
+            portsock.bind((HOSTNAME, PORT))
+            portsock.listen(5)
+            mainsocks.append(portsock)
+            readsocks.append(portsock)
+            
+        <FONT COLOR=#1111CC># Create Reading Sockets:</FONT>
+        self.mainsocks = mainsocks
+        self.readsocks = readsocks
+        self.writesocks = []
+        
+        <FONT COLOR=#1111CC># Message Queue</FONT>
+        self.Q = []
+        
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="Now"><FONT COLOR=#CC0000><B> Now</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> time.strftime(<FONT COLOR=#115511>"%I:%M:%S%p"</FONT>,time.localtime())
+    <FONT COLOR=#115511>"""
+    AH!!!
+    Connect to myself!!!
+    Create a new socket, connect, and
+    send a single message, then disconnect.
+    You'll get handled, and then you can issue
+    commands to the server.  Just do this in another
+    thread.  This way the server can be told to quit,
+    instead of killing it in a messy way.
+    """</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="Prompt"><FONT COLOR=#CC0000><B> Prompt</B></FONT></A>(self,ps):
+        done = 0
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Admin Initializing WRITES"</FONT>
+        <FONT COLOR=#1111CC># Create Connect _WRITE_ Message</FONT>
+        connect = Protocol.ConnectWrite(<FONT COLOR=#115511>"__ADMIN__"</FONT>)
+        <FONT COLOR=#1111CC># Initialize Network Connection    </FONT>
+        writesock = socket(AF_INET, SOCK_STREAM)
+        writesock.connect((self.HOSTNAME, self.PORTS[1]))
+        writesock.send(pickle.dumps(connect))
+        <FONT COLOR=#3333CC><B>while</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> done:
+            input = raw_input(ps)
+            <FONT COLOR=#3333CC><B>if</B></FONT> input == <FONT COLOR=#115511>"quit"</FONT>:
+                message = Protocol.Message(<FONT COLOR=#115511>"__ADMIN__"</FONT>,<FONT COLOR=#115511>"\\"</FONT>+<FONT COLOR=#115511>"QUIT "</FONT>+self.PASSWORD)
+                message.isCommand()
+                writesock.send(pickle.dumps(message))
+                <FONT COLOR=#3333CC><B>break</B></FONT>
+            <FONT COLOR=#3333CC><B>else</B></FONT>:
+                time.sleep(0.2)
+        writesock.close()
+        <FONT COLOR=#3333CC><B>return</B></FONT>
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="Serve"><FONT COLOR=#CC0000><B> Serve</B></FONT></A>(self):
+        <FONT COLOR=#1111CC># Starting Select Server:</FONT>
+        done = 0
+        thread.start_new(self.Prompt,(<FONT COLOR=#115511>"&gt;"</FONT>,))
+        <FONT COLOR=#3333CC><B>while</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> done:
+            <FONT COLOR=#1111CC># The one and only call to select - There is one missing optional argument</FONT>
+            <FONT COLOR=#1111CC># in the select call which can be used to set a timeout or timeout behavior.</FONT>
+            readables, writeables, exceptions = select(self.readsocks,self.writesocks,[])
+            <FONT COLOR=#3333CC><B>for</B></FONT> sockobj <FONT COLOR=#3333CC><B>in</B></FONT> readables:
+                <FONT COLOR=#3333CC><B>if</B></FONT> sockobj <FONT COLOR=#3333CC><B>in</B></FONT> self.mainsocks:
+                    <FONT COLOR=#1111CC># port socket: accept new client</FONT>
+                    newsock, address = sockobj.accept()
+                    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Connect:'</FONT>, address, id(newsock)
+                    self.readsocks.append(newsock)
+                <FONT COLOR=#3333CC><B>else</B></FONT>:
+                    <FONT COLOR=#1111CC># This is already an open connection, handle it</FONT>
+                    <FONT COLOR=#1111CC>#try:</FONT>
+                    <FONT COLOR=#1111CC># Data is a pickled Protocol.Message object</FONT>
+                    data = sockobj.recv(1024)
+                    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> data:
+                        sockobj.close()
+                        self.readsocks.remove(sockobj)
+                    <FONT COLOR=#3333CC><B>try</B></FONT>:
+                        data = pickle.loads(data)
+                    <FONT COLOR=#3333CC><B>except</B></FONT> EOFError:
+                        sockobj.close()
+                        <FONT COLOR=#3333CC><B>if</B></FONT> sockobj <FONT COLOR=#3333CC><B>in</B></FONT> self.readsocks:
+                            self.readsocks.remove(sockobj)
+                        <FONT COLOR=#3333CC><B>continue</B></FONT>
+                    <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>'\tgot'</FONT>, data, <FONT COLOR=#115511>'on'</FONT>, id(sockobj)
+                    <FONT COLOR=#1111CC># Server Commands</FONT>
+                    <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>"Is it type 2:"</FONT>,data.type == 2
+                    <FONT COLOR=#3333CC><B>if</B></FONT> data.type == 3:
+                        cmd = data.command
+                        passwd = data.password
+                    <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>"Is the command &lt;QUIT&gt;"</FONT>, cmd[0] == <FONT COLOR=#115511>"QUIT"</FONT>
+                    <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>"Is the password right?"</FONT>, cmd[1] == self.PASSWORD
+                    <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>"Password ="</FONT>, cmd[1], self.PASSWORD
+                        <FONT COLOR=#3333CC><B>if</B></FONT> cmd == <FONT COLOR=#115511>"QUIT"</FONT>:
+                            <FONT COLOR=#3333CC><B>if</B></FONT> passwd == self.PASSWORD:
+                                self.handleQuit()
+                                <FONT COLOR=#3333CC><B>return</B></FONT> <FONT COLOR=#1111CC>#EXIT!</FONT>
+                            <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Incorrect password on Quit Attempt!"</FONT>
+                        <FONT COLOR=#3333CC><B>else</B></FONT>:
+                            <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Unhandled Type 3 Command:"</FONT>,cmd
+                    <FONT COLOR=#3333CC><B>elif</B></FONT> data.type == 2:
+                        cmd = data.command
+                        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"cmd = "</FONT>, cmd
+                        <FONT COLOR=#3333CC><B>if</B></FONT> cmd == <FONT COLOR=#115511>"&lt;_WRITE_&gt;"</FONT>:
+                            <FONT COLOR=#115511>"""Leave in Readsocks"""</FONT>
+                        <FONT COLOR=#3333CC><B>elif</B></FONT> cmd == <FONT COLOR=#115511>"&lt;_READ_&gt;"</FONT>:
+                            self.readsocks.remove(sockobj)
+                            self.writesocks.append(sockobj)
+                        <FONT COLOR=#3333CC><B>else</B></FONT>:
+                            <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Unhandled Type 2 Command:"</FONT>,cmd
+                    <FONT COLOR=#3333CC><B>elif</B></FONT> data.type == 1 <FONT COLOR=#3333CC><B>or</B></FONT> data.type == 0:
+                        <FONT COLOR=#1111CC># 1 is a client Command</FONT>
+                        <FONT COLOR=#1111CC># 0 is a normal message</FONT>
+                        <FONT COLOR=#1111CC># just drop both in the QUEUE</FONT>
+                        <FONT COLOR=#1111CC># Drop message in the Q</FONT>
+                        data.approve(self.Now())
+                        self.Q.append(data)
+                    <FONT COLOR=#1111CC>#except:</FONT>
+                    <FONT COLOR=#1111CC>#    pass</FONT>
+            <FONT COLOR=#1111CC># Get ready to write</FONT>
+            <FONT COLOR=#1111CC>#print </FONT>len(writeables), len(self.Q)
+            <FONT COLOR=#3333CC><B>while</B></FONT> 1:
+                <FONT COLOR=#3333CC><B>if</B></FONT> (len(writeables)==0) <FONT COLOR=#3333CC><B>or</B></FONT> (len(self.Q) == 0):
+                    <FONT COLOR=#3333CC><B>break</B></FONT>
+                message = self.Q[0]
+                <FONT COLOR=#1111CC># Actually Write Messages</FONT>
+                <FONT COLOR=#3333CC><B>for</B></FONT> sockobj <FONT COLOR=#3333CC><B>in</B></FONT> writeables:
+                    <FONT COLOR=#1111CC># Name(Time): Message</FONT>
+                    <FONT COLOR=#3333CC><B>try</B></FONT>:
+                        sockobj.send( pickle.dumps(message) )
+                        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"\tsent"</FONT>,message,<FONT COLOR=#115511>"to"</FONT>, id(sockobj)
+                    <FONT COLOR=#3333CC><B>except</B></FONT>:
+                        <FONT COLOR=#3333CC><B>pass</B></FONT>
+                self.Q.remove(message)
+        time.sleep(0.1)
+        <FONT COLOR=#3333CC><B>return</B></FONT>
+
+    <FONT COLOR=#1111CC>#</FONT>
+    <FONT COLOR=#1111CC># Command Handlers</FONT>
+    <FONT COLOR=#1111CC>#</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="handleQuit"><FONT COLOR=#CC0000><B> handleQuit</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>for</B></FONT> sock <FONT COLOR=#3333CC><B>in</B></FONT> self.mainsocks:
+            sock.close()
+        <FONT COLOR=#3333CC><B>for</B></FONT> sock <FONT COLOR=#3333CC><B>in</B></FONT> self.readsocks:
+            sock.close()
+        <FONT COLOR=#3333CC><B>for</B></FONT> sock <FONT COLOR=#3333CC><B>in</B></FONT> self.writesocks:
+            sock.close()
+        <FONT COLOR=#3333CC><B>return</B></FONT>
+                
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
+    Bob = Server(<FONT COLOR=#115511>""</FONT>,[7777,7778],<FONT COLOR=#115511>"ack7778syn"</FONT>)
+    <FONT COLOR=#3333CC><B>try</B></FONT>:
+        Bob.Serve()
+    <FONT COLOR=#3333CC><B>finally</B></FONT>:
+        <FONT COLOR=#3333CC><B>for</B></FONT> sock <FONT COLOR=#3333CC><B>in</B></FONT> Bob.mainsocks:
+            sock.close()
+            
+            
+</PRE>
+                  <!--footer-->
+                  </BODY>

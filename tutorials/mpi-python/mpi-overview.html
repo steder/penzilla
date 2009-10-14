@@ -1,0 +1,60 @@
+<html>
+<head>
+<title>Penzilla.net:  MPI on Python</title>
+</head>
+<body>
+<h1>Penzilla.net:  MPI on Python</h1>
+<hr>
+<a href="index.html">Table of Contents</a>
+<hr><!--^Header^-->
+<h2><font color="green">MPI Overview</font></h2>
+<h3><font color="blue">What is MPI?</font></h3>
+<P>The Message Passing Interface( MPI ) is a library that provides a programming model for writing high performance parallel software for supercomputers.  Now before I continue, I'll try to define a few of these terms.
+</P>A supercomputer is typically a machine with many times the processing power of the average computer.  What makes a supercomputer "super" is not faster processors but more processors.  Supercomputers are often built from a large number (10-1000+) of what are essentially desktop PC's (like what you're probably reading this on right now) linked together by a fast network and other software to form a <b>cluster</b>.  A machine like this is a <b>parallel</b> supercomputer.  It is able to achieve performance that a not-so-super machine cannot because it leverages Parallelism.  
+<h4><font color="red">For instance:</font> You can think of the average computer as an assembly line.</h4>
+<P><center>
+<img src="images/assembly1.png">
+</center></P>
+<P>Imagine that you have to execute 1 Billion Instructions, or have your assembling line build 1 Billion Widgets.  You can easily determine how long it would take to produce these instructions/widgets: simply multiple the time per widget * 1 Billion.  However, what if that number comes out to be 1 widget/instruction per hour?  At that rate it would take over 1000 years to build the requisite number of widgets.</P>
+<P>For many high performance and scientific applications this is the reality of the situation.  The problems are so huge that they cannot be completed in a reasonable amount of time on a regular machine.
+</P>
+<P>To parallelize this problem we could add a large number of additional assembly lines.  To do this I need to be able to organize all these assembly lines and I need to be able to divide up the work.  The concept is simple.  If 1 Billion widgets will take 1000 years on 1 assembly line it would 1 year on 1000 assembly lines.
+</P>
+<P><center><img src="images/assembly2.png"></center></P>
+<h4><font color="red">Messages:</font>
+Now, with 1000 assembly lines running at once I need to organize these assembly lines and keep them working together.  If nothing else I need to maintain a count of the total number of widgets produced collectively by all the assembly lines.  A general way in which you can communicate between assembly lines is by using messages.  
+<h3><font color="blue">Who uses MPI?</font></h3>
+<P>This is just a short list of organizations that were involved in the most recent MPI standards meetings (for MPI-2).  This hopefully gives a good overview of the kinds of people interested in MPI.
+<ul>
+ <li>Argonne National Laboratory</li>
+ <li>California Institute of Technology</li>
+  <li>Cray Research</li> 
+ <li>Hewlett-Packard</li>
+ <li>Hitachi</li>
+ <li>Intel Corporation</li>
+ <li>International Business Machines</li>
+ <li>Los Alamos National Laboratory</li>
+  <li>NEC Corporation</li>
+ <li>National Aeronautics and Space Administration</li>
+   <li>Sanders, A Lockheed-Martin Company</li>
+ <li>Sandia National Laboratories</li>
+  <li>Silicon Graphics Incorporated</li>
+ <li>Sun Microsystems Computer Corporation</li>
+  <li>Thinking Machines Corporation</li>
+ <li>United States Navy</li>
+ <li>University of Illinois</li>
+</ul>
+
+
+
+
+<!--Include Sourcecode-->
+<ul><!--#include virtual=""--></ul>
+<hr>
+<a href="index.html">Table of Contents</a>
+<hr>
+</body>
+<!--\/Footer\/-->
+<footer>
+</footer>
+</html>

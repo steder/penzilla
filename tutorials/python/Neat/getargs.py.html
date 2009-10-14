@@ -1,0 +1,458 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#!/usr/bin/env python</FONT>
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC># getargs.py:       (Yet Another getopt) Parse command line arguments</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># See __doc__ string below.</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># Requires:</FONT>
+<FONT COLOR=#1111CC>#    - Python 1.5.2 or newer (www.python.org)</FONT>
+<FONT COLOR=#1111CC>#    - OS: portable</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># $Id: //depot/rgutils/rgutils/getargs.py#1 $</FONT>
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#115511>'''
+Command line arguments parser.
+
+Synopsis
+========
+    C{r = parseArgs(args, options)}
+Where
+=====
+    - args is a sequence of command line arguments, typically sys.argv[1:]
+    - options is a string specifying the acceptable options (see below).
+
+Options
+=======
+  Syntax for the options::
+    options : 0 a N options separated by one or more of comma ',',
+              semicolon ';' or "blank" character. Leading & trailing spaces
+              allowed.
+    option  : shortOpt['|'longOpt]['!'][optValueCnt]
+    shortOpt: letter
+    longOpt : at least 2 letters alphaNum or '-' or '_' or '.'. Must not
+              begin with a '-'. A long option *MUST* have a corresponding
+              short option.
+    '!'       If present indicates that the option is required (optional by
+              default)
+
+    optValueCnt: (Option values multiplicity) One of '-?=*+' :
+
+       Letter:    min:   max:     Comment:
+       ------------------------------------------------------------
+         -         0      0       No param/value expected (default)
+         ?         0      1       Optional 1 param
+         =         1      1       Required 1 param
+         *         0      N       Optional, unbounded nb of params
+         +         1      N       Required, unbounded nb of params
+
+  Multiplicity &gt;1 means that the option may appear more than once
+  (e.g. "-a v1 -b -a v2"), and the values will be collected in a
+  sequence. It is still legal but meaningless if option has no args.
+
+  Short options may be concatenated as far as there is no ambiguity, e.g.
+  -ab is equivalent to -a -b. Last option can take values, e.g.
+  -abc v1 is equivalent to -a -b -c v1.
+
+  Bonus: '?' if encountered is translated to '-h'.
+
+Return
+======
+    If no error occurs, the result r is a tuple (optDict, nonOpts) where:
+      - optDict -- dictionary {shortOption: values,...}
+          - if option max values cnt is 1, values is a single value or None
+          - if option max values cnt is &gt;1, values is a list of values
+            (possibly empty).
+      - nonOpts -- list of everything else than options.
+Examples
+========
+    Option specs
+    ------------
+      Some examples of option specifications::
+        "a"         short option -a, optional, no value.
+        "a!         short option -a, required, no value.
+        "a?         short option -a, optional, one optional value.
+        "d|dir="    short option -d &lt;=&gt; long opt --dir, optional,
+                    exactly one required value.
+        "f|file!*   short option -f &lt;=&gt; long option --file, required,
+                    0 to many values.
+        "f+"        short option -f, optional, 1 to many values.
+
+        "a!; d|dir=  ; f+" Specification for the 3 options -a, -d, -f
+        " a!,d|dir=, f+ "  Same. Spaces, ';' or ',' are valid separators.
+                           Leading & trailing spaces allowed.
+
+    Typical usage
+    -------------
+      Here is a sample of typical code::
+
+        import getargs
+        # (default for 2e param (args to parse) is sys.argv[1:])
+        optDict, others = getargs.parseArgs("a!*, d|dir=, f?, g, e+")
+
+        aValues = optDict['-a']     # list, possibly empty
+        if optDict.has_key('-d'):   # opt -d is optional
+            dir = optDict['-d']     # one single value, required
+        fValue = optDict.get('-f', aSingleDefaultValue)
+        eValues = optDict.get('-e', aDefaultValueList)
+        gOccured = optDict.kas_key('-g')
+
+
+    See also
+    --------
+        L{test()} for other examples of use.
+
+To do
+=====
+    Could add stuff like default values, value typing, but I want to keep
+    the interface simple!
+
+Competitors
+===========
+    - getopt.py   -- included in std distrib of Python. Basic 
+               functionality: no required args, mapping from long to
+               short opts, etc..
+    - optik   -- by Greg Ward (U{http://optik.sourceforge.net/}).
+                 Will supersede getopt in Python 2.3.
+    - getargs.py  -- by Ivan Van Laningham (ivanlan@callware.com.),
+               available at U{ftp://www.pauahtun.org/pub/getargspy.zip}.
+               Quite complete but less concise and simple to use.
+'''</FONT>
+__version__ = <FONT COLOR=#115511>'1.8.'</FONT> + <FONT COLOR=#115511>'$Revision: #1 $'</FONT>[12:-2]
+__author__ = <FONT COLOR=#115511>'Richard Gruet'</FONT>, <FONT COLOR=#115511>'rjgruet@yahoo.com'</FONT>
+__date__    = <FONT COLOR=#115511>'$Date: 2003/05/23 $'</FONT>[7:-2], <FONT COLOR=#115511>'$Author: rgruet $'</FONT>[9:-2]
+__since__ = <FONT COLOR=#115511>'2001-07-15'</FONT>
+__doc__ += <FONT COLOR=#115511>'\n@author: %s (U{%s})\n@version: %s'</FONT> % (__author__[0],
+                                            __author__[1], __version__)
+__all__ = [<FONT COLOR=#115511>'Error'</FONT>, <FONT COLOR=#115511>'GetArgsError'</FONT>, <FONT COLOR=#115511>'OptError'</FONT>, <FONT COLOR=#115511>'ArgError'</FONT>, <FONT COLOR=#115511>'TestError'</FONT>,
+           <FONT COLOR=#115511>'parseArgs'</FONT>, <FONT COLOR=#115511>'CmdLineArgParser'</FONT>]
+
+<FONT COLOR=#3333CC><B>import</B></FONT> sys, string, re, types
+
+true, false = 1, 0
+
+<FONT COLOR=#1111CC># Exception raised by this module.</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Error"><FONT COLOR=#CC0000><B> Error</B></FONT></A>(Exception):
+    <FONT COLOR=#115511>''' Base exception.'''</FONT>
+    <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+GetArgsError = Error <FONT COLOR=#1111CC># -&gt;Use this name, Error is kept for compatibility.</FONT>
+    
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="OptError"><FONT COLOR=#CC0000><B> OptError</B></FONT></A>(GetArgsError):
+    <FONT COLOR=#115511>''' Bad option specification.'''</FONT>
+    <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="ArgError"><FONT COLOR=#CC0000><B> ArgError</B></FONT></A>(GetArgsError):
+    <FONT COLOR=#115511>''' Arg doesn't match option spec.'''</FONT>
+    <FONT COLOR=#3333CC><B>pass</B></FONT>
+    
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="TestError"><FONT COLOR=#CC0000><B> TestError</B></FONT></A>(GetArgsError):
+    <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="parseArgs"><FONT COLOR=#CC0000><B> parseArgs</B></FONT></A>(options, args=sys.argv[1:]):
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#115511>''' Helper function to parse cmd line args in one call.
+    
+        @param options: Specification of options (see module __doc__)
+        @param args: The sequence of cmd line argumentsto parse.
+        @return: (optDict, nonOpts) where:
+            - optDict: dictionary {shortOption: [Parameter/value list],...}
+            - nonOpts: list of everything else than options.
+    '''</FONT>
+    <FONT COLOR=#3333CC><B>return</B></FONT> CmdLineArgParser(options).parseArgs(args)
+
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="CmdLineArgParser"><FONT COLOR=#CC0000><B> CmdLineArgParser</B></FONT></A>:
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#115511>''' Parses command line args according to options specification.
+    '''</FONT>
+    <FONT COLOR=#1111CC># Regular expression matching the specification for ONE option:</FONT>
+    OPTION_SPEC_REGEXP = (r<FONT COLOR=#115511>'\s*(?P&lt;shortOpt&gt;[A-Za-z])'</FONT>
+                           <FONT COLOR=#115511>'(\|(?P&lt;longOpt&gt;[^\-][\w\-_\.]+?))?'</FONT>
+                           <FONT COLOR=#115511>'(?P&lt;required&gt;!)?'</FONT>
+                           <FONT COLOR=#115511>'(?P&lt;optValueCnt&gt;[-=?+*])?\s*'</FONT>
+                           <FONT COLOR=#115511>'$'</FONT>)
+    RE_OPTION_SPEC = re.compile(OPTION_SPEC_REGEXP)
+    
+    <FONT COLOR=#1111CC># Regular expression matching (loosely) an option in the cmd line:</FONT>
+    RE_OPTION = re.compile(r<FONT COLOR=#115511>'-{1,2}[^-]+'</FONT>)
+
+    <FONT COLOR=#1111CC># Option values multiplicity:</FONT>
+    N = sys.maxint  <FONT COLOR=#1111CC># unbounded</FONT>
+        <FONT COLOR=#1111CC># Maps symbol to value multiplicity (min, max):</FONT>
+    VALUE_CNT = {<FONT COLOR=#115511>'-'</FONT>:(0, 0), <FONT COLOR=#115511>'?'</FONT>:(0, 1), <FONT COLOR=#115511>'='</FONT>:(1, 1), <FONT COLOR=#115511>'+'</FONT>:(1, N), <FONT COLOR=#115511>'*'</FONT>:(0, N)}
+    
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, options):
+        <FONT COLOR=#115511>''' Parses option specification.
+        '''</FONT>
+        self.optSpecs = {}      <FONT COLOR=#1111CC># { shortOpt: (required, (minValues,</FONT>
+                                <FONT COLOR=#1111CC>#              maxValues)), ...}</FONT>
+                                <FONT COLOR=#1111CC># shortOpt includes leading '-'.</FONT>
+        self.long2short = {}    <FONT COLOR=#1111CC># Maps long opt to short {longOpt: shortOpt,...}</FONT>
+        self.options = options  <FONT COLOR=#1111CC># original string spec</FONT>
+        
+        <FONT COLOR=#3333CC><B>for</B></FONT> optSpec <FONT COLOR=#3333CC><B>in</B></FONT> re.split(<FONT COLOR=#115511>"[;,\s]+"</FONT>, string.strip(options)):
+        
+            m = self.RE_OPTION_SPEC.match(optSpec)
+        
+            <FONT COLOR=#3333CC><B>if</B></FONT> m <FONT COLOR=#3333CC><B>is</B></FONT> None <FONT COLOR=#3333CC><B>or</B></FONT> m.group(<FONT COLOR=#115511>'shortOpt'</FONT>) <FONT COLOR=#3333CC><B>is</B></FONT> None:
+                <FONT COLOR=#3333CC><B>raise</B></FONT> OptError(<FONT COLOR=#115511>'Invalid option specification "%s": legal '</FONT>
+                      <FONT COLOR=#115511>'pattern is "%s".'</FONT> % (optSpec, self.OPTION_SPEC_REGEXP))
+            
+            shortOpt, longOpt, required, optValueCnt = (m.group(<FONT COLOR=#115511>'shortOpt'</FONT>),
+                m.group(<FONT COLOR=#115511>'longOpt'</FONT>), m.group(<FONT COLOR=#115511>'required'</FONT>), m.group(<FONT COLOR=#115511>'optValueCnt'</FONT>))
+                                
+            required = (required <FONT COLOR=#3333CC><B>is</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> None)
+            <FONT COLOR=#3333CC><B>if</B></FONT> required <FONT COLOR=#3333CC><B>is</B></FONT> None:
+                required = false        <FONT COLOR=#1111CC># default= optional</FONT>
+            
+            <FONT COLOR=#1111CC># Value multiplicity:</FONT>
+            <FONT COLOR=#3333CC><B>if</B></FONT> optValueCnt <FONT COLOR=#3333CC><B>is</B></FONT> None:
+                optValueCnt = <FONT COLOR=#115511>'-'</FONT>
+            pm = self.VALUE_CNT[optValueCnt] 
+            
+            <FONT COLOR=#1111CC># Store opt info:</FONT>
+            shortOpt = <FONT COLOR=#115511>'-'</FONT> + shortOpt
+            <FONT COLOR=#3333CC><B>if</B></FONT> self.optSpecs.has_key(shortOpt):
+                <FONT COLOR=#3333CC><B>raise</B></FONT> OptError(<FONT COLOR=#115511>"Duplicate short option '%s'."</FONT> % shortOpt)
+            self.optSpecs[shortOpt] = (required, pm)
+            
+            <FONT COLOR=#1111CC># Map long option to short:</FONT>
+            <FONT COLOR=#3333CC><B>if</B></FONT> longOpt <FONT COLOR=#3333CC><B>is</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> None:
+                longOpt = <FONT COLOR=#115511>'--'</FONT> + longOpt
+                self.long2short[longOpt] = shortOpt
+        
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__repr__"><FONT COLOR=#CC0000><B> __repr__</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> <FONT COLOR=#115511>"&lt;CmdLineArgParser options='%s'&gt;"</FONT> % self.options
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="parseArgs"><FONT COLOR=#CC0000><B> parseArgs</B></FONT></A>(self, args):
+        <FONT COLOR=#115511>''' Parses the given sequence of cmd line args according to spec
+            given at construction time.
+        
+            @return: (optDict, nonOpts) where:
+              - optDict: dictionary {shortOption: List of values (may be
+                empty),...}
+              - nonOpts: list of everything else than options.
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> type(args) <FONT COLOR=#3333CC><B>not</B></FONT> <FONT COLOR=#3333CC><B>in</B></FONT> (types.ListType, types.TupleType):
+            <FONT COLOR=#3333CC><B>raise</B></FONT> ArgError(<FONT COLOR=#115511>'&lt;args&gt; must be a sequence.'</FONT>)
+        
+        optDict = {}
+        nonOpts = []
+        optionExpectingValue = None
+        valueRequired = false       <FONT COLOR=#1111CC># Whether value is required or optional</FONT>
+        
+        <FONT COLOR=#1111CC># First pass to "explode" contracted forms like '-abc' &lt;=&gt; '-a -b -c';</FONT>
+        <FONT COLOR=#1111CC># also map ? to -h (bonus feature!):</FONT>
+        expandedArgs = []
+        <FONT COLOR=#3333CC><B>for</B></FONT> arg <FONT COLOR=#3333CC><B>in</B></FONT> args:
+            <FONT COLOR=#3333CC><B>if</B></FONT> arg == <FONT COLOR=#115511>'?'</FONT>:
+                expandedArgs.append(<FONT COLOR=#115511>'-h'</FONT>)
+            <FONT COLOR=#3333CC><B>elif</B></FONT> len(arg) &gt; 2 <FONT COLOR=#3333CC><B>and</B></FONT> arg[0]==<FONT COLOR=#115511>'-'</FONT> <FONT COLOR=#3333CC><B>and</B></FONT> arg[1]!=<FONT COLOR=#115511>'-'</FONT>:
+                expandedArgs.extend(map(<FONT COLOR=#3333CC><B>lambda</B></FONT> x: <FONT COLOR=#115511>'-'</FONT>+x, 
+                                    filter(<FONT COLOR=#3333CC><B>lambda</B></FONT> x: x <FONT COLOR=#3333CC><B>in</B></FONT> string.letters,
+                                    list(arg[1:]))))
+            <FONT COLOR=#3333CC><B>else</B></FONT>:
+                expandedArgs.append(arg)
+            
+        <FONT COLOR=#1111CC># Now analyse the sequence of tokens in expandedArgs:</FONT>
+        <FONT COLOR=#1111CC># First, create a dictionary of all options with their values</FONT>
+        <FONT COLOR=#1111CC># without checking min and max (concatenate values for same option).</FONT>
+        curOpt = None
+        <FONT COLOR=#3333CC><B>for</B></FONT> token <FONT COLOR=#3333CC><B>in</B></FONT> expandedArgs:
+
+            <FONT COLOR=#3333CC><B>if</B></FONT> self.RE_OPTION.match(token): <FONT COLOR=#1111CC># Option</FONT>
+
+                <FONT COLOR=#3333CC><B>try</B></FONT>:
+                    curOpt = shortOpt = self._shortOptionOf(token)
+                    self.optSpecs[shortOpt]
+                <FONT COLOR=#3333CC><B>except</B></FONT> KeyError:
+                    <FONT COLOR=#3333CC><B>raise</B></FONT> ArgError(<FONT COLOR=#115511>"Invalid option %s"</FONT> % token)
+
+                <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> optDict.has_key(shortOpt):
+                    optDict[shortOpt] = []
+                    
+            <FONT COLOR=#3333CC><B>else</B></FONT>: <FONT COLOR=#1111CC># token is a value:</FONT>
+                <FONT COLOR=#3333CC><B>if</B></FONT> curOpt <FONT COLOR=#3333CC><B>is</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> None:
+                    values = optDict[curOpt]
+                    values.append(token)
+                <FONT COLOR=#3333CC><B>else</B></FONT>:
+                    nonOpts.append(token)
+        
+        <FONT COLOR=#1111CC># At this point, optDict contains the options with their values, without</FONT>
+        <FONT COLOR=#1111CC># checking value multiplicity.</FONT>
+        <FONT COLOR=#1111CC># nonOpts contains only the values not assigned to an option.</FONT>
+        
+        requiredOpts = {}   <FONT COLOR=#1111CC># Compute dict of required options</FONT>
+        <FONT COLOR=#3333CC><B>for</B></FONT> opt, spec <FONT COLOR=#3333CC><B>in</B></FONT> self.optSpecs.items():
+            <FONT COLOR=#3333CC><B>if</B></FONT> spec[0]:
+                requiredOpts[opt] = None
+        
+        <FONT COLOR=#1111CC># Check min and max values for each option. All values exceeding max </FONT>
+        <FONT COLOR=#1111CC># are put in nonOpts list. Error if value count &lt; min.</FONT>
+        
+        <FONT COLOR=#3333CC><B>for</B></FONT> opt, values <FONT COLOR=#3333CC><B>in</B></FONT> optDict.items():
+
+            required, (min, max) = self.optSpecs[opt]
+            <FONT COLOR=#3333CC><B>if</B></FONT> required:
+                <FONT COLOR=#3333CC><B>del</B></FONT> requiredOpts[opt]
+            
+            l = len(values)
+            <FONT COLOR=#3333CC><B>if</B></FONT> l &lt; min:
+                <FONT COLOR=#3333CC><B>raise</B></FONT> ArgError(<FONT COLOR=#115511>"Not enough values for option '%s' "</FONT>
+                    <FONT COLOR=#115511>"(expected at least %d, got only %d)"</FONT> % (opt, min, l))
+            <FONT COLOR=#3333CC><B>if</B></FONT> l &gt; max:
+                nonOpts.extend(values[max:])
+                values = values[:max]
+            
+            <FONT COLOR=#1111CC># Convert value list to a single element (or None) if max &lt;= 1:</FONT>
+            
+            <FONT COLOR=#3333CC><B>if</B></FONT> max == 0: values = None
+            <FONT COLOR=#3333CC><B>elif</B></FONT> max == 1:
+                <FONT COLOR=#3333CC><B>if</B></FONT> values: values = values[0]
+                <FONT COLOR=#3333CC><B>else</B></FONT>: values = None
+            <FONT COLOR=#1111CC># (else max&gt;1, keep values list as is)</FONT>
+            optDict[opt] = values 
+            
+        <FONT COLOR=#1111CC># Finally, check that all required options occured at least once:</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> requiredOpts:
+            <FONT COLOR=#3333CC><B>raise</B></FONT> ArgError(<FONT COLOR=#115511>"Missing required option(s) %s."</FONT> % string.join(
+                                                    requiredOpts.keys(), <FONT COLOR=#115511>','</FONT>))
+        <FONT COLOR=#3333CC><B>return</B></FONT> optDict, nonOpts     
+                    
+                
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_shortOptionOf"><FONT COLOR=#CC0000><B> _shortOptionOf</B></FONT></A>(self, opt):
+        <FONT COLOR=#115511>'''Returns short option for opt if it is a long option,
+           otherwise returns opt unchanged.
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> opt[:2] != <FONT COLOR=#115511>'--'</FONT>:
+            <FONT COLOR=#3333CC><B>return</B></FONT> opt
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.long2short[opt]
+        
+
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test"><FONT COLOR=#CC0000><B> test</B></FONT></A>():
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#115511>''' Unit test.
+    '''</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="checkParseOptsOK"><FONT COLOR=#CC0000><B> checkParseOptsOK</B></FONT></A>(optSpec, expectedOptSpec, expectedLong2short={}):
+        p = CmdLineArgParser(optSpec)
+        <FONT COLOR=#3333CC><B>if</B></FONT> p.optSpecs !=  expectedOptSpec:
+            <FONT COLOR=#3333CC><B>raise</B></FONT> TestError(<FONT COLOR=#115511>'expected %s, got %s (opts="%s")'</FONT> %
+                            (expectedOptSpec, p.optSpecs, optSpec))
+        <FONT COLOR=#3333CC><B>if</B></FONT> p.long2short !=  expectedLong2short:
+            <FONT COLOR=#3333CC><B>raise</B></FONT> TestError(<FONT COLOR=#115511>'expected %s, got %s (opts="%s")'</FONT> %
+                            (expectedLong2short, p.long2short, optSpec))
+        <FONT COLOR=#3333CC><B>return</B></FONT> p
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="checkParseOptsFails"><FONT COLOR=#CC0000><B> checkParseOptsFails</B></FONT></A>(optSpec):
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            CmdLineArgParser(optSpec)
+        <FONT COLOR=#3333CC><B>except</B></FONT> Exception, e:
+            <FONT COLOR=#3333CC><B>if</B></FONT> e.__class__ == OptError:
+                <FONT COLOR=#3333CC><B>return</B></FONT>
+        <FONT COLOR=#3333CC><B>raise</B></FONT> TestError(<FONT COLOR=#115511>'expected OptError not raised (optSpec="%s")'</FONT> % optSpec)
+                
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="checkParseArgsOK"><FONT COLOR=#CC0000><B> checkParseArgsOK</B></FONT></A>(parser, what, expectedResult):
+        r = parser.parseArgs(string.split(what))
+        <FONT COLOR=#3333CC><B>if</B></FONT> r !=  expectedResult:
+            <FONT COLOR=#3333CC><B>raise</B></FONT> TestError(<FONT COLOR=#115511>'expected %s, got %s (args="%s", opts="%s")'</FONT> %
+                            (expectedResult, r, what, parser.options))
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="checkParseArgsFails"><FONT COLOR=#CC0000><B> checkParseArgsFails</B></FONT></A>(parser, what, expectedException):
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            r = parser.parseArgs(string.split(what))
+        <FONT COLOR=#3333CC><B>except</B></FONT> Exception, e:
+            <FONT COLOR=#3333CC><B>if</B></FONT> e.__class__ == expectedException:
+                <FONT COLOR=#3333CC><B>return</B></FONT>
+        <FONT COLOR=#3333CC><B>raise</B></FONT> TestError(<FONT COLOR=#115511>'expected exception "%s" not raised '</FONT>
+            <FONT COLOR=#115511>'(args="%s", opts="%s")'</FONT> % (expectedException,what, parser.options))
+    
+    
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Testing getargs.py...'</FONT>
+    
+    N = CmdLineArgParser.N  <FONT COLOR=#1111CC># shortcut</FONT>
+    
+    <FONT COLOR=#1111CC># Parse option specifications :</FONT>
+    checkParseOptsOK(<FONT COLOR=#115511>'a'</FONT>, {<FONT COLOR=#115511>'-a'</FONT>: (0,(0,0))})
+    checkParseOptsOK(<FONT COLOR=#115511>'  a '</FONT>, {<FONT COLOR=#115511>'-a'</FONT>: (0,(0,0))}) <FONT COLOR=#1111CC># leading/trailing spaces OK</FONT>
+    checkParseOptsFails(<FONT COLOR=#115511>'-a'</FONT>)   <FONT COLOR=#1111CC># '-' must be omitted.</FONT>
+    checkParseOptsFails(<FONT COLOR=#115511>'a b? a='</FONT>)  <FONT COLOR=#1111CC># duplicate option a.</FONT>
+    checkParseOptsFails(<FONT COLOR=#115511>'ab|c'</FONT>) <FONT COLOR=#1111CC># short opt is more than 1 char</FONT>
+    checkParseOptsFails(<FONT COLOR=#115511>'|ab'</FONT>)  <FONT COLOR=#1111CC># short opt is required.</FONT>
+    checkParseOptsFails(<FONT COLOR=#115511>'a|-'</FONT>)  <FONT COLOR=#1111CC># long opt may not begin with a '-'</FONT>
+    checkParseOptsFails(<FONT COLOR=#115511>'a|b'</FONT>)  <FONT COLOR=#1111CC># long opt must be 2 chars min.</FONT>
+    checkParseOptsOK(<FONT COLOR=#115511>'a|bc-de'</FONT>, {<FONT COLOR=#115511>'-a'</FONT>: (0,(0,0))}, {<FONT COLOR=#115511>'--bc-de'</FONT>:<FONT COLOR=#115511>'-a'</FONT>})
+    checkParseOptsOK(<FONT COLOR=#115511>'a!'</FONT>, {<FONT COLOR=#115511>'-a'</FONT>: (1,(0,0))})
+    checkParseOptsOK(<FONT COLOR=#115511>'a?'</FONT>, {<FONT COLOR=#115511>'-a'</FONT>: (0,(0,1))})
+    checkParseOptsOK(<FONT COLOR=#115511>'a!='</FONT>, {<FONT COLOR=#115511>'-a'</FONT>: (1,(1,1))})
+    checkParseOptsOK(<FONT COLOR=#115511>'a*'</FONT>, {<FONT COLOR=#115511>'-a'</FONT>: (0,(0,N))})
+    checkParseOptsOK(<FONT COLOR=#115511>'a+'</FONT>, {<FONT COLOR=#115511>'-a'</FONT>: (0,(1,N))})
+    checkParseOptsOK(<FONT COLOR=#115511>'a|add-'</FONT>, {<FONT COLOR=#115511>'-a'</FONT>: (0,(0,0))}, {<FONT COLOR=#115511>'--add'</FONT>:<FONT COLOR=#115511>'-a'</FONT>})
+    checkParseOptsOK(<FONT COLOR=#115511>'a|add!?'</FONT>, {<FONT COLOR=#115511>'-a'</FONT>: (1,(0,1))}, {<FONT COLOR=#115511>'--add'</FONT>:<FONT COLOR=#115511>'-a'</FONT>})
+    checkParseOptsOK(<FONT COLOR=#115511>'a|add*'</FONT>, {<FONT COLOR=#115511>'-a'</FONT>: (0,(0,N))}, {<FONT COLOR=#115511>'--add'</FONT>:<FONT COLOR=#115511>'-a'</FONT>})
+    checkParseOptsFails(<FONT COLOR=#115511>'#'</FONT>)    <FONT COLOR=#1111CC># short opt must be a letter</FONT>
+    checkParseOptsFails(<FONT COLOR=#115511>'1'</FONT>)    <FONT COLOR=#1111CC># short opt must be a letter</FONT>
+    checkParseOptsFails(<FONT COLOR=#115511>'a@'</FONT>)   <FONT COLOR=#1111CC># '@' is illegal</FONT>
+    checkParseOptsFails(<FONT COLOR=#115511>'a!@'</FONT>)  <FONT COLOR=#1111CC># '@' is illegal</FONT>
+    checkParseOptsFails(<FONT COLOR=#115511>'a|add!@'</FONT>) <FONT COLOR=#1111CC># '@' is illegal</FONT>
+    checkParseOptsFails(<FONT COLOR=#115511>'a|'</FONT>)   <FONT COLOR=#1111CC># long option missing</FONT>
+    o1 = <FONT COLOR=#115511>' a! ; b|blong?   ,c=; d|d-long* ; e+;f'</FONT>
+    r1,r2 = {<FONT COLOR=#115511>'-a'</FONT>: (1,(0,0)), <FONT COLOR=#115511>'-b'</FONT>: (0,(0,1)), <FONT COLOR=#115511>'-c'</FONT>:(0,(1,1)), <FONT COLOR=#115511>'-d'</FONT>: (0,(0,N)), <FONT COLOR=#115511>'-e'</FONT>: (0,(1,N)), <FONT COLOR=#115511>'-f'</FONT>: (0,(0,0))}, {<FONT COLOR=#115511>'--blong'</FONT>: <FONT COLOR=#115511>'-b'</FONT>, <FONT COLOR=#115511>'--d-long'</FONT>: <FONT COLOR=#115511>'-d'</FONT>} 
+    <FONT COLOR=#1111CC># Variants with different separators. Sometimes stupid, yet correct:</FONT>
+    checkParseOptsOK(<FONT COLOR=#115511>' a! b|blong?    c=; d|d-long* e+ f'</FONT>, r1, r2)
+    checkParseOptsOK(<FONT COLOR=#115511>' a!, b|blong?, c=, d|d-long*, e+,f'</FONT>, r1, r2)
+    checkParseOptsOK(<FONT COLOR=#115511>' a!,;,b|blong?, c=,;,,,,   d|d-long*, e+,f '</FONT>, r1, r2)
+    
+    <FONT COLOR=#1111CC># Parse args against opt. specifications :</FONT>
+    p = CmdLineArgParser(o1)
+    checkParseArgsFails(p, <FONT COLOR=#115511>''</FONT>, ArgError)            <FONT COLOR=#1111CC># missing option '-a'</FONT>
+    checkParseArgsFails(p, <FONT COLOR=#115511>'hello world'</FONT>, ArgError) <FONT COLOR=#1111CC># missing option '-a'</FONT>
+    checkParseArgsOK(p, <FONT COLOR=#115511>'hello -a  world'</FONT>, ({<FONT COLOR=#115511>'-a'</FONT>:None},[<FONT COLOR=#115511>'hello'</FONT>,<FONT COLOR=#115511>'world'</FONT>]))
+    checkParseArgsOK(p, <FONT COLOR=#115511>'-a hello -d  world'</FONT>, ({<FONT COLOR=#115511>'-d'</FONT>:[<FONT COLOR=#115511>'world'</FONT>], <FONT COLOR=#115511>'-a'</FONT>:None},[<FONT COLOR=#115511>'hello'</FONT>]))
+    
+    o2 = <FONT COLOR=#115511>' a; b|blong?   ,c=; d|d-long* ; e+;f; h|help'</FONT> <FONT COLOR=#1111CC># -a now optional</FONT>
+    p = CmdLineArgParser(o2)
+    checkParseArgsOK(p, <FONT COLOR=#115511>'?'</FONT>, ({<FONT COLOR=#115511>'-h'</FONT>:None},[]))
+    checkParseArgsOK(p, <FONT COLOR=#115511>'-b'</FONT>, ({<FONT COLOR=#115511>'-b'</FONT>:None},[]))
+    checkParseArgsOK(p, <FONT COLOR=#115511>'-b -b'</FONT>, ({<FONT COLOR=#115511>'-b'</FONT>:None},[])) <FONT COLOR=#1111CC># Redundant but correct.</FONT>
+    checkParseArgsOK(p, <FONT COLOR=#115511>'-ab'</FONT>, ({<FONT COLOR=#115511>'-a'</FONT>:None, <FONT COLOR=#115511>'-b'</FONT>:None},[]))
+    checkParseArgsOK(p, <FONT COLOR=#115511>'--blong'</FONT>, ({<FONT COLOR=#115511>'-b'</FONT>:None},[]))
+    checkParseArgsOK(p, <FONT COLOR=#115511>'hello -b'</FONT>, ({<FONT COLOR=#115511>'-b'</FONT>:None},[<FONT COLOR=#115511>'hello'</FONT>]))
+    checkParseArgsOK(p, <FONT COLOR=#115511>'-b hello'</FONT>, ({<FONT COLOR=#115511>'-b'</FONT>:<FONT COLOR=#115511>'hello'</FONT>},[]))
+    checkParseArgsOK(p, <FONT COLOR=#115511>'-b hello'</FONT>, ({<FONT COLOR=#115511>'-b'</FONT>:<FONT COLOR=#115511>'hello'</FONT>},[]))
+    checkParseArgsFails(p, <FONT COLOR=#115511>'-c'</FONT>, ArgError)  <FONT COLOR=#1111CC># required arg for -c</FONT>
+    checkParseArgsOK(p, <FONT COLOR=#115511>'-c hello world'</FONT>, ({<FONT COLOR=#115511>'-c'</FONT>:<FONT COLOR=#115511>'hello'</FONT>},[<FONT COLOR=#115511>'world'</FONT>]))
+    checkParseArgsOK(p, <FONT COLOR=#115511>'I say -c hello -d nice world'</FONT>, ({<FONT COLOR=#115511>'-c'</FONT>:<FONT COLOR=#115511>'hello'</FONT>, <FONT COLOR=#115511>'-d'</FONT>:[<FONT COLOR=#115511>'nice'</FONT>, <FONT COLOR=#115511>'world'</FONT>]},[<FONT COLOR=#115511>'I'</FONT>, <FONT COLOR=#115511>'say'</FONT>]))
+    
+    checkParseArgsOK(p, <FONT COLOR=#115511>'-d'</FONT>, ({<FONT COLOR=#115511>'-d'</FONT>:[]},[]))
+    checkParseArgsOK(p, <FONT COLOR=#115511>'-d hello world'</FONT>, ({<FONT COLOR=#115511>'-d'</FONT>:[<FONT COLOR=#115511>'hello'</FONT>, <FONT COLOR=#115511>'world'</FONT>]},[]))
+    checkParseArgsOK(p, <FONT COLOR=#115511>'-d hello -a -d nice world'</FONT>, ({<FONT COLOR=#115511>'-a'</FONT>:None, <FONT COLOR=#115511>'-d'</FONT>:[<FONT COLOR=#115511>'hello'</FONT>, <FONT COLOR=#115511>'nice'</FONT>, <FONT COLOR=#115511>'world'</FONT>]},[]))
+    
+    checkParseArgsFails(p, <FONT COLOR=#115511>'-e'</FONT>, ArgError)  <FONT COLOR=#1111CC># required arg for -e</FONT>
+    checkParseArgsOK(p, <FONT COLOR=#115511>'hello -e world'</FONT>, ({<FONT COLOR=#115511>'-e'</FONT>:[<FONT COLOR=#115511>'world'</FONT>]},[<FONT COLOR=#115511>'hello'</FONT>]))
+    checkParseArgsOK(p, <FONT COLOR=#115511>'-e hello nice -e world'</FONT>, ({<FONT COLOR=#115511>'-e'</FONT>:[<FONT COLOR=#115511>'hello'</FONT>, <FONT COLOR=#115511>'nice'</FONT>,<FONT COLOR=#115511>'world'</FONT>]},[]))
+    
+    checkParseArgsOK(p, <FONT COLOR=#115511>'-af'</FONT>, ({<FONT COLOR=#115511>'-a'</FONT>:None, <FONT COLOR=#115511>'-f'</FONT>:None},[]))
+    checkParseArgsOK(p, <FONT COLOR=#115511>'-afb'</FONT>, ({<FONT COLOR=#115511>'-a'</FONT>:None, <FONT COLOR=#115511>'-f'</FONT>:None, <FONT COLOR=#115511>'-b'</FONT>:None},[]))
+    checkParseArgsOK(p, <FONT COLOR=#115511>'-afb hello'</FONT>, ({<FONT COLOR=#115511>'-a'</FONT>:None, <FONT COLOR=#115511>'-f'</FONT>:None, <FONT COLOR=#115511>'-b'</FONT>:<FONT COLOR=#115511>'hello'</FONT>},[]))
+    checkParseArgsFails(p, <FONT COLOR=#115511>'-afc'</FONT>, ArgError)    <FONT COLOR=#1111CC># required arg for -c</FONT>
+    checkParseArgsOK(p, <FONT COLOR=#115511>'I -a say -fd hello world'</FONT>, ({<FONT COLOR=#115511>'-a'</FONT>:None, <FONT COLOR=#115511>'-f'</FONT>:None, <FONT COLOR=#115511>'-d'</FONT>:[<FONT COLOR=#115511>'hello'</FONT>, <FONT COLOR=#115511>'world'</FONT>]},[<FONT COLOR=#115511>'I'</FONT>, <FONT COLOR=#115511>'say'</FONT>]))
+    
+    checkParseArgsFails(p, <FONT COLOR=#115511>'-z'</FONT>, ArgError)
+    checkParseArgsFails(p, <FONT COLOR=#115511>'--zorglub'</FONT>, ArgError)
+    
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'=&gt; tests passed.'</FONT>
+
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC>#       M A I N</FONT>
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__ == <FONT COLOR=#115511>"__main__"</FONT>:
+    test()
+</PRE>
+                  <!--footer-->
+                  </BODY>

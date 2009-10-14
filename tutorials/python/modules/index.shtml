@@ -1,0 +1,31 @@
+<html>
+<title>Introduction to Python:  Modules</title>
+<body>
+<h2>An Introduction to Python:  Modules</h2>
+<h3>Modules</h3>
+<a href="../index.html">Table of Contents</a>
+<hr>
+<h3><font color="green">Modules</font></h3>
+<P>Modules are essentially similar to header files in C, but not exactly, and modules are similar to libraries, but not exactly.  All Python files only look like scripts until they are "imported" by another Python program.  Importing allows you to include a Python script and all the functions and variables it contains inside of another script or program.  Code reuse is one of the primary reasons for having Modules.  
+<P>Modules also create namespaces, which may or may not mean something do you.  Suffice it to lssay that modules create there own scope, kind of like global and local scope, or local and function scope.  
+<P>Modules are useful for storing data that needs to be shared between several programs, or several parts of programs.  
+
+<h3><font color="green">Creating Modules</font></h3>
+<P>Python Modules:  All Python code is a Module as I said before, although not all of it is actually useful.  Let's build a simple example, this one keeps track of some simple objects (We'll cover those very soon, sorry to jump ahead!).
+<!--Include Sourcecode-->
+<ul><!--#include virtual="book.py.html"--></ul>
+<P>Let's also include some functions:
+<ul><!--#include virtual="map.py.html"--></ul>
+<P>Finally, let's do a little example of using modules.  In this case we are just interested in reusing code:
+<ul><!--#include virtual="modules.py.html"--></ul>
+<h3><font color="green">C Extension Modules</font></h3>  
+<P>This is one of the coolest features of Python for people converting code from C/C++ or Fortran to Python.  You can actually write compiled extension modules that look and act just like standard Python modules to the Interpreter.  This is generally accomplished with the help of <a href="http://www.swig.org">SWIG</a>, which I'll talk about and go over some examples of later.
+<!--^Header^-->
+
+
+
+<!--\/Footer\/-->
+<hr>
+<a href="../index.html">Table of Contents</a>
+</body>
+</html>

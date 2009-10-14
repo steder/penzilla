@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="24"
+   name=""
+   committed-date="2005-02-24T16:27:18.754022Z"
+   url="http://www.ripplefx.net:81/svn/python/pympi/simple_extension/CVS"
+   last-author="steder"
+   kind="dir"
+   revision="24"/>
+<entry
+   committed-rev="24"
+   name="Repository"
+   text-time="2004-10-20T23:22:42.000000Z"
+   committed-date="2005-02-24T16:27:18.754022Z"
+   checksum="9a434182d2a7cac114803edeb0961577"
+   last-author="steder"
+   kind="file"/>
+<entry
+   committed-rev="24"
+   name="Root"
+   text-time="2004-10-20T23:22:42.000000Z"
+   committed-date="2005-02-24T16:27:18.754022Z"
+   checksum="eda92458dc59c49422e55c61453518ac"
+   last-author="steder"
+   kind="file"/>
+<entry
+   committed-rev="24"
+   name="Entries"
+   text-time="2004-10-20T23:22:42.000000Z"
+   committed-date="2005-02-24T16:27:18.754022Z"
+   checksum="eeb247ad4d01eb7d0309f8c776a1c001"
+   last-author="steder"
+   kind="file"/>
+</wc-entries>

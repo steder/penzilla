@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="10"
+   name=""
+   committed-date="2004-01-09T22:55:59.613144Z"
+   url="http://www.ripplefx.net:81/svn/python/html_source/nehe1-10"
+   last-author="steder"
+   kind="dir"
+   uuid="996777e2-3ecf-0310-aa64-e0ff611b1bef"
+   revision="17"/>
+<entry
+   committed-rev="10"
+   name="lesson02.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="1a7f5b7db829b342a70a46f9767670ce"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+<entry
+   committed-rev="10"
+   name="lesson03.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="b6da2a929c89be8e6aa1682f37d965c6"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+<entry
+   committed-rev="10"
+   name="lesson04.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="80c5af829ee7d04628235b46f8e43835"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+<entry
+   committed-rev="10"
+   name="lesson05.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="b9f02251aca14f2a112a855710b930de"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+<entry
+   committed-rev="10"
+   name="lesson06.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="9832ba37857bd3053e84b54d7481d3ac"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+<entry
+   committed-rev="10"
+   name="lesson07.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="1d8bc6d5a4b456c754eb3acb15b3948a"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+<entry
+   committed-rev="10"
+   name="lesson08.py.html"
+   text-time="2004-09-20T02:22:34.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="0864e74626421ddbb465b8a907d4efc8"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:34.000000Z"/>
+<entry
+   committed-rev="10"
+   name="lesson09.py.html"
+   text-time="2004-09-20T02:22:34.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="d627e74ef7220cc3d947326bc2e169b2"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:34.000000Z"/>
+<entry
+   committed-rev="10"
+   name="lesson01.py.html"
+   text-time="2004-09-20T02:22:34.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="2b934142646b4b71ebb302cd3c1a583c"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:34.000000Z"/>
+<entry
+   committed-rev="10"
+   name="lesson10.py.html"
+   text-time="2004-09-20T02:22:34.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="55f981cea10eaad1bf2371137941a941"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:34.000000Z"/>
+</wc-entries>

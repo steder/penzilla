@@ -1,0 +1,426 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#!/usr/bin/env python</FONT>
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC># async.py:             Asynchronous utilities</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># See __doc__ string below.</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># Package: </FONT>
+<FONT COLOR=#1111CC># Requires:</FONT>
+<FONT COLOR=#1111CC>#    - Python 2.1 or newer (www.python.org)</FONT>
+<FONT COLOR=#1111CC>#    - OS: portable</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># $Id: //depot/rgutils/rgutils/async.py#1 $</FONT>
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#115511>'''
+Asynchronous utilities.
+
+Classes
+=======
+ L{TimedOutCaller} Wraps a function to allow calls w/ timeout.
+
+Functions
+=========
+ L{callWithTimeout}(timeout, func, *args, **kwargs) Helper fct.
+'''</FONT>
+__version__ = <FONT COLOR=#115511>'0.1.'</FONT> + <FONT COLOR=#115511>'$Revision: #1 $'</FONT>[12:-2]
+__author__ = <FONT COLOR=#115511>'Richard Gruet'</FONT>, <FONT COLOR=#115511>'rjgruet@yahoo.com'</FONT>
+__date__    = <FONT COLOR=#115511>'$Date: 2003/05/23 $'</FONT>[7:-2], <FONT COLOR=#115511>'$Author: rgruet $'</FONT>[9:-2]
+__since__ = <FONT COLOR=#115511>'2000-04-11'</FONT>
+__doc__ += <FONT COLOR=#115511>'\n@author: %s (U{%s})\n@version: %s'</FONT> % (__author__[0],
+                                            __author__[1], __version__)
+__all__ = [<FONT COLOR=#115511>'TimedOutCaller'</FONT>, <FONT COLOR=#115511>'AsyncError'</FONT>, <FONT COLOR=#115511>'TimeoutError'</FONT>, <FONT COLOR=#115511>'callWithTimeout'</FONT>]
+
+
+<FONT COLOR=#3333CC><B>from</B></FONT> __future__ <FONT COLOR=#3333CC><B>import</B></FONT> nested_scopes
+<FONT COLOR=#3333CC><B>import</B></FONT> sys, thread, threading, types 
+
+<FONT COLOR=#3333CC><B>if</B></FONT> sys.version[:3] &lt; <FONT COLOR=#115511>'2.2'</FONT>:
+    True, False = 1, 0  <FONT COLOR=#1111CC># built-in in Python 2.2</FONT>
+
+<FONT COLOR=#1111CC># Exceptions:</FONT>
+<FONT COLOR=#1111CC># ----------</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="AsyncError"><FONT COLOR=#CC0000><B> AsyncError</B></FONT></A>(Exception):
+    <FONT COLOR=#115511>''' Exceptions raised by this module.'''</FONT>
+    <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="TimeoutError"><FONT COLOR=#CC0000><B> TimeoutError</B></FONT></A>(AsyncError):
+    <FONT COLOR=#115511>''' Timeout during a call.'''</FONT>
+    <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="TimedOutCaller"><FONT COLOR=#CC0000><B> TimedOutCaller</B></FONT></A>:
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#115511>''' Function wrapper to make them callable with a timeout.
+    
+        Allows to call a function with a timeout, to avoid get stuck if
+        the function freezes.
+        Each instance wraps a function (changeable) which can be
+        called many times with different arguments, using the operator().
+    
+        Methods
+        =======
+            L{__call__(*args, **kwargs)} -- Calls the default function w/ timeout.
+            
+            L{callFunc(func, *args, **kwargs)} -- Calls a function w/ timeout.
+            
+            L{setFunc(func)} -- Change default function.
+            
+            L{setTimeout(timeout)} -- Change timeout.
+            
+            L{getTimeoutCnt()} -- Gets nb of timeouts occurred.
+            
+            L{cleanUp()} -- clean up before exit.
+            
+        Usage
+        =====
+          Typical code::
+            from async import TimedOutCaller
+            
+            # The function to call:
+            def lazyFunc(x, y=3, z=0):
+                sleep(2)
+                return x
+            
+            # The function wrapper:
+            lazyFunc_to = TimedOutCaller(lazyFunc, 4)
+            
+            # Call the function. No timeout occurs since the fct executes
+            # in less than 4 sec:
+            lazyFunc_to(1, z=2)  --&gt; return 1
+            
+            # Change the timeout value so that lazyFunc fails:
+            lazyFunc_to.setTimeout(1)
+            lazyFunc_to(1) ==&gt; raise TimeoutError
+            
+            # Call cleanUp when you no longer use the TimedOutCaller:
+            lazyFunc_to.cleanUp()
+            
+        Limitations
+        ===========
+            Everytime a timeout occurs, a zombie thread stays alive. This is
+            because there is no way to kill a thread in Python (it is a design
+            decision), they have to terminate by themselves.
+            The caller will still get control back, thanks to the timeout,
+            but the called fct continues to consume the CPU in the background,
+            which may or may not be acceptable. However if the called function
+            exits later, the thread will automatically exits.
+            
+            TODO: on windows, we might call (via calldll) the WIN32API 
+            fct TerminateThread to kill the thread.
+    '''</FONT>
+    DEFAUT_TIMEOUT = 5.0
+    <FONT COLOR=#1111CC># Max time waiting for a call before the "call" thread exits :</FONT>
+    THREAD_MAX_IDLE_TIME = 5.0
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, func=None, timeout=DEFAUT_TIMEOUT):
+    
+        self._lock = threading.RLock() <FONT COLOR=#1111CC>#[RLock] Avoids reentrant calls.</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> func <FONT COLOR=#3333CC><B>is</B></FONT> None:
+            func = <FONT COLOR=#3333CC><B>lambda</B></FONT>:None
+        self._func = func           <FONT COLOR=#1111CC># [function] The function to call.</FONT>
+        self.setFunc(func)
+        self._args = None           <FONT COLOR=#1111CC># [tuple] Arguments.</FONT>
+        self._kwargs = None         <FONT COLOR=#1111CC># [tuple] keyword arguments.</FONT>
+        self._callResult = None     <FONT COLOR=#1111CC># holds return value</FONT>
+        self._callException = None  <FONT COLOR=#1111CC># holds exception if any</FONT>
+        
+        self._timeout = None        <FONT COLOR=#1111CC># [float&gt;0] timeout in sec.</FONT>
+        self.setTimeout(timeout)
+        self._timeoutCnt = 0        <FONT COLOR=#1111CC># [int] Nb of timeouts occurred</FONT>
+
+        <FONT COLOR=#1111CC># Sync between __call__ and the thread performing calls is ensured</FONT>
+        <FONT COLOR=#1111CC># via a pair of events:</FONT>
+        self._doCall = threading.Event()   <FONT COLOR=#1111CC># [Event] Set=perform the call</FONT>
+        self._callDone = threading.Event() <FONT COLOR=#1111CC># [Event] Set=call completed</FONT>
+        
+        self._callThread = None     <FONT COLOR=#1111CC># [Thread] thread in which call executes</FONT>
+        self._threadId = 0          <FONT COLOR=#1111CC># [int] System thread identifier.</FONT>
+        self._stops = {}    <FONT COLOR=#1111CC># (dict] call threads in timeout, for which stop</FONT>
+                            <FONT COLOR=#1111CC># is requested: { threadId: T/F, ...}</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__del__"><FONT COLOR=#CC0000><B> __del__</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            self.cleanUp()
+        <FONT COLOR=#3333CC><B>except</B></FONT>: 
+            <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__repr__"><FONT COLOR=#CC0000><B> __repr__</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>if</B></FONT> self._func: fn = self._func.__name__
+        <FONT COLOR=#3333CC><B>else</B></FONT>: fn = <FONT COLOR=#115511>'(None)'</FONT>
+        <FONT COLOR=#3333CC><B>return</B></FONT> <FONT COLOR=#115511>'&lt;TimedOutCaller for function %s, timeout=%f&gt;'</FONT> % (
+                                                    fn, self._timeout)
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="cleanUp"><FONT COLOR=#CC0000><B> cleanUp</B></FONT></A>(self):
+        <FONT COLOR=#115511>''' Clean-up before exit.
+        '''</FONT>
+        self._lock.acquire()
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            <FONT COLOR=#3333CC><B>for</B></FONT> id <FONT COLOR=#3333CC><B>in</B></FONT> self._stops.keys():
+                self._stops[id] = True
+        <FONT COLOR=#3333CC><B>finally</B></FONT>:
+            self._lock.release()
+        
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__call__"><FONT COLOR=#CC0000><B> __call__</B></FONT></A>(self, *args, **kwargs):
+        <FONT COLOR=#115511>''' [synchronized] Calls associated function with the given args.
+
+            The call is performed in a separate thread. If the fct
+            is not completed within &lt;timeout&gt; seconds, an Exception
+            is raised. If an exception occurs in the fct, it is forwarded
+            here.
+            @return: The result of the fct call.
+            @exception TimeoutError: in case of time out.
+            @see: L{setFunc}
+            @see: L{callFunc}
+        '''</FONT>
+        <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>'%s(%s, %s)'</FONT> % (self._func.__name__, args, kwargs) <FONT COLOR=#1111CC>####</FONT>
+        self._lock.acquire()
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            self._args = args
+            self._kwargs = kwargs
+            self._callResult = None
+            self._callException = None
+            
+            self._callDone.clear()
+            <FONT COLOR=#3333CC><B>if</B></FONT> self._callThread <FONT COLOR=#3333CC><B>is</B></FONT> None <FONT COLOR=#3333CC><B>or</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> self._callThread.isAlive():
+                self._createCallThread()
+            self._doCall.set()  <FONT COLOR=#1111CC># signal the call thread to do the call</FONT>
+            self._callDone.wait(self._timeout) <FONT COLOR=#1111CC># wait for end of exec.</FONT>
+            
+            <FONT COLOR=#3333CC><B>if</B></FONT> self._callDone.isSet():  <FONT COLOR=#1111CC># OK</FONT>
+                <FONT COLOR=#3333CC><B>if</B></FONT> self._callException <FONT COLOR=#3333CC><B>is</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> None:
+                    <FONT COLOR=#3333CC><B>raise</B></FONT> self._callException
+                <FONT COLOR=#3333CC><B>else</B></FONT>:
+                    <FONT COLOR=#3333CC><B>return</B></FONT> self._callResult
+            <FONT COLOR=#3333CC><B>else</B></FONT>:   <FONT COLOR=#1111CC># timeout:</FONT>
+                self._timeoutCnt += 1
+                <FONT COLOR=#1111CC>## Try to kill the thread under win32 (TerminateThread)????</FONT>
+                self._stops[self._threadId] = True  <FONT COLOR=#1111CC># request stop</FONT>
+                self._callThread = None <FONT COLOR=#1111CC># (will create new thread when needed)</FONT>
+                <FONT COLOR=#3333CC><B>raise</B></FONT> TimeoutError(<FONT COLOR=#115511>'Time out (%.02f sec) while calling %s'</FONT> %
+                                    (self._timeout, self._func.__name__))
+        <FONT COLOR=#3333CC><B>finally</B></FONT>:
+            self._lock.release()
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="callFunc"><FONT COLOR=#CC0000><B> callFunc</B></FONT></A>(self, func, *args, **kwargs):
+        <FONT COLOR=#115511>''' Calls the given function with the given arguments.
+        
+            C{func} becomes the default function for next calls.
+            @param func: [function] The new function.
+            @see: L{__call__}
+        '''</FONT>
+        self.setFunc(func)
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.__call__(*args, **kwargs)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="setFunc"><FONT COLOR=#CC0000><B> setFunc</B></FONT></A>(self, func):
+        <FONT COLOR=#115511>''' Changes the function called.
+            @param func: [function|Method] The new function.
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> isinstance(func, types.FunctionType) <FONT COLOR=#3333CC><B>and</B></FONT> (
+           <FONT COLOR=#3333CC><B>not</B></FONT> isinstance(func, types.MethodType)):
+            <FONT COLOR=#3333CC><B>raise</B></FONT> TypeError(<FONT COLOR=#115511>'argument "func" must be a function|Method.'</FONT>)
+        self._lock.acquire()
+        self._func = func
+        self._lock.release()
+        
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="setTimeout"><FONT COLOR=#CC0000><B> setTimeout</B></FONT></A>(self, timeout):
+        <FONT COLOR=#115511>''' Changes the timeout.
+            @param timeout: [float|int &gt;0] The new timeout.
+        '''</FONT>
+        timeout = float(timeout) <FONT COLOR=#1111CC># (TypeError possible)</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> timeout &lt;= 0:
+            <FONT COLOR=#3333CC><B>raise</B></FONT> ValueError(<FONT COLOR=#115511>'setTimeout: timeout must be &gt;0.'</FONT>)
+        self._lock.acquire()
+        self._timeout = timeout
+        self._lock.release()
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getTimeoutCnt"><FONT COLOR=#CC0000><B> getTimeoutCnt</B></FONT></A>(self):
+        <FONT COLOR=#115511>''' Returns the number of timeouts that occured so far.'''</FONT>
+        <FONT COLOR=#3333CC><B>return</B></FONT> self._timeoutCnt
+
+    <FONT COLOR=#1111CC># Private:</FONT>
+    <FONT COLOR=#1111CC># -------</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_createCallThread"><FONT COLOR=#CC0000><B> _createCallThread</B></FONT></A>(self):
+        self._callThread = threading.Thread(target=self._callThreadMain)
+        self._callThread.start()
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_callThreadMain"><FONT COLOR=#CC0000><B> _callThreadMain</B></FONT></A>(self):
+        <FONT COLOR=#115511>''' Call thread main loop.
+            Waits for a call to perform, do it, signal end, and loop.
+        '''</FONT>
+        id = self._threadId = thread.get_ident()
+        self._stops[id] = False
+        
+        <FONT COLOR=#3333CC><B>while</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> self._stops[id]:
+            <FONT COLOR=#1111CC># Wait for a function to call; if idle for too long, or stop</FONT>
+            <FONT COLOR=#1111CC># requested or instance finalization, exit:</FONT>
+            self._doCall.wait(self.THREAD_MAX_IDLE_TIME)
+            
+            <FONT COLOR=#3333CC><B>if</B></FONT> (self._stops[id] <FONT COLOR=#3333CC><B>or</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> hasattr(self, <FONT COLOR=#115511>'_doCall'</FONT>)
+                                <FONT COLOR=#3333CC><B>or</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> self._doCall.isSet()):
+                <FONT COLOR=#3333CC><B>break</B></FONT>
+
+            <FONT COLOR=#1111CC># Call the function:</FONT>
+            self._doCall.clear()
+            <FONT COLOR=#3333CC><B>try</B></FONT>:
+                self._callResult = apply(self._func, self._args,
+                                         self._kwargs)
+            <FONT COLOR=#3333CC><B>except</B></FONT> Exception, e:
+                self._callException = e
+            <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> self._stops[id]:
+                self._callDone.set()    <FONT COLOR=#1111CC># signal end.</FONT>
+        
+        <FONT COLOR=#1111CC># [stop]</FONT>
+        self._callThread = None
+        <FONT COLOR=#3333CC><B>del</B></FONT> self._stops[id]
+        self._threadId = None
+        
+            
+<FONT COLOR=#1111CC>#end class TimedOutCaller</FONT>
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="callWithTimeout"><FONT COLOR=#CC0000><B> callWithTimeout</B></FONT></A>(timeout, func, *args, **kwargs):
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#115511>" Helper function."</FONT>
+    <FONT COLOR=#3333CC><B>return</B></FONT> TimedOutCaller(func, timeout)(*args, **kwargs)
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC>#                               T E S T S</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> unittest, time
+
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="TimedOutCallerTestCase"><FONT COLOR=#CC0000><B> TimedOutCallerTestCase</B></FONT></A>(unittest.TestCase):
+    <FONT COLOR=#115511>''' Test cases for class TimedOutCaller.
+    '''</FONT> 
+    <FONT COLOR=#1111CC># Init / finalization for all test cases:</FONT>
+    <FONT COLOR=#1111CC># -------------------</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="setUp"><FONT COLOR=#CC0000><B> setUp</B></FONT></A>(self):
+        <FONT COLOR=#115511>"Init, called before each test case."</FONT>
+        TimedOutCaller.THREAD_MAX_IDLE_TIME = 0.1   <FONT COLOR=#1111CC># speed up !</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="tearDown"><FONT COLOR=#CC0000><B> tearDown</B></FONT></A>(self):
+        <FONT COLOR=#115511>"Finalization, called after each test case (whatever the outcome)."</FONT>
+        <FONT COLOR=#3333CC><B>pass</B></FONT>
+    
+    <FONT COLOR=#1111CC># Util functions :</FONT>
+    <FONT COLOR=#1111CC># --------------</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_intersect"><FONT COLOR=#CC0000><B> _intersect</B></FONT></A>(self, l1, l2):
+        <FONT COLOR=#3333CC><B>if</B></FONT> len(l1) &lt;= len(l2):
+            <FONT COLOR=#3333CC><B>return</B></FONT> filter(<FONT COLOR=#3333CC><B>lambda</B></FONT> x: x <FONT COLOR=#3333CC><B>in</B></FONT> l2, l1)
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#3333CC><B>return</B></FONT> filter(<FONT COLOR=#3333CC><B>lambda</B></FONT> x: x <FONT COLOR=#3333CC><B>in</B></FONT> l1, l2)
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_equalSets"><FONT COLOR=#CC0000><B> _equalSets</B></FONT></A>(self, l1, l2):
+        <FONT COLOR=#3333CC><B>return</B></FONT> len(self._intersect(l1,l2)) == len(l1)
+
+    <FONT COLOR=#1111CC># Test cases (method names must start with 'test')</FONT>
+    <FONT COLOR=#1111CC># ----------</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test01Constructor"><FONT COLOR=#CC0000><B> test01Constructor</B></FONT></A>(self):
+        <FONT COLOR=#115511>"Check Construction."</FONT>
+        self.assertRaises(TypeError, TimedOutCaller, func=1)
+        self.assertRaises(TypeError, TimedOutCaller, timeout=None)
+        self.assertRaises(ValueError, TimedOutCaller, timeout=<FONT COLOR=#115511>'hello'</FONT>)
+        self.assertRaises(ValueError, TimedOutCaller, timeout=0)
+        toc = TimedOutCaller()  <FONT COLOR=#1111CC># default args</FONT>
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test02Repr"><FONT COLOR=#CC0000><B> test02Repr</B></FONT></A>(self):
+        <FONT COLOR=#115511>"Check __repr__"</FONT>
+        repr(TimedOutCaller())  <FONT COLOR=#1111CC># will fail if non string</FONT>
+        
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test03FuncWithoutArgs"><FONT COLOR=#CC0000><B> test03FuncWithoutArgs</B></FONT></A>(self):
+        <FONT COLOR=#115511>"Function without args returns a known value."</FONT>
+        self.assertEqual(TimedOutCaller(<FONT COLOR=#3333CC><B>lambda</B></FONT>:3.14159)(), 3.14159)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test04CreateWithoutFunc"><FONT COLOR=#CC0000><B> test04CreateWithoutFunc</B></FONT></A>(self):
+        <FONT COLOR=#115511>"Default function call (none specified at creation) is harmless."</FONT>
+        self.assertEqual(TimedOutCaller()(), None)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test05MultipleCalls"><FONT COLOR=#CC0000><B> test05MultipleCalls</B></FONT></A>(self):
+        <FONT COLOR=#115511>"Multiple calls to same instance are possible."</FONT>
+        <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getPi"><FONT COLOR=#CC0000><B> getPi</B></FONT></A>(): <FONT COLOR=#3333CC><B>return</B></FONT> 3.14159
+        getPi_ = TimedOutCaller(getPi)
+        self.assert_(getPi_() == getPi_() == 3.14159)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test06SameCallThreadUsed"><FONT COLOR=#CC0000><B> test06SameCallThreadUsed</B></FONT></A>(self):
+        <FONT COLOR=#115511>"Same thread for different calls as long as there is no timeout."</FONT>
+        f = TimedOutCaller()
+        f() <FONT COLOR=#1111CC># (will create call thread)</FONT>
+        thread0 = f._callThread
+        self.assertEqual(f._callThread, thread0,
+                        <FONT COLOR=#115511>'Thread has changed between 2 calls without timeout'</FONT>)
+        time.sleep(f.THREAD_MAX_IDLE_TIME + 0.1) <FONT COLOR=#1111CC># ensure &gt; idle time</FONT>
+        self.assertEqual(f._callThread, None)
+        f() <FONT COLOR=#1111CC># (will create call thread)</FONT>
+        self.assertNotEqual(f._callThread, thread0,
+                        <FONT COLOR=#115511>'Thread idle time expired but thread not changed'</FONT>)
+         
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test07ChangeFunc"><FONT COLOR=#CC0000><B> test07ChangeFunc</B></FONT></A>(self):
+        <FONT COLOR=#115511>"Function may be changed via setFunc()."</FONT>
+        <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getPi"><FONT COLOR=#CC0000><B> getPi</B></FONT></A>(): <FONT COLOR=#3333CC><B>return</B></FONT> 3.14159
+        f = TimedOutCaller()
+        f.setFunc(getPi)
+        self.assertEqual(f(), 3.14159)
+        
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test08CallFunc"><FONT COLOR=#CC0000><B> test08CallFunc</B></FONT></A>(self):
+        <FONT COLOR=#115511>"Method callFunc()"</FONT>
+        f = TimedOutCaller()
+        <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="echo"><FONT COLOR=#CC0000><B> echo</B></FONT></A>(*args, **kwargs): <FONT COLOR=#3333CC><B>return</B></FONT> args, kwargs
+        self.assertEqual(f.callFunc(echo, 1,2,3,x=4), ((1,2,3), {<FONT COLOR=#115511>'x'</FONT>:4}))
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test09ArgsPassing"><FONT COLOR=#CC0000><B> test09ArgsPassing</B></FONT></A>(self):
+        <FONT COLOR=#115511>"Args well passed and returned to/by function called."</FONT>
+        <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="echo"><FONT COLOR=#CC0000><B> echo</B></FONT></A>(*args, **kwargs): <FONT COLOR=#3333CC><B>return</B></FONT> args, kwargs
+        self.assertEqual(TimedOutCaller(echo)(1,2,3,x=4), ((1,2,3), {<FONT COLOR=#115511>'x'</FONT>:4}))
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test10ReturnNone"><FONT COLOR=#CC0000><B> test10ReturnNone</B></FONT></A>(self):
+        <FONT COLOR=#115511>"None received when calling a func. returning nothing."</FONT>
+        <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="returnNothing"><FONT COLOR=#CC0000><B> returnNothing</B></FONT></A>(): <FONT COLOR=#3333CC><B>pass</B></FONT>
+        self.assertEqual(TimedOutCaller(returnNothing)(), None)
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test11ExceptionInFunc"><FONT COLOR=#CC0000><B> test11ExceptionInFunc</B></FONT></A>(self):
+        <FONT COLOR=#115511>"Exception raised by function is passed back."</FONT>
+        <FONT COLOR=#3333CC><B>class</B></FONT><A NAME="FakeException"><FONT COLOR=#CC0000><B> FakeException</B></FONT></A>(Exception): <FONT COLOR=#3333CC><B>pass</B></FONT>
+        <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="fail"><FONT COLOR=#CC0000><B> fail</B></FONT></A>(): <FONT COLOR=#3333CC><B>raise</B></FONT> FakeException(<FONT COLOR=#115511>'Fake exception for test'</FONT>)
+        self.assertRaises(FakeException, TimedOutCaller(fail))
+        
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test12TimeoutInFunc"><FONT COLOR=#CC0000><B> test12TimeoutInFunc</B></FONT></A>(self):
+        <FONT COLOR=#115511>"Timeout during a call raises TimeoutError and is counted."</FONT>
+        <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="sleepy"><FONT COLOR=#CC0000><B> sleepy</B></FONT></A>(): time.sleep(0.5)
+        f = TimedOutCaller(timeout=0.01)
+        f() <FONT COLOR=#1111CC># (will create a call thread)</FONT>
+        thread0 = f._callThread
+        self.assertNotEqual(thread0, None)
+        self.assertEqual(f.getTimeoutCnt(), 0)
+        self.assertRaises(TimeoutError, f.callFunc, sleepy)
+        self.assertEqual(f.getTimeoutCnt(), 1)
+        self.assertEqual(f._callThread, None)
+        f.setTimeout(1) <FONT COLOR=#1111CC># be sure to avoid timeout</FONT>
+        f()
+        self.assertEqual(f(), None,
+                        <FONT COLOR=#115511>'First (correct) call after a timeout failed.'</FONT>)
+        self.assertNotEqual(f._callThread, thread0,
+                        <FONT COLOR=#115511>'Thread should have changed after a timeout'</FONT>)
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test14CallsSync"><FONT COLOR=#CC0000><B> test14CallsSync</B></FONT></A>(self):
+        <FONT COLOR=#115511>"Reentrant calls are synced (sequentialized)."</FONT>
+        <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>'thread count = %d ####'</FONT> % threading.activeCount()
+        <FONT COLOR=#3333CC><B>pass</B></FONT> <FONT COLOR=#1111CC>#self.fail("Don't know how to perform this test!")</FONT>
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test15"><FONT COLOR=#CC0000><B> test15</B></FONT></A>(self):
+        <FONT COLOR=#115511>"Test callWithTimeout()"</FONT>
+        <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="echo"><FONT COLOR=#CC0000><B> echo</B></FONT></A>(*args, **kwargs):
+            <FONT COLOR=#3333CC><B>return</B></FONT> args + tuple(kwargs.values())
+        self.assert_(self._equalSets(callWithTimeout(1, echo, 1, 2, x=3, y=4), (1,2,3,4))) 
+        
+<FONT COLOR=#1111CC># Builds a TestSuite from the test cases:</FONT>
+<FONT COLOR=#1111CC>#suite = unittest.defaultTestLoader.loadTestsFromTestCase(</FONT>
+<FONT COLOR=#1111CC>#                                       TimedOutCallerTestCase)</FONT>
+    
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC>#       M A I N</FONT>
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__ == <FONT COLOR=#115511>"__main__"</FONT>:
+    unittest.main() <FONT COLOR=#1111CC># Run all test cases found in this module.</FONT>
+</PRE>
+                  <!--footer-->
+                  </BODY>

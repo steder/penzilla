@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content=
+          "HTML Tidy for Linux/x86 (vers 1st August 2004), see www.w3.org" />
+    <title>Penzilla.net's Python Tutorial: CGI</title>
+    <link rel="StyleSheet" href="../style.css" type="text/css" media="screen" />
+  </head>
+  <body>
+    <div id="header">
+      <h1>Penzilla.net's Python Tutorial</h1>
+      <h2>CGI Scripting Basics</h2>
+      <hr /></div>
+    <div id="sidebar">
+      <div id="menu"><a href="../index.shtml">&raquo;Tutorial Home</a> 
+        <!--#include virtual="/tutorials/python/menu.html"--></div>
+      <!--#include virtual="/tutorials/python/skyscraper_ads.html"--></div>
+    <div id="content"><!-- Comments -->
+      <!-- Body -->
+      <h4><font color="green">What is CGI?</font></h4>
+      <P>
+        <font color="blue">CGI Scripting</font> is a type of server side programming 
+        that powers a lot of the useful sites on the web.  CGI Scripts power search engines, online shopping sites, and many if not all news sites, discussion forums, blogs, etc.</P>
+      <P><font color="blue">Server Side</font> means that the code runs on a remote server, and the only the output is sent to the client.  So in the case of a google search, I first go to their homepage:
+      </P>
+      <center>
+        <img src="google1.png">
+        </center>
+        <P>
+          Google's pages are mostly simple HTML markup, but there are a few special 
+          statements that create a "Form", that is responsible for displaying the 
+          text box that you type your query into, and the buttons that you can press 
+          to begin your search.  Some of the code that generates this form is displayed below.  
+          Do you see the line where "name=q" is?  That's the text box that you type into.  
+          The buttons are the pretty obvious last couple lines.  The really important one is hiding at
+          the top:  <pre>&lt form action='/search' name=f&gt</pre>  Action essentially tells the 
+          form what script to submit it's input to, so this is really key if you want a CGI script that 
+          interacts with a user.  
+        </p>
+        <div id="code">
+          <pre><code>
+&lt form action="/search" name=f&gt
+&lt input type=hidden name=oe value="UTF-8"&gt
+&lt input maxLength=256 size=55 name=q value=""&gt
+&lt input type=submit value="Google Search" name=btnG&gt
+&lt input type=submit value="I'm Feeling Lucky" name=btnI&gt
+          </code></pre>
+        </div>
+        <p>
+        Now when you click the button on that form to submit your search string, a CGI script 
+        (which I don't have access to so I can't show you), takes that string and runs the search.  
+        Then from your search results, the CGI script on the server takes those results and formats
+        them as HTML, and outputs them to you.</p>  
+        <center>
+          <img src="google2.png">
+          </center>
+          
+          <P>
+            Now not all CGI scripts are like this, some are run everytime you access a page,
+            without you pressing any buttons or inputing any data.  We'll have an example or two in a little bit.  For now I hope that this helps give those of you who are looking into CGI scripting for the first time some idea of what you'll be trying to accomplish with your scripts.
+          </p>
+          
+          <h4><font color="green">A (very) simple script:</font></h4>
+          
+          First let's take a very quick look at <i>test.py</i>:
+          <!--Include Sourcecode-->
+          <div id="code">
+            <!--#include virtual="test.py.html"-->
+          </div>
+          At first you won't see many differences between this and any other python 
+          code that we've written.  In fact you might say that this looks like just a 
+          simple "Hello World" Program, and you'd be right.
+          
+          The important differences between code that you run at the command line and
+          CGI scripts like this one is that the #!("pound-bang") hack is required in 
+          CGI's, and that all your output <strong>must</strong> be valid HTML.
+          
+          <h4><font color="green">Initial Content</font></h4>
+          Before printing anything else in your CGI script you should be certain to print the following "special" lines:
+          
+          <div id="code"><!--#include virtual="special.py.html"--></div>
+          
+          These lines send the correct header information to your clients web browser.  Without those
+          lines the web browser isn't sure what to do with the output of your CGI script.
+          
+          <h4><font color="green">Debugging and Coding Tips</font></h4>
+          
+          To simplify debugging there are several things you can do.  Old school CGI scriptors, especially from the Perl camp we'll suggest that you do something like this:
+          <div id="code"><!--#include virtual="redirect.py.html"--></div>
+          
+          Another thing worth doing is including the following import statements:
+          
+          <div id="code"><!--#include virtual="cgitb-sample.py.html"--></div>
+          
+          Both of the above are ways to get errors that occur during your script to be properly formatted and outputed to the browser for testing.  The <i>cgitb</i> module is more advanced and probably the more Python-y way to do things, I highly recommend it.
+          
+          <P>One last thing to keep in mind:<strong>Always run your script at the commandline before trying it in your browser!</strong>  If your script has any major syntax errors in it(incorrect indentation, missing modules and misspellings) it will simply refuse to run and you will see:
+          </p>
+          <h1>500:  Internal Server Error</h1>
+          <p>... rather then the friendly and exciting CGI script output you were expecting.  <i>cgitb</i> and other techniques will handle runtime errors, but not syntax errors, those you have to deal with before <i>cgitb</i> can be of any help.
+          </p>
+          <P><b>So what errors will I actually see?</b>  Well, you won't see syntax errors, so you won't see something like this:
+          </p>
+            <div id="code"><!--#include virtual="bad1.py.html"--></div>
+          <P>But this will show up in your browser as an error(in <i>cgitb</i> or whatever):
+          </p>
+          <div id="code"><!--#include virtual="bad2.py.html"--></div>
+          
+          <h4><font color="green">A "no-input" example</font></h4>
+          <p>
+          This CGI script just prints the current time (on the server) that you asked
+          for the page.
+          </p>
+          
+          <P>Here's the code:</p>
+            
+          <div id="code"><!--#include virtual="wittime.py.html"--></div>
+          
+          <P><a href="http://www.penzilla.net/cgi-bin/wittime.py">Click here to test out wittime.py</a></p>
+          
+            
+          <h4><font color="green">A Game:  Rock Paper Scissors Spock Lizard</font></h4>
+          <p>
+          Rock Paper Scissors Spock Lizard is a variation on the classic game or Rock Paper Scissors.  The addition of two new "signs" makes the game a little more interesting and a little harder to predict.  The code is not the most exciting in the world, and it's pretty repetitive, so I'm including links to just download and check the code out at your leisure. 
+          </p>
+          
+          <a href="rpssl.html">The Required HTML input page</a><br />
+          <a href="rpssl.py">The python code / CGI Script</a>
+          
+          <P>Try playing the game here:
+            <a href="rpssl.html">http://www.penzilla.net/tutorials/python/cgi/rpssl.html</a>
+          </p>
+          
+          <h4><font color="green">Sorting IP Addresses</font></h4>
+          
+          <P>I wrote the following program to help out a friend who wanted to look at his 
+            web traffic a bit.  He had a number of php hit counters that stored the 
+            ip address of anyone who visited his site.  He was interested in things like
+            who visited his site most and things like that.</p>
+            
+          <P>The following simple script grabs these hits[1-8].txt files and read's all the
+            ip addresses from them.  It then sorts the IP addresses and counts the number
+            of times each address occurs.</p>
+            
+          <P>It is designed to run as a CGI to let you check this information 
+            from your browser.</p>
+            
+          <div id="code">
+            <!--#include virtual="ipsort.py.html" -->
+          </div>
+            
+          <!--End Body-->
+        </div>
+    <div id="footer">
+      <!--#include virtual="/tutorials/python/footer.shtml"-->
+    </div>
+  </body>
+</html>

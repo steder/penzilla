@@ -1,0 +1,63 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># Simple Application/Script to Compress files of a</FONT>
+<FONT COLOR=#1111CC># specific type in a Directory.</FONT>
+<FONT COLOR=#1111CC># I'm using this to build the packages of</FONT>
+<FONT COLOR=#1111CC># example codes for download that are</FONT>
+<FONT COLOR=#1111CC># on the first page of this tutorial.</FONT>
+<FONT COLOR=#1111CC># Yes:  You could use Zip, Winzip, Tar, or whatever</FONT>
+<FONT COLOR=#1111CC># to pick out just the code files and so on, but this</FONT>
+<FONT COLOR=#1111CC># is just a little more fun.  </FONT>
+<FONT COLOR=#115511>"""
+Path can be a file or directory
+Archname is the name of the to be created archive
+"""</FONT>
+<FONT COLOR=#3333CC><B>from</B></FONT> zipfile <FONT COLOR=#3333CC><B>import</B></FONT> ZipFile,ZIP_DEFLATED
+<FONT COLOR=#3333CC><B>import</B></FONT> os
+<FONT COLOR=#3333CC><B>import</B></FONT> sys 
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="zipty"><FONT COLOR=#CC0000><B> zipty</B></FONT></A>(path, archive, type):
+    paths = os.listdir(path)
+    <FONT COLOR=#3333CC><B>for</B></FONT> p <FONT COLOR=#3333CC><B>in</B></FONT> paths:
+        p = os.path.join(path, p) 
+        <FONT COLOR=#3333CC><B>if</B></FONT> os.path.isdir(p): 
+            zipty(p, archive,type)
+        <FONT COLOR=#3333CC><B>elif</B></FONT> os.path.splitext(p)[1] == type: <FONT COLOR=#1111CC>#Just a little change here</FONT>
+            archive.write(p) 
+    <FONT COLOR=#3333CC><B>return</B></FONT>
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="ziptype"><FONT COLOR=#CC0000><B> ziptype</B></FONT></A>(path, archname, type):
+    <FONT COLOR=#1111CC># Create a ZipFile Object primed to write</FONT>
+    archive = ZipFile(archname, <FONT COLOR=#115511>"w"</FONT>,ZIP_DEFLATED) <FONT COLOR=#1111CC># "a" to append, "r" to read</FONT>
+    <FONT COLOR=#1111CC># Recurse or not, depending on what path is</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> os.path.isdir(path):
+        zipty(path, archive, type)
+    <FONT COLOR=#3333CC><B>elif</B></FONT> os.path.splitext(path)[1] == type: <FONT COLOR=#1111CC>#This is all we're changing</FONT>
+        archive.write(path)
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#115511>"Compression of \""</FONT>+path+<FONT COLOR=#115511>"\" was failed!"</FONT> <FONT COLOR=#1111CC># And a failure message</FONT>
+    archive.close()
+    <FONT COLOR=#3333CC><B>return</B></FONT> <FONT COLOR=#115511>"Compression of \""</FONT>+path+<FONT COLOR=#115511>"\" was successful!"</FONT>
+
+instructions = <FONT COLOR=#115511>"ziptype.py:  Simple zipfile creation script."</FONT> + \
+               <FONT COLOR=#115511>"recursively zips files in a directory that match"</FONT> +\
+               <FONT COLOR=#115511>"a specific type."</FONT>+\
+               <FONT COLOR=#115511>"e.g.:  python zipit.py myfiles .py myfiles.zip"</FONT>
+
+<FONT COLOR=#1111CC># Notice the __name__=="__main__"</FONT>
+<FONT COLOR=#1111CC># this is used to control what Python does when it is called from the</FONT>
+<FONT COLOR=#1111CC># command line.  I'm sure you've seen this in some of my other examples.</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
+    <FONT COLOR=#3333CC><B>if</B></FONT> len(sys.argv) == 4:
+        <FONT COLOR=#1111CC># ziptype("directory/path", "filetype", "archivename")</FONT>
+        result = ziptype(sys.argv[1], sys.argv[3], sys.argv[2])
+        <FONT COLOR=#3333CC><B>print</B></FONT> result
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#3333CC><B>print</B></FONT> instructions
+        
+        
+
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="10"
+   name=""
+   committed-date="2004-01-09T22:55:59.613144Z"
+   url="http://www.ripplefx.net:81/svn/python/html_source/classes"
+   last-author="steder"
+   kind="dir"
+   uuid="996777e2-3ecf-0310-aa64-e0ff611b1bef"
+   revision="17"/>
+<entry
+   committed-rev="10"
+   name="anatomy.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="f4e73b6f287fc20cc8fa88fb6f266153"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+<entry
+   committed-rev="10"
+   name="students.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="66d920e56f7fe029ccc82b09065878cf"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+<entry
+   committed-rev="10"
+   name="stopwatch.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="df1e32f39135dd33e5992b140d7b185d"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+<entry
+   committed-rev="10"
+   name="bob.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="a5c9b29909783d39640128e6fa76833f"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+<entry
+   committed-rev="10"
+   name="instantiate1.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="a247d8384890e45cb308bda8a69c6f44"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+</wc-entries>

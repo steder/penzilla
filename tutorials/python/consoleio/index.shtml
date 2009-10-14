@@ -1,0 +1,31 @@
+<html>
+<title>Introduction to Python:  Console I/O</title>
+<body>
+<h2>An Introduction to Python:  Control I/O</h2>
+<h3><font color="blue">Console I/O</font></h3>
+<a href="../index.html">Table of Contents</a>
+<hr><!--^Header^-->
+<h4><font color="green">Asking the user questions</font></h4>
+<P>
+I personally haven't spent a lot of time writing programs that prompt the user
+for input.  Usually, I deal with commandline arguments are configuration files.  However, it's not unreasonable to want to query the user to figure out what they'd like to do next.  
+<P>
+I'm first going to look into how you prompt for input, and I'll cover file IO and commandline arguments in a couple later sections.
+<h4><font color="green">Meet 'raw_input'</font></h4>
+
+<P><font color="blue">raw_input</font> is a function that takes whatever string is passed to it and uses it as a prompt, and then waits for the user to press enter before returning.  All the text typed in between the time raw_input is called and the time when the user presses enter is the return value of <font color="blue">raw_input</font>.  
+
+<!--Include Sourcecode-->
+<ul><!--#include virtual="consoleio.py.html" --></ul>
+
+<P>You'll hopefully notice in the above code that there is a lot of error 
+checking that should really be included.  For instance, what happens if
+the user inputs 0.7, -3, or whatever for the number between 1 and 7?  I'm not
+sure, and neither is this program.  This is part of the reason that user input
+is kind of a pain.
+
+<!--\/Footer\/-->
+<hr>
+<a href="../index.html">Table of Contents</a>
+</body>
+</html>

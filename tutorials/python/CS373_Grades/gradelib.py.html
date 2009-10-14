@@ -1,0 +1,155 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># Mike Steder</FONT>
+<FONT COLOR=#1111CC># 10/29/03</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># This is what I'm doing instead of studying or homework</FONT>
+<FONT COLOR=#1111CC># :~)</FONT>
+<FONT COLOR=#115511>"""
+This is a script designed to do some simple analysis of
+the CS373 Grade's.
+  Average Score Per Assignment
+  Average Overall
+  High Score
+  Low Score
+
+  Grade Ranges assuming one standard deviation from the average
+  set's the curve.
+
+  If given a student Alias it returns:
+    *all these statistic's
+    *The student's projected letter grade
+
+  A CGI Frontend would be awesome!
+"""</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> sys
+<FONT COLOR=#3333CC><B>import</B></FONT> os
+<FONT COLOR=#3333CC><B>import</B></FONT> string
+
+<FONT COLOR=#115511>"""
+This returns a dictionary of lists:
+data = {'alias1':[hw0, hw1, ..., midterm]}
+"""</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="parse"><FONT COLOR=#CC0000><B> parse</B></FONT></A>(filename):
+    data = {}
+    infile = open(filename,<FONT COLOR=#115511>"r"</FONT>)
+    header = infile.readline()
+    header = header.split(<FONT COLOR=#115511>"\t"</FONT>)
+    <FONT COLOR=#1111CC># Parse the rest of the file:</FONT>
+    lcount = 0
+    file = infile.readlines()
+    <FONT COLOR=#3333CC><B>for</B></FONT> line <FONT COLOR=#3333CC><B>in</B></FONT> file:
+        line = line.split(<FONT COLOR=#115511>"\t"</FONT>)
+        <FONT COLOR=#3333CC><B>if</B></FONT> len(line) != len(header):
+            <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Ignoring line!("</FONT>,lcount,<FONT COLOR=#115511>"):"</FONT>, string.join(line,<FONT COLOR=#115511>"\t"</FONT>)
+            <FONT COLOR=#3333CC><B>continue</B></FONT>
+        alias = line[0]
+        <FONT COLOR=#1111CC># Convert all the scores to floats</FONT>
+        <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> range(len(line[1:])):
+            <FONT COLOR=#3333CC><B>try</B></FONT>:
+                line[i+1] = string.atof(line[i+1])
+            <FONT COLOR=#3333CC><B>except</B></FONT> ValueError:
+                line[i+1] = 0.0
+        data[alias] = line[1:]
+        lcount = lcount + 1
+    <FONT COLOR=#3333CC><B>return</B></FONT> data,header
+
+<FONT COLOR=#115511>"""
+Stat's Consist of the following:
+average for each category
+average of total points
+"""</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getaverages"><FONT COLOR=#CC0000><B> getaverages</B></FONT></A>(data,header):
+    names = data.keys()
+    grades = []
+    <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> range(len(header)-1):
+        grades.append(0)
+        <FONT COLOR=#3333CC><B>for</B></FONT> name <FONT COLOR=#3333CC><B>in</B></FONT> names:
+            grades[i] += data[name][i]
+        grades[i] = grades[i] / (len(names) * 1.0)  
+    <FONT COLOR=#3333CC><B>return</B></FONT> grades
+
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="tentative"><FONT COLOR=#CC0000><B> tentative</B></FONT></A>(data, header, name):
+    <FONT COLOR=#3333CC><B>try</B></FONT>:
+        grades = data[name]
+    <FONT COLOR=#3333CC><B>except</B></FONT> KeyError:
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Keys are case sensitive:"</FONT>,name,<FONT COLOR=#115511>"does not exist (as typed)!"</FONT>
+        <FONT COLOR=#3333CC><B>return</B></FONT> <FONT COLOR=#115511>"Keys are case sensitive:"</FONT>,name,<FONT COLOR=#115511>"does not exist (as typed)!"</FONT>
+    sum = 0
+    <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> grades[:-1]:
+        sum += i
+    <FONT COLOR=#3333CC><B>print</B></FONT> sum, grades[-1]
+    percent = ((0.37 * sum)/160.0)+((0.67 * grades[-1])/90.0)
+    <FONT COLOR=#3333CC><B>return</B></FONT> percent
+
+<FONT COLOR=#115511>"""
+Let's generate a basic html table with all this info in it.
+"""</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="html_header"><FONT COLOR=#CC0000><B> html_header</B></FONT></A>():
+    html = <FONT COLOR=#115511>"&lt;html&gt;\n"</FONT>+\
+           <FONT COLOR=#115511>"&lt;title&gt;CS373 Grades&lt;/title&gt;"</FONT>+\
+           <FONT COLOR=#115511>"&lt;h1&gt;CS373 Grades&lt;/h1&gt;"</FONT>
+    <FONT COLOR=#3333CC><B>return</B></FONT> html
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="html_footer"><FONT COLOR=#CC0000><B> html_footer</B></FONT></A>():
+    html = <FONT COLOR=#115511>"&lt;/html&gt;\n"</FONT>
+    <FONT COLOR=#3333CC><B>return</B></FONT> html
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="htmllize"><FONT COLOR=#CC0000><B> htmllize</B></FONT></A>(data,tableheader):
+    body = html_header()
+    body += <FONT COLOR=#115511>"&lt;table&gt;\n"</FONT>+\
+           <FONT COLOR=#115511>"&lt;tbody&gt;\n"</FONT>
+    line = <FONT COLOR=#115511>"&lt;tr&gt;&lt;b&gt;"</FONT>
+    line += <FONT COLOR=#115511>"&lt;td width=\"10%\"&gt;&lt;b&gt;"</FONT>+tableheader[0]+<FONT COLOR=#115511>"&lt;/b&gt;&lt;/td&gt;"</FONT>
+    <FONT COLOR=#3333CC><B>for</B></FONT> item <FONT COLOR=#3333CC><B>in</B></FONT> tableheader[1:]:
+        line += <FONT COLOR=#115511>"&lt;td width=\"15%\"&gt;&lt;b&gt;"</FONT>+item+<FONT COLOR=#115511>"&lt;/b&gt;&lt;/td&gt;"</FONT>
+    line += <FONT COLOR=#115511>"&lt;/b&gt;&lt;/tr&gt;\n"</FONT>
+    body += line
+    names = data.keys()
+    names.sort()
+    <FONT COLOR=#3333CC><B>for</B></FONT> name <FONT COLOR=#3333CC><B>in</B></FONT> names:
+        scores = data[name]
+        line = <FONT COLOR=#115511>"&lt;tr&gt;&lt;td width=\"10%\"&gt;"</FONT>+name+<FONT COLOR=#115511>"&lt;/td&gt;"</FONT>
+        <FONT COLOR=#3333CC><B>for</B></FONT> score <FONT COLOR=#3333CC><B>in</B></FONT> scores:
+            line += <FONT COLOR=#115511>"&lt;td width=\"15%\"&gt;"</FONT>+str(score)+<FONT COLOR=#115511>"&lt;/td&gt;"</FONT>
+        line += <FONT COLOR=#115511>"&lt;/tr&gt;"</FONT>+<FONT COLOR=#115511>"\n"</FONT>
+        body += line
+    body += html_averages(getaverages(data,tableheader))
+    body += <FONT COLOR=#115511>"&lt;/tbody&gt;\n"</FONT>+\
+            <FONT COLOR=#115511>"&lt;/table&gt;\n"</FONT>
+    body += html_footer()
+    <FONT COLOR=#3333CC><B>return</B></FONT> body
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="html_averages"><FONT COLOR=#CC0000><B> html_averages</B></FONT></A>(averages):
+    html = <FONT COLOR=#115511>"&lt;tr&gt;&lt;td width=\"10%\"&gt;&lt;b&gt;"</FONT>+<FONT COLOR=#115511>"Average:"</FONT>+<FONT COLOR=#115511>"&lt;/b&gt;&lt;/td&gt;"</FONT>
+    <FONT COLOR=#3333CC><B>for</B></FONT> item <FONT COLOR=#3333CC><B>in</B></FONT> averages:
+        html += <FONT COLOR=#115511>"&lt;td width=\"15%\"&gt;"</FONT>+str(item)+<FONT COLOR=#115511>"&lt;/td&gt;"</FONT>
+    html += <FONT COLOR=#115511>"\n"</FONT>
+    <FONT COLOR=#3333CC><B>return</B></FONT> html
+
+instructions = <FONT COLOR=#115511>"usage:  python grade.py grades.txt"</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
+    <FONT COLOR=#3333CC><B>if</B></FONT> len(sys.argv) == 2:
+        <FONT COLOR=#3333CC><B>if</B></FONT> os.path.isfile(sys.argv[1]):
+            data,header = parse(sys.argv[1])
+            html = htmllize(data,header)
+            <FONT COLOR=#3333CC><B>print</B></FONT> html
+            outfile = open(<FONT COLOR=#115511>"grades.html"</FONT>,<FONT COLOR=#115511>"w"</FONT>)
+            outfile.write(html)
+            outfile.close()
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#3333CC><B>print</B></FONT> instructions
+    <FONT COLOR=#3333CC><B>elif</B></FONT> len(sys.argv)==3:
+        <FONT COLOR=#3333CC><B>if</B></FONT> os.path.isfile(sys.argv[1]):
+            data,header = parse(sys.argv[1])
+            estgrade = tentative(data, header, sys.argv[2])
+            <FONT COLOR=#3333CC><B>print</B></FONT> estgrade
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#3333CC><B>print</B></FONT> instructions
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#3333CC><B>print</B></FONT> instructions
+</PRE>
+                  <!--footer-->
+                  </BODY>

@@ -1,0 +1,81 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#115511>"""
+file: steady-state.py
+
+A simple 2D Steady State Heat Distribution code
+(Underlying Partial Differential Equation is the Poisson Equation)
+
+The edges of the grid are all at constant temperature, 3 sides are at 100.0 (Degrees, whatever)
+1 side is at 0 degrees.
+
+We iterate until the temperatures converge.
+"""</FONT>
+
+<FONT COLOR=#3333CC><B>import</B></FONT> math
+<FONT COLOR=#3333CC><B>import</B></FONT> time
+<FONT COLOR=#3333CC><B>import</B></FONT> Numeric
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="main"><FONT COLOR=#CC0000><B> main</B></FONT></A>( N=10, EPSILON = 0.01 ):
+    <FONT COLOR=#1111CC># Stores Old(previous timestep) Values </FONT>
+    u = Numeric.zeros( (N,N),Numeric.Float32 )
+    <FONT COLOR=#1111CC># New(current/next timestep) Values</FONT>
+    w = Numeric.zeros( (N,N),Numeric.Float32 )
+
+    <FONT COLOR=#1111CC># Set boundary values and compute mean boundary value</FONT>
+    mean = 0.0
+    <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> xrange(N):
+        <FONT COLOR=#1111CC># 3 sides @ 100.0 degrees</FONT>
+        u[i][0] = 100.0
+        u[i][N-1] = 100.0
+        u[0][i]  = 100.0
+        <FONT COLOR=#1111CC># 1 side @ 0 degrees</FONT>
+    <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> xrange(N):
+        u[N-1][i] = 0.0
+        
+    mean += Numeric.sum(u[:][0])
+    mean += Numeric.sum(u[:][N-1])
+    mean += Numeric.sum(u[0][:])
+    mean += Numeric.sum(u[N-1][:])
+    mean /= (4.0 * N)
+
+    <FONT COLOR=#1111CC># Initialize interior values:</FONT>
+    <FONT COLOR=#3333CC><B>print</B></FONT> mean
+    <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> xrange(1,N-1):
+        <FONT COLOR=#3333CC><B>for</B></FONT> j <FONT COLOR=#3333CC><B>in</B></FONT> xrange(1,N-1):
+            u[i][j] = mean
+    <FONT COLOR=#3333CC><B>print</B></FONT> u,<FONT COLOR=#115511>"\n"</FONT>
+    <FONT COLOR=#1111CC># Compute Steady-State solution:</FONT>
+    done = False
+    iterations = 0
+    <FONT COLOR=#3333CC><B>while</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> done:
+        delta = 0.0
+        <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> xrange(1,N-1):
+            <FONT COLOR=#3333CC><B>for</B></FONT> j <FONT COLOR=#3333CC><B>in</B></FONT> xrange(1,N-1):
+                w[i][j] = u[i-1][j] + u[i+1][j] + u[i][j-1] + u[i][j+1]
+                w[i][j] /= 4.0
+                d = math.fabs( w[i][j] - u[i][j] ) 
+                <FONT COLOR=#3333CC><B>if</B></FONT>( d &gt; delta ):
+                    delta = d
+        <FONT COLOR=#3333CC><B>if</B></FONT>( delta &lt;= EPSILON ):
+            done = True
+        <FONT COLOR=#1111CC># Copy new interior state to old:</FONT>
+        <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> xrange(1,N-1):
+            <FONT COLOR=#3333CC><B>for</B></FONT> j <FONT COLOR=#3333CC><B>in</B></FONT> xrange(1,N-1):
+                u[i][j] = w[i][j]
+        iterations += 1
+
+    <FONT COLOR=#1111CC># Print Solution:</FONT>
+    <FONT COLOR=#3333CC><B>print</B></FONT> u
+    <FONT COLOR=#3333CC><B>return</B></FONT> iterations
+                    
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Starting Steady State Example:"</FONT>
+    start = time.time()
+    iterations = main()
+    end = time.time()
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Finished Steady State Example in"</FONT>,end - start,<FONT COLOR=#115511>"and"</FONT>,iterations,<FONT COLOR=#115511>"iterations."</FONT>
+</PRE>
+                  <!--footer-->
+                  </BODY>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="10"
+   name=""
+   committed-date="2004-01-09T22:55:59.613144Z"
+   url="http://www.ripplefx.net:81/svn/python/html_source/scripting"
+   last-author="steder"
+   kind="dir"
+   uuid="996777e2-3ecf-0310-aa64-e0ff611b1bef"
+   revision="17"/>
+<entry
+   committed-rev="10"
+   name="normalDate.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="73df8eb90fcbd17242615c9ef5b8dc5b"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+<entry
+   committed-rev="10"
+   name="download_pa_images.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="3f75f9376f70e82a9802f6c58a18f041"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+<entry
+   committed-rev="10"
+   name="zipit.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="66c2ea3422e06c2a53b77557fc37b6bb"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+<entry
+   committed-rev="10"
+   name="unzipit.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="e91b2245fbe9db22e7f619920247ed73"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+<entry
+   committed-rev="10"
+   name="ziptype.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="569ef32a57c624350415e3e0ad9074df"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+</wc-entries>

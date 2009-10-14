@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content=
+          "HTML Tidy for Linux/x86 (vers 1st August 2004), see www.w3.org" />
+    <title>Penzilla.net's Python Tutorial:  PyGame</title>
+    <link rel="StyleSheet" href="../style.css" type="text/css" media="screen" />
+  </head>
+  <body>
+    <div id="header">
+      <h1>Penzilla.net's Python Tutorial:</h1>
+      <h2>PyGame</h2>
+      <hr />
+    </div>
+    <div id="sidebar">
+      <div id="menu"><a href="../index.shtml">&raquo;Tutorial Home</a>
+        <!--#include virtual="/tutorials/python/pygame/menu.html"-->
+        <!--#include virtual="/tutorials/python/menu.html"-->
+      </div>
+      <!--#include virtual="/tutorials/python/skyscraper_ads.html"--></div>
+    <div id="content"><!-- Comments -->
+      <!-- Body -->
+      <h3>PyGame</h3>
+      <P>
+        <a href="http://www.pygame.org">PyGame</a> is a Python port of the SDL (<a href="http://www.libsdl.org">Simple Directmedia 
+        Layer</a>) Library.  As the name suggests it's focus is writing games but is well suited
+        to developing other types of applications and visualizations.  
+      </p>
+      <p>PyGame supplies the following:
+        <ul>
+          <li>Surfaces(Hardware/Software Accelerated)</li>
+          <li>OpenGL</li>
+          <li>Fonts</li>
+          <li>Events(Keyboard, Mouse, Joysticks)</li>
+          <li>Audio</li>
+          <li>Video</li>
+          <li>Sprites, Images</li>
+          <li>Basic Drawing Routines</li>
+        </ul>
+        ... as well as many things I'm forgetting.  I strongly recommend checking out their 
+        <a href="http://www.pygame.org">homepage</a> when you get the chance.  
+      </p>
+      <h3>An Example</h3>
+      <h4>Hello World (WITH BOXES!)</h4>
+      <p>Because I know <em>EXCITING</em>, I thought I'd try showing you an "action packed"
+        demo instead of the boring ol' hello world type stuff.  First, a preview of what you're going to
+        see produce:</p>
+      <a href="bounce.py"><img alt="bouncing boxes image" src="bounce.png"/></a>
+      <h5>bounce.py: Initialization and Event handling</h5>
+      <p>This first file is the main program.  It is responsible for initializing PyGame and 
+        setting everything up for drawing.</p>
+      <div id="code">
+        <!--#include virtual="bounce.py.html"-->
+      </div>
+      <p></p>
+      <p>Download <a href="bounce.py">bounce.py</a></p>
+      <h5>box.py:  Box Class w/ Drawing code</h5>
+      <p>Box.py defines the Box class and it's draw method.</p>
+      <div id="code">
+        <!--#include virtual="box.py.html"-->
+      </div>
+      <p>Boxes consist of a screen height and width, a box height and width, a box velocity (as x and y components) in terms of standard python types.  Boxes also include a Pygame Surface(called screen), 2 colors (background and box), and a Rect object.  (Rect's represent drawable screen regions.)</p>
+      <p>The boxes are all moving, so when we draw a box, we first want to clear the rectangle on
+        the screen where we used to be.  So that is the first thing we do in the draw method.
+        Next, we determine if we are near an edge or not.  If the box has arrived at an edge we just 
+        reverse our velocity with respect to that edge. (If you hit the left or right sides you reverse
+        <em>self.vx</em>, otherwise reverse <em>self.vy</em>.)  </p>
+      <p>When our box is not bouncing, it's simply moving, so we just update it's coordinates 
+        by adding the velocity values to them(<em>nx = self.x + self.vx</em>).  We then create
+        a new Rect at our new coordinates and draw that rectangle to the screen.</p>
+      <p>Download <a href="box.py">box.py</a></p>
+      <h3>More Examples</h3>
+      <h4>Heat</h4>
+      <a href="heat/"><img alt="steady state heat visualization image" src="heat/heat.png"/></a>
+      <p><a href="heat/">Heat</a> is a visualization of a partial differential equation problem 
+        that I look at briefly in my <a href="../numeric/index.shtml#examples_more">Numeric
+          Examples</a>.  Basically it is a color coded view of the field as it settles down</p>
+      <h4>Life</h4>
+      <a href="life/"><img alt="game of life image" src="life/life.png"/></a>
+      <p><a href="life/">Life</a> is an implementation of the Game of Life that automatically
+        generates a large field of cells and lets it develop.  This could easily be the beginnings of a
+        screensaver or quickly adapted into a more traditional game of life (much smaller grid, 
+        place cells with your mouse, hit play and see if the colony lives or dies).</p>
+      <p>If you're not familiar with the Game of Life the concept is simple.  Each green cell
+        represents a living thing.  Depending on the number of neighbors each cell has, it is either
+        happy (and reproduces), average( it just sits there ), or depressed (it dies).</p>
+      <p>There is no traditional goal in this game.  You don't really "win" or "lose".  It's usually
+        just interesting to see what sort of patterns come out of this simple algorithm.</p>
+      <p>The performance of this problem on this size grid is not nearly as good as I'd like but I 
+        haven't had sufficient time to optimize it.  Perhaps optimization can be left to you
+        as an exercise?</p>
+        <P>:~)</p>
+      <!--End Body-->
+    </div>
+    <div id="footer">
+      <!--#include virtual="/tutorials/python/footer.shtml"-->
+    </div>
+  </body>
+</html>

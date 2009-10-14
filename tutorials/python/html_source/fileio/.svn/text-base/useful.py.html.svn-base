@@ -1,0 +1,42 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#3333CC><B>import</B></FONT> os.path
+<FONT COLOR=#1111CC># os.path - The key to File I/O</FONT>
+os.path.exists(<FONT COLOR=#115511>"bob.txt"</FONT>)
+os.path.isfile(<FONT COLOR=#115511>"bob.txt"</FONT>) <FONT COLOR=#1111CC># Does bob.txt exist?  Is it a file, or a directory?</FONT>
+os.path.isdir(<FONT COLOR=#115511>"bob"</FONT>)
+os.path.isabs(<FONT COLOR=#115511>"/home/me/bob.txt"</FONT>) <FONT COLOR=#1111CC># Is it an absolute path to this file?</FONT>
+
+<FONT COLOR=#1111CC># Creating cross platform paths</FONT>
+<FONT COLOR=#1111CC># This will be slightly different on each platform</FONT>
+currentdir = os.curdir
+imagedir = os.path.join(currentdir, <FONT COLOR=#115511>"images"</FONT>)
+
+<FONT COLOR=#1111CC># Let's say I have a full path, and yet I want to store records based</FONT>
+<FONT COLOR=#1111CC># on the name of the file:</FONT>
+longpath = <FONT COLOR=#115511>"/home/me/python/somefiles/junk/notjunk/blah/bingo.txt"</FONT>
+shortpath = os.path.basename(longpath)
+
+<FONT COLOR=#1111CC># Get the type of shortpath:</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Type of"</FONT>,shortpath,<FONT COLOR=#115511>"is"</FONT>, os.path.splitext(shortpath)[1]
+
+<FONT COLOR=#1111CC># os.path.walk can be used to traverse directories recursively</FONT>
+<FONT COLOR=#1111CC># to apply changes to a whole tree of files.</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="callback"><FONT COLOR=#CC0000><B> callback</B></FONT></A>( arg, dirname, fnames ):
+    sum = 0
+    <FONT COLOR=#3333CC><B>for</B></FONT> file <FONT COLOR=#3333CC><B>in</B></FONT> fnames:
+        sum += os.path.getsize(file)
+    arg.append(sum)
+
+arglist = []
+os.path.walk(<FONT COLOR=#115511>"./"</FONT>,callback,arglist)
+
+sum = 0
+<FONT COLOR=#3333CC><B>for</B></FONT> value <FONT COLOR=#3333CC><B>in</B></FONT> arglist:
+    sum += value
+
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Size of directory:"</FONT>,sum
+</PRE>
+                  <!--footer-->
+                  </BODY>

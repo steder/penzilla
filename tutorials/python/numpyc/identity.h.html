@@ -1,0 +1,53 @@
+<html>
+<head>
+  <title>identity.h</title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<pre>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;Python.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;Numeric/arrayobject.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;sys/types.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;stdio.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;stdlib.h&gt;</font></strong></font>
+
+<font color="0000ff"><strong>#define IDENTITY_DOC &quot;\</strong></font>
+<font color="#2040a0">This</font> <font color="#2040a0">method</font> <font color="#2040a0">simply</font> <font color="#2040a0">unpacks</font> <font color="#2040a0">the</font> <font color="#2040a0">Array</font> <font color="4444FF">(</font><font color="#2040a0">so</font> <font color="#2040a0">that</font> <font color="#2040a0">it</font> <font color="#2040a0">could</font> <font color="#2040a0">be</font> <font color="#2040a0">modified</font><font color="4444FF">)</font>\
+<font color="#2040a0">and</font> <font color="#2040a0">then</font> <font color="#2040a0">returns</font> <font color="#2040a0">it</font> <font color="#2040a0">unchanged</font>.<font color="#008000">&quot;
+static PyObject *identity(PyObject *self, PyObject *args)
+{
+int i,n;
+PyObject *input;
+PyArrayObject *array;
+char *aptr;
+
+ if (!PyArg_ParseTuple(args, &quot;</font><font color="#2040a0">O</font>&quot;, <font color="4444FF">&amp;</font><font color="#2040a0">input</font> <font color="4444FF">)</font><font color="4444FF">)</font>
+   <strong>return</strong> <font color="#2040a0">NULL</font><font color="4444FF">;</font>
+ <font color="#2040a0">array</font> <font color="4444FF">=</font> <font color="4444FF">(</font><font color="#2040a0">PyArrayObject</font> <font color="4444FF">*</font><font color="4444FF">)</font> <font color="#2040a0">PyArray_ContiguousFromObject</font><font color="4444FF">(</font><font color="#2040a0">input</font>, <font color="#2040a0">PyArray_INT</font>, <font color="#FF0000">0</font>, <font color="#FF0000">3</font><font color="4444FF">)</font><font color="4444FF">;</font>
+ <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">array</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#2040a0">NULL</font><font color="4444FF">)</font>
+   <strong>return</strong> <font color="#2040a0">NULL</font><font color="4444FF">;</font>
+ 
+ // <font color="#2040a0">Compute</font> <font color="#2040a0">Size</font> <font color="#2040a0">of</font> <font color="#2040a0">Array</font> 
+ <strong>if</strong><font color="4444FF">(</font><font color="#2040a0">array</font><font color="4444FF">-</font><font color="4444FF">&gt;</font><font color="#2040a0">nd</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#FF0000">0</font><font color="4444FF">)</font>
+   <font color="#2040a0">n</font> <font color="4444FF">=</font> <font color="#FF0000">1</font><font color="4444FF">;</font>
+ <strong>else</strong> <font color="4444FF"><strong>{</strong></font>
+   <font color="#2040a0">n</font> <font color="4444FF">=</font> <font color="#FF0000">1</font><font color="4444FF">;</font>
+   <strong>for</strong><font color="4444FF">(</font><font color="#2040a0">i</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">;</font><font color="#2040a0">i</font><font color="4444FF">&lt;</font><font color="#2040a0">array</font><font color="4444FF">-</font><font color="4444FF">&gt;</font><font color="#2040a0">nd</font><font color="4444FF">;</font><font color="#2040a0">i</font><font color="4444FF">+</font><font color="4444FF">+</font><font color="4444FF">)</font> 
+     <font color="#2040a0">n</font> <font color="4444FF">=</font> <font color="#2040a0">n</font> <font color="4444FF">*</font> <font color="#2040a0">array</font><font color="4444FF">-</font><font color="4444FF">&gt;</font><font color="#2040a0">dimensions</font><font color="4444FF">[</font><font color="#2040a0">i</font><font color="4444FF">]</font><font color="4444FF">;</font>
+ <font color="4444FF"><strong>}</strong></font> 
+ 
+ <font color="#2040a0">aptr</font><font color="4444FF">=</font><font color="4444FF">(</font><strong>char</strong><font color="4444FF">*</font><font color="4444FF">)</font><font color="4444FF">(</font><font color="#2040a0">array</font><font color="4444FF">-</font><font color="4444FF">&gt;</font><font color="#2040a0">data</font><font color="4444FF">)</font><font color="4444FF">;</font>
+ 
+ // <font color="#2040a0">Do</font> <font color="#2040a0">Your</font> <font color="#2040a0">Array</font> <font color="#2040a0">Operation</font><font color="4444FF">(</font><font color="#2040a0">s</font><font color="4444FF">)</font>
+
+ // <font color="#2040a0">Return</font> <font color="#2040a0">the</font> <font color="#2040a0">result</font>
+ <strong>return</strong> <font color="#2040a0">PyArray_Return</font><font color="4444FF">(</font><font color="#2040a0">array</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+
+
+
+
+</pre>
+<hr>
+syntax highlighted by <a href="http://www.palfrader.org/code2html">Code2HTML</a>, v. 0.9.1
+</body>
+</html>

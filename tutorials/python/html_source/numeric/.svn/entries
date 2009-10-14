@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="10"
+   name=""
+   committed-date="2004-01-09T22:55:59.613144Z"
+   url="http://www.ripplefx.net:81/svn/python/html_source/numeric"
+   last-author="steder"
+   kind="dir"
+   uuid="996777e2-3ecf-0310-aa64-e0ff611b1bef"
+   revision="17"/>
+<entry
+   committed-rev="10"
+   name="array.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="444f12c89889d11e0b0aecc459dd67c6"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+</wc-entries>

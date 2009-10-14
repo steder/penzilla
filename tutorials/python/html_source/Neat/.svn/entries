@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="10"
+   name=""
+   committed-date="2004-01-09T22:55:59.613144Z"
+   url="http://www.ripplefx.net:81/svn/python/html_source/Neat"
+   last-author="steder"
+   kind="dir"
+   uuid="996777e2-3ecf-0310-aa64-e0ff611b1bef"
+   revision="17"/>
+<entry
+   committed-rev="10"
+   name="imap.py.html"
+   text-time="2004-09-20T02:22:29.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="310901b5662c3b9ad0cb10fbf3349917"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:29.000000Z"/>
+<entry
+   committed-rev="10"
+   name="pool.py.html"
+   text-time="2004-09-20T02:22:29.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="9f2e0fb1798221b0a3a51e43db4de816"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:29.000000Z"/>
+<entry
+   committed-rev="10"
+   name="getargs.py.html"
+   text-time="2004-09-20T02:22:29.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="9389a9243dac618c4c3268ddc5e4e7d4"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:29.000000Z"/>
+<entry
+   committed-rev="10"
+   name="async.py.html"
+   text-time="2004-09-20T02:22:29.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="a5de5832d40a41d031dc105cb6f22014"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:29.000000Z"/>
+<entry
+   committed-rev="10"
+   name="dataxfer.py.html"
+   text-time="2004-09-20T02:22:29.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="63a9e63d68840e06b5fb76c7e829a700"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:29.000000Z"/>
+<entry
+   committed-rev="10"
+   name="process.py.html"
+   text-time="2004-09-20T02:22:29.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="f2859189ea5f0e7e6cfd77a6b89cceb5"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:29.000000Z"/>
+<entry
+   committed-rev="10"
+   name="glock.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="4529b2695234285a2766323ad11e0414"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+<entry
+   committed-rev="10"
+   name="pop3.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="eeee5ff0d0e70069acfea278dad59059"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+<entry
+   committed-rev="10"
+   name="fwdmail.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="c37d3defa58c410a11dbee6e6d9081c5"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+<entry
+   committed-rev="10"
+   name="message.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="a4cc77337a89b93257a924021fb30cbd"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+<entry
+   committed-rev="10"
+   name="platform.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="24c2fda68ee93a25ce2d87b2f03dc69d"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+</wc-entries>

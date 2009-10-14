@@ -1,0 +1,37 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># Introduction to Python's Data Structures</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># Int and Long int(Range?)</FONT>
+inta = 100
+fact = <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="factorial"><FONT COLOR=#CC0000><B> factorial</B></FONT></A> (n):
+    <FONT COLOR=#3333CC><B>if</B></FONT> n == 0:
+        <FONT COLOR=#3333CC><B>return</B></FONT> 1
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#3333CC><B>return</B></FONT> n * factorial(n-1)
+intb = fact(100) <FONT COLOR=#1111CC># 100! is pretty damned big, notice python doesn't choke.</FONT>
+
+<FONT COLOR=#1111CC># Float/Double(Precision?)</FONT>
+floata = 1.2
+floatb = 0.1 <FONT COLOR=#1111CC># isn't this peculiar?</FONT>
+
+<FONT COLOR=#1111CC># Strings(Indexing, Concatination, Searching, Matching)</FONT>
+s1 = <FONT COLOR=#115511>"I am a string!\n"</FONT>
+c1 = s1[1]
+
+<FONT COLOR=#1111CC># Tuples(What are they, simple examples)</FONT>
+t1 = (1, 2) <FONT COLOR=#1111CC># coordinates on a grid</FONT>
+t2 = (<FONT COLOR=#115511>"username"</FONT>, <FONT COLOR=#115511>"passcode"</FONT>) <FONT COLOR=#1111CC># Not a very useful "use" of a tuple</FONT>
+<FONT COLOR=#1111CC># Tuples are mostly going to be used for things like encapsulating a</FONT>
+<FONT COLOR=#1111CC># bunch of function arguments, especially things like coordinates</FONT>
+<FONT COLOR=#1111CC># that are very tightly coupled.</FONT>
+
+<FONT COLOR=#1111CC># Lists(What they are, append, concatenate, add, remove(del), searching, map, SLICES!)</FONT>
+
+<FONT COLOR=#1111CC># Now connect strings (w/slicing) to lists :~)</FONT>
+
+<FONT COLOR=#1111CC># Dictionaries(What they are, some neat uses, NOTES on SPEED?)</FONT>
+</PRE>
+                  <!--footer-->
+                  </BODY>

@@ -1,0 +1,58 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># Simple Application/Script to Compress a File or Directory</FONT>
+<FONT COLOR=#1111CC># Essentially you could use this instead of Winzip</FONT>
+<FONT COLOR=#1111CC># "I hate GUI Applications like WINZIP!!!"</FONT>
+<FONT COLOR=#1111CC># "Argh!"</FONT>
+<FONT COLOR=#1111CC># "I like Python though."</FONT>
+
+<FONT COLOR=#115511>"""
+Path can be a file or directory
+Archname is the name of the to be created archive
+"""</FONT>
+<FONT COLOR=#3333CC><B>from</B></FONT> zipfile <FONT COLOR=#3333CC><B>import</B></FONT> ZipFile, ZIP_DEFLATED
+<FONT COLOR=#3333CC><B>import</B></FONT> os  <FONT COLOR=#1111CC># File stuff</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> sys <FONT COLOR=#1111CC># Command line parsing</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="zippy"><FONT COLOR=#CC0000><B> zippy</B></FONT></A>(path, archive):
+    paths = os.listdir(path)
+    <FONT COLOR=#3333CC><B>for</B></FONT> p <FONT COLOR=#3333CC><B>in</B></FONT> paths:
+        p = os.path.join(path, p) <FONT COLOR=#1111CC># Make the path relative</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> os.path.isdir(p): <FONT COLOR=#1111CC># Recursive case</FONT>
+            zippy(p, archive)
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            archive.write(p) <FONT COLOR=#1111CC># Write the file to the zipfile</FONT>
+    <FONT COLOR=#3333CC><B>return</B></FONT>
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="zipit"><FONT COLOR=#CC0000><B> zipit</B></FONT></A>(path, archname):
+    <FONT COLOR=#1111CC># Create a ZipFile Object primed to write</FONT>
+    archive = ZipFile(archname, <FONT COLOR=#115511>"w"</FONT>, ZIP_DEFLATED) <FONT COLOR=#1111CC># "a" to append, "r" to read</FONT>
+    <FONT COLOR=#1111CC># Recurse or not, depending on what path is</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> os.path.isdir(path):
+        zippy(path, archive)
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        archive.write(path)
+    archive.close()
+    <FONT COLOR=#3333CC><B>return</B></FONT> <FONT COLOR=#115511>"Compression of \""</FONT>+path+<FONT COLOR=#115511>"\" was successful!"</FONT>
+
+instructions = <FONT COLOR=#115511>"zipit.py:  Simple zipfile creation script."</FONT> + \
+               <FONT COLOR=#115511>"recursively zips files in a directory into"</FONT> + \
+               <FONT COLOR=#115511>"a single archive."</FONT> +\
+               <FONT COLOR=#115511>"e.g.:  python zipit.py myfiles myfiles.zip"</FONT>
+
+<FONT COLOR=#1111CC># Notice the __name__=="__main__"</FONT>
+<FONT COLOR=#1111CC># this is used to control what Python does when it is called from the</FONT>
+<FONT COLOR=#1111CC># command line.  I'm sure you've seen this in some of my other examples.</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
+    <FONT COLOR=#3333CC><B>if</B></FONT> len(sys.argv) &gt;= 3:
+        result = zipit(sys.argv[1], sys.argv[2])
+        <FONT COLOR=#3333CC><B>print</B></FONT> result
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#3333CC><B>print</B></FONT> instructions
+        
+        
+
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

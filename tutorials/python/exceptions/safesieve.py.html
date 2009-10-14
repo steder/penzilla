@@ -1,0 +1,75 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#simplesieve.py</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> traceback
+<FONT COLOR=#3333CC><B>try</B></FONT>:
+	<FONT COLOR=#3333CC><B>import</B></FONT> Numeric
+<FONT COLOR=#3333CC><B>except</B></FONT> ImportError:
+	<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Sorry, you don't have the Numeric module installed, and this"</FONT>
+	<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"script relies on it.  Please install or reconfigure Numeric"</FONT>
+	<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"and try again."</FONT>
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="sieve"><FONT COLOR=#CC0000><B> sieve</B></FONT></A>( n ):
+	<FONT COLOR=#1111CC># Let's start at array index 1 instead of 0</FONT>
+	<FONT COLOR=#3333CC><B>try</B></FONT>:
+		array = Numeric.zeros(n+1)
+	<FONT COLOR=#3333CC><B>except</B></FONT> ValueError:
+		traceback.print_exc()
+		<FONT COLOR=#3333CC><B>return</B></FONT> []
+		
+	<FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> xrange(1,n+1):
+		array[i] = i
+	
+	done = False
+	prime = array[2] <FONT COLOR=#1111CC># The number, as well as the index.</FONT>
+	<FONT COLOR=#3333CC><B>while</B></FONT>( prime &lt; n ):
+		<FONT COLOR=#1111CC># Index 2 corresponds to the number 2 for this indexing scheme</FONT>
+		index = prime
+		index += prime
+		<FONT COLOR=#1111CC># Mark multiples of prime</FONT>
+		<FONT COLOR=#3333CC><B>while</B></FONT>( index &lt;= n ):
+			array[index]=-1
+			index += prime
+		<FONT COLOR=#1111CC># Get a new prime</FONT>
+		prime+=1
+		<FONT COLOR=#3333CC><B>while</B></FONT>( prime &lt; n ):
+			<FONT COLOR=#3333CC><B>if</B></FONT> (array[prime]==-1):
+				prime+=1
+			<FONT COLOR=#3333CC><B>elif</B></FONT> (prime &lt; n ):
+				<FONT COLOR=#3333CC><B>break</B></FONT>
+		<FONT COLOR=#1111CC>#print </FONT>prime,n,array
+
+	<FONT COLOR=#1111CC># Grab all the primes</FONT>
+	primes = []
+	<FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> xrange(1,n+1):
+		<FONT COLOR=#3333CC><B>if</B></FONT>( array[i] != -1):
+			primes.append(array[i])
+			
+	<FONT COLOR=#3333CC><B>return</B></FONT> primes
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="main"><FONT COLOR=#CC0000><B> main</B></FONT></A>():
+	<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"This program computes the number of primes between 1 and n\nusing the Sieve of Erastothenes."</FONT>
+	input = raw_input(<FONT COLOR=#115511>"Enter (n):"</FONT>)
+	
+	<FONT COLOR=#3333CC><B>try</B></FONT>:
+		n = int(input)
+	<FONT COLOR=#3333CC><B>except</B></FONT> ValueError:
+		<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"You entered:"</FONT>,input
+		<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Please enter a positive integer next time."</FONT>
+		<FONT COLOR=#3333CC><B>return</B></FONT>
+		
+	primes = sieve( n )
+	<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"There are %d primes between 1 and %d.  They are:"</FONT> % (len(primes),n)
+	<FONT COLOR=#3333CC><B>print</B></FONT> primes
+	<FONT COLOR=#3333CC><B>return</B></FONT>
+	
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
+	<FONT COLOR=#3333CC><B>try</B></FONT>:
+		main()
+	<FONT COLOR=#3333CC><B>except</B></FONT>:
+		<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"An unhandled exception occured, here's the traceback!"</FONT>
+		traceback.print_exc()
+</PRE>
+                  <!--footer-->
+                  </BODY>

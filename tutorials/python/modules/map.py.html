@@ -1,0 +1,21 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># map.py</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="map"><FONT COLOR=#CC0000><B> map</B></FONT></A>( fun, list ):
+    nlist = []
+    <FONT COLOR=#3333CC><B>for</B></FONT> item <FONT COLOR=#3333CC><B>in</B></FONT> list:
+        nlist.append( fun( item ) )
+    <FONT COLOR=#3333CC><B>return</B></FONT> nlist
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="rmap"><FONT COLOR=#CC0000><B> rmap</B></FONT></A> ( fun, list ):
+    <FONT COLOR=#3333CC><B>if</B></FONT> list == []:
+        <FONT COLOR=#3333CC><B>return</B></FONT> []
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#3333CC><B>return</B></FONT> [fun( list[0] )] + rmap( fun, list[1:] )
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="increment"><FONT COLOR=#CC0000><B> increment</B></FONT></A>(x):
+    <FONT COLOR=#3333CC><B>return</B></FONT> x+1
+</PRE>
+                  <!--footer-->
+                  </BODY>

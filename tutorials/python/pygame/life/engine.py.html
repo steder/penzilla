@@ -1,0 +1,187 @@
+<html>
+<head>
+  <title>engine.py</title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<pre>
+<font color="#444444">#################################################################</font>
+<font color="#444444">##  Game of Life</font>
+<font color="#444444">##  Mike Steder</font>
+<font color="#444444">##</font>
+<font color="#444444">##  Simulation Engine Object</font>
+<font color="#444444">##  engine.py</font>
+<font color="#444444">##</font>
+<font color="#444444">##  &quot;this object generates a field/universe for our creatures</font>
+<font color="#444444">##   and distributes them.  A call to a step method timesteps</font>
+<font color="#444444">##   the entire 'civilization' of creatures once.  </font>
+<font color="#444444">##</font>
+<font color="#444444">##   Currently the model follows the following rules:</font>
+<font color="#444444">##</font>
+<font color="#444444">##   1).  The field is randomly populated with creatures to a certain percentage of</font>
+<font color="#444444">##          the available space</font>
+<font color="#444444">##   2).  Creatures with 3 or more neighbors(diagonals count):</font>
+<font color="#444444">##          (  This creature has no neighbors:</font>
+<font color="#444444">##            O O O</font>
+<font color="#444444">##            O X O</font>
+<font color="#444444">##            O O O</font>
+<font color="#444444">##            This creature has 3 neighbors</font>
+<font color="#444444">##            X X O</font>
+<font color="#444444">##            O X X</font>
+<font color="#444444">##            O O O )</font>
+<font color="#444444">##          will mate with a nearby neighbor and reproduce</font>
+<font color="#444444">##          into one of their open adjacent spots (diagonals count)</font>
+<font color="#444444">##  3).  A creature with 2 neighbors will just sit still and wait for something exciting to happen.</font>
+<font color="#444444">##  4).  A creature with fewer then 2 neighbors will get lonely and die.</font>
+<font color="#444444">#################################################################</font>
+
+<font color="#444444"># Import my module first</font>
+<strong>import</strong> <font color="#2040a0">_engine</font>
+
+
+<strong>import</strong> <font color="#2040a0">sys</font>
+<strong>import</strong> <font color="#2040a0">random</font>
+<strong>import</strong> <font color="#2040a0">time</font>
+
+<strong>import</strong> <font color="#2040a0">Numeric</font>
+
+<font color="#444444"># Coords = [UP, UP-RIGHT, RIGHT, etc] clockwise</font>
+<font color="#2040a0">NEIGHBORS</font> <font color="4444FF">=</font> <font color="4444FF">[</font>
+                            <font color="4444FF">(</font><font color="#FF0000">0</font>,<font color="#FF0000">1</font><font color="4444FF">)</font>, <font color="#444444"># up</font>
+                            <font color="4444FF">(</font><font color="#FF0000">0</font>,<font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">)</font>, <font color="#444444"># down</font>
+                            <font color="4444FF">(</font><font color="#FF0000">1</font>,<font color="#FF0000">0</font><font color="4444FF">)</font>, <font color="#444444"># left</font>
+                            <font color="4444FF">(</font><font color="4444FF">-</font><font color="#FF0000">1</font>,<font color="#FF0000">0</font><font color="4444FF">)</font>, <font color="#444444"># right</font>
+                            <font color="4444FF">(</font><font color="#FF0000">1</font>,<font color="#FF0000">1</font><font color="4444FF">)</font>, <font color="#444444"># upper left</font>
+                            <font color="4444FF">(</font><font color="4444FF">-</font><font color="#FF0000">1</font>,<font color="#FF0000">1</font><font color="4444FF">)</font>, <font color="#444444"># upper right</font>
+                            <font color="4444FF">(</font><font color="4444FF">-</font><font color="#FF0000">1</font>,<font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">)</font>, <font color="#444444"># lower right</font>
+                            <font color="4444FF">(</font><font color="#FF0000">1</font>,<font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">)</font>, <font color="#444444"># lower left</font>
+                            <font color="4444FF">]</font>
+
+<strong>class</strong> <font color="#2040a0">Simulation</font><font color="4444FF">:</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __init__</font>(self,xdim=10,<font color="ff0000"> ydim</font>=10,
+</strong>                 <font color="#444444"># colors will all be real palette values</font>
+                 <font color="#2040a0">plantcolor</font><font color="4444FF">=</font><font color="#FF0000">0</font>, <font color="#2040a0">herbcolor</font><font color="4444FF">=</font><font color="#FF0000">0</font>,
+                 <font color="#2040a0">carncolor</font><font color="4444FF">=</font><font color="#FF0000">0</font>, <font color="#2040a0">emptycolor</font><font color="4444FF">=</font><font color="#FF0000">0</font>,
+                 <font color="#2040a0">numcreatures</font><font color="4444FF">=</font><font color="#FF0000">10</font>,
+                 <font color="#2040a0">static</font><font color="4444FF">=</font><font color="#FF0000">2</font>, <font color="#444444"># number of neighbors necessary to be in balance</font>
+                <font color="4444FF">)</font><font color="4444FF">:</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">xdim</font> <font color="4444FF">=</font> <font color="#2040a0">xdim</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">ydim</font> <font color="4444FF">=</font> <font color="#2040a0">ydim</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">xrange</font> <font color="4444FF">=</font> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">0</font>,<font color="#2040a0">self</font>.<font color="#2040a0">xdim</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">yrange</font> <font color="4444FF">=</font> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">0</font>, <font color="#2040a0">self</font>.<font color="#2040a0">ydim</font> <font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">range</font> <font color="4444FF">=</font> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">0</font>, <font color="#2040a0">self</font>.<font color="#2040a0">xdim</font> <font color="4444FF">*</font> <font color="#2040a0">self</font>.<font color="#2040a0">ydim</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">plantcolor</font><font color="4444FF">=</font><font color="#2040a0">plantcolor</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">herbcolor</font><font color="4444FF">=</font><font color="#2040a0">herbcolor</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">carncolor</font><font color="4444FF">=</font><font color="#2040a0">carncolor</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">emptycolor</font><font color="4444FF">=</font><font color="#2040a0">emptycolor</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">numcreatures</font> <font color="4444FF">=</font> <font color="#2040a0">numcreatures</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">static</font> <font color="4444FF">=</font> <font color="#2040a0">static</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">environment</font> <font color="4444FF">=</font> <font color="#2040a0">None</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">lut</font> <font color="4444FF">=</font> <font color="#2040a0">None</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">pixel_data</font> <font color="4444FF">=</font> <font color="#2040a0">Numeric</font>.<font color="#2040a0">zeros</font><font color="4444FF">(</font> <font color="4444FF">(</font><font color="#2040a0">xdim</font>,<font color="#2040a0">ydim</font><font color="4444FF">)</font>, <font color="#008000">'i'</font> <font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">init_environment</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> init_environment</font><font color="2040a0">(self)</font>:
+</strong>        <font color="#2040a0">self</font>.<font color="#2040a0">environment</font> <font color="4444FF">=</font> <font color="#2040a0">Numeric</font>.<font color="#2040a0">zeros</font><font color="4444FF">(</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">xdim</font>,<font color="#2040a0">self</font>.<font color="#2040a0">ydim</font><font color="4444FF">)</font>,<font color="#008000">'i'</font><font color="4444FF">)</font>
+
+        <strong>print</strong> <font color="#008000">&quot;Setting up pixel_data array:&quot;</font>
+        <strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">xrange</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">xdim</font><font color="4444FF">)</font><font color="4444FF">:</font>
+            <strong>for</strong> <font color="#2040a0">j</font> <strong>in</strong> <font color="#2040a0">xrange</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">ydim</font><font color="4444FF">)</font><font color="4444FF">:</font>
+                <strong>try</strong><font color="4444FF">:</font>
+                    <font color="#2040a0">self</font>.<font color="#2040a0">pixel_data</font><font color="4444FF">[</font><font color="#2040a0">i</font><font color="4444FF">]</font><font color="4444FF">[</font><font color="#2040a0">j</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">emptycolor</font>
+                <strong>except</strong> <font color="#2040a0">IndexError</font><font color="4444FF">:</font>
+                    <strong>print</strong> <font color="#008000">&quot;Tried to set pixel_data[%s][%s]! (xdim=%s,ydim=%s)&quot;</font><font color="4444FF">%</font><font color="4444FF">(</font><font color="#2040a0">i</font>,<font color="#2040a0">j</font>,<font color="#2040a0">self</font>.<font color="#2040a0">xdim</font>,<font color="#2040a0">self</font>.<font color="#2040a0">ydim</font><font color="4444FF">)</font>
+                <strong>except</strong> <font color="#2040a0">TypeError</font><font color="4444FF">:</font>
+                    <strong>print</strong> <font color="#008000">&quot;i=%s,j=%s,self.emptycolor=%s&quot;</font><font color="4444FF">%</font><font color="4444FF">(</font><font color="#2040a0">i</font>,<font color="#2040a0">j</font>,<font color="#2040a0">self</font>.<font color="#2040a0">emptycolor</font><font color="4444FF">)</font>
+
+        <strong>print</strong> <font color="#008000">&quot;Setting up Lookup Table:&quot;</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">lut</font> <font color="4444FF">=</font> <font color="4444FF"><strong>{</strong></font><font color="4444FF"><strong>}</strong></font>
+                    
+        <strong>print</strong> <font color="#008000">'Setting up creatures'</font>
+        <font color="#2040a0">i</font> <font color="4444FF">=</font> <font color="#FF0000">0</font> <font color="#444444"># self.numplants</font>
+        <font color="#2040a0">iterations</font> <font color="4444FF">=</font> <font color="#FF0000">0</font>
+        <strong>while</strong> <font color="#2040a0">i</font> <font color="4444FF">&lt;</font> <font color="#2040a0">self</font>.<font color="#2040a0">numcreatures</font><font color="4444FF">:</font>
+            <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">randomx</font><font color="4444FF">(</font><font color="4444FF">)</font>
+            <font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">randomy</font><font color="4444FF">(</font><font color="4444FF">)</font>
+            <strong>if</strong> <font color="#2040a0">self</font>.<font color="#2040a0">environment</font><font color="4444FF">[</font><font color="#2040a0">x</font><font color="4444FF">]</font><font color="4444FF">[</font><font color="#2040a0">y</font><font color="4444FF">]</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#FF0000">0</font><font color="4444FF">:</font>
+               <font color="#2040a0">self</font>.<font color="#2040a0">environment</font><font color="4444FF">[</font><font color="#2040a0">x</font><font color="4444FF">]</font><font color="4444FF">[</font><font color="#2040a0">y</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="#FF0000">1</font>
+               <font color="#2040a0">self</font>.<font color="#2040a0">pixel_data</font><font color="4444FF">[</font><font color="#2040a0">x</font><font color="4444FF">]</font><font color="4444FF">[</font><font color="#2040a0">y</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">plantcolor</font> <font color="#444444"># GREEN!</font>
+               <strong>if</strong><font color="4444FF">(</font> <font color="#2040a0">i</font> <font color="4444FF">%</font> <font color="#FF0000">100</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#FF0000">0</font> <font color="4444FF">)</font><font color="4444FF">:</font>
+                   <strong>print</strong> <font color="#2040a0">i</font>,<font color="#008000">&quot;- (&quot;</font>,<font color="#2040a0">x</font>,<font color="#008000">&quot;,&quot;</font>,<font color="#2040a0">y</font>,<font color="#008000">&quot;)&quot;</font>,<font color="#008000">&quot;- Created!&quot;</font>
+               <font color="#2040a0">i</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+               <font color="#2040a0">iterations</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">1</font>
+               <font color="#2040a0">self</font>.<font color="#2040a0">lut</font><font color="4444FF">[</font><font color="4444FF">(</font><font color="#2040a0">x</font>,<font color="#2040a0">y</font><font color="4444FF">)</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="4444FF">(</font><font color="#2040a0">x</font>,<font color="#2040a0">y</font><font color="4444FF">)</font>
+            <strong>else</strong><font color="4444FF">:</font>
+                <font color="#444444"># Duplicate location, something's already living here.</font>
+                <font color="#444444"># Try again!</font>
+                <font color="#2040a0">iterations</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">1</font>
+                <strong>continue</strong>
+        <strong>print</strong> <font color="#008000">&quot;%s Creatures setup in %s iterations.&quot;</font><font color="4444FF">%</font><font color="4444FF">(</font><font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">lut</font><font color="4444FF">)</font>,<font color="#2040a0">iterations</font><font color="4444FF">)</font>
+        <font color="#444444"># End of initenvironment</font>
+        <strong>return</strong>
+
+    <font color="#444444">### Determine random starting locations</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> randomx</font><font color="2040a0">(self)</font>:
+</strong>        <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">random</font>.<font color="#2040a0">randrange</font><font color="4444FF">(</font><font color="#FF0000">0</font>,<font color="#2040a0">self</font>.<font color="#2040a0">xdim</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">)</font>
+        <strong>return</strong> <font color="#2040a0">x</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> randomy</font><font color="2040a0">(self)</font>:
+</strong>        <font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#2040a0">random</font>.<font color="#2040a0">randrange</font><font color="4444FF">(</font><font color="#FF0000">0</font>,<font color="#2040a0">self</font>.<font color="#2040a0">ydim</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">)</font>
+        <strong>return</strong> <font color="#2040a0">y</font>
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> timestep</font><font color="2040a0">(self)</font>:
+</strong>        <font color="#444444"># Set move options and call move</font>
+        <font color="#2040a0">values</font> <font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">lut</font>.<font color="#2040a0">values</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <font color="#2040a0">moves</font> <font color="4444FF">=</font> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">values</font><font color="4444FF">)</font>
+        <font color="#2040a0">avgmove</font> <font color="4444FF">=</font> <font color="#FF0000">0.0</font>
+        <font color="#2040a0">startstep</font> <font color="4444FF">=</font> <font color="#2040a0">time</font>.<font color="#2040a0">time</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <strong>for</strong> <font color="#2040a0">coords</font> <strong>in</strong> <font color="#2040a0">values</font><font color="4444FF">:</font>
+            <font color="#2040a0">startmove</font> <font color="4444FF">=</font> <font color="#2040a0">time</font>.<font color="#2040a0">time</font><font color="4444FF">(</font><font color="4444FF">)</font>
+            <font color="#2040a0">self</font>.<font color="#2040a0">move</font><font color="4444FF">(</font> <font color="#2040a0">coords</font> <font color="4444FF">)</font>
+            <font color="#2040a0">endmove</font> <font color="4444FF">=</font> <font color="#2040a0">time</font>.<font color="#2040a0">time</font><font color="4444FF">(</font><font color="4444FF">)</font>
+            <font color="#2040a0">avgmove</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="4444FF">(</font><font color="#2040a0">endmove</font> <font color="4444FF">-</font> <font color="#2040a0">startmove</font><font color="4444FF">)</font>
+        <font color="#2040a0">endstep</font> <font color="4444FF">=</font> <font color="#2040a0">time</font>.<font color="#2040a0">time</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <strong>return</strong>
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> countNeighbors</font><font color="2040a0">( self, coords )</font>:
+</strong>        <font color="#2040a0">myNeighbors</font> <font color="4444FF">=</font> <font color="#FF0000">0</font>
+        <font color="#2040a0">freelist</font> <font color="4444FF">=</font> <font color="4444FF">[</font><font color="4444FF">]</font>
+        <strong>for</strong> <font color="#2040a0">n</font> <strong>in</strong> <font color="#2040a0">NEIGHBORS</font><font color="4444FF">:</font>
+            <font color="#2040a0">nx</font>,<font color="#2040a0">ny</font> <font color="4444FF">=</font> <font color="4444FF">(</font><font color="#2040a0">coords</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font> <font color="4444FF">+</font> <font color="#2040a0">n</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">%</font><font color="#2040a0">self</font>.<font color="#2040a0">xdim</font>, <font color="4444FF">(</font><font color="#2040a0">coords</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font> <font color="4444FF">+</font> <font color="#2040a0">n</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">%</font><font color="#2040a0">self</font>.<font color="#2040a0">ydim</font>
+            <strong>if</strong><font color="4444FF">(</font> <font color="#2040a0">self</font>.<font color="#2040a0">environment</font><font color="4444FF">[</font><font color="#2040a0">nx</font><font color="4444FF">]</font><font color="4444FF">[</font><font color="#2040a0">ny</font><font color="4444FF">]</font> <font color="4444FF">)</font><font color="4444FF">:</font>
+                <font color="#2040a0">myNeighbors</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">1</font>
+            <strong>else</strong><font color="4444FF">:</font>
+                <font color="#2040a0">freelist</font>.<font color="#2040a0">append</font><font color="4444FF">(</font> <font color="#2040a0">n</font> <font color="4444FF">)</font>
+        <strong>return</strong> <font color="#2040a0">myNeighbors</font>, <font color="#2040a0">freelist</font>
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> move</font><font color="2040a0">( self, coords )</font>:
+</strong>        <font color="#2040a0">x</font>,<font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#2040a0">coords</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>,<font color="#2040a0">coords</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+        <font color="#444444"># numNeighbors,freeList = self.countNeighbors(coords)</font>
+        <font color="#2040a0">numNeighbors</font>,<font color="#2040a0">freeList</font> <font color="4444FF">=</font> <font color="#2040a0">_engine</font>.<font color="#2040a0">count_neighbors</font><font color="4444FF">(</font> <font color="#2040a0">x</font>, <font color="#2040a0">y</font>, <font color="#2040a0">self</font>.<font color="#2040a0">environment</font> <font color="4444FF">)</font>
+        <font color="#444444"># print &quot;neighbors, freelist = %s, %s&quot;%(numNeighbors,freeList)</font>
+        <strong>if</strong><font color="4444FF">(</font> <font color="#2040a0">numNeighbors</font> <font color="4444FF">&gt;</font> <font color="#2040a0">self</font>.<font color="#2040a0">static</font> <strong>and</strong> <font color="#2040a0">numNeighbors</font> <font color="4444FF">&lt;</font> <font color="#FF0000">8</font> <font color="4444FF">)</font><font color="4444FF">:</font>
+            <font color="#2040a0">random</font>.<font color="#2040a0">shuffle</font><font color="4444FF">(</font><font color="#2040a0">freeList</font><font color="4444FF">)</font>
+            <font color="#2040a0">item</font> <font color="4444FF">=</font> <font color="#2040a0">freeList</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>
+            <font color="#2040a0">nx</font> <font color="4444FF">=</font> <font color="4444FF">(</font><font color="#2040a0">x</font> <font color="4444FF">+</font> <font color="#2040a0">item</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">%</font><font color="#2040a0">self</font>.<font color="#2040a0">xdim</font>
+            <font color="#2040a0">ny</font> <font color="4444FF">=</font> <font color="4444FF">(</font><font color="#2040a0">y</font> <font color="4444FF">+</font> <font color="#2040a0">item</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">%</font><font color="#2040a0">self</font>.<font color="#2040a0">ydim</font>
+            <font color="#2040a0">self</font>.<font color="#2040a0">environment</font><font color="4444FF">[</font><font color="#2040a0">nx</font><font color="4444FF">]</font><font color="4444FF">[</font><font color="#2040a0">ny</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="#FF0000">1</font>
+            <font color="#2040a0">self</font>.<font color="#2040a0">pixel_data</font><font color="4444FF">[</font><font color="#2040a0">nx</font><font color="4444FF">]</font><font color="4444FF">[</font><font color="#2040a0">ny</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">plantcolor</font>
+            <font color="#2040a0">self</font>.<font color="#2040a0">lut</font><font color="4444FF">[</font><font color="4444FF">(</font><font color="#2040a0">nx</font>,<font color="#2040a0">ny</font><font color="4444FF">)</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="4444FF">(</font><font color="#2040a0">nx</font>,<font color="#2040a0">ny</font><font color="4444FF">)</font>
+            <font color="#2040a0">self</font>.<font color="#2040a0">numcreatures</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+        <strong>elif</strong><font color="4444FF">(</font> <font color="#2040a0">numNeighbors</font> <font color="4444FF">&lt;</font> <font color="#2040a0">self</font>.<font color="#2040a0">static</font> <font color="4444FF">)</font><font color="4444FF">:</font>
+            <font color="#444444"># Die</font>
+            <font color="#2040a0">self</font>.<font color="#2040a0">environment</font><font color="4444FF">[</font><font color="#2040a0">x</font><font color="4444FF">]</font><font color="4444FF">[</font><font color="#2040a0">y</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="#FF0000">0</font>
+            <font color="#2040a0">self</font>.<font color="#2040a0">pixel_data</font><font color="4444FF">[</font><font color="#2040a0">x</font><font color="4444FF">]</font><font color="4444FF">[</font><font color="#2040a0">y</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">emptycolor</font>
+            <strong>del</strong> <font color="#2040a0">self</font>.<font color="#2040a0">lut</font><font color="4444FF">[</font><font color="4444FF">(</font><font color="#2040a0">x</font>,<font color="#2040a0">y</font><font color="4444FF">)</font><font color="4444FF">]</font> 
+            <font color="#2040a0">self</font>.<font color="#2040a0">numcreatures</font> <font color="4444FF">-</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+        <strong>else</strong><font color="4444FF">:</font>
+            <font color="#444444"># Do nothing, wait for your neighbors to do something</font>
+            <strong>pass</strong>
+        
+        <strong>return</strong>
+        
+
+
+</pre>
+<hr>
+syntax highlighted by <a href="http://www.palfrader.org/code2html">Code2HTML</a>, v. 0.9.1
+</body>
+</html>

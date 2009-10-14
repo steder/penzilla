@@ -1,0 +1,22 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># An example using NumPtr and Numeric to interface with SWIG'ed code:</FONT>
+
+<FONT COLOR=#3333CC><B>import</B></FONT> Numeric
+<FONT COLOR=#3333CC><B>import</B></FONT> NumPtr
+
+<FONT COLOR=#1111CC># import swig'ed module:</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> average
+
+<FONT COLOR=#1111CC># Create a numeric array that we want to compute the average of:</FONT>
+A = Numeric.array( range(1, 100), Numeric.Float64 )
+
+<FONT COLOR=#1111CC># Get a pointer to this array:</FONT>
+aptr = NumPtr.getpointer( A )
+
+<FONT COLOR=#1111CC># Pass this pointer to your swig'ed function 'ave'</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"The average of array A is:"</FONT>,average.ave( len(A), aptr )
+</PRE>
+                  <!--footer-->
+                  </BODY>

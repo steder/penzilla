@@ -1,0 +1,18 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#3333CC><B>from</B></FONT> dmTxt2Html <FONT COLOR=#3333CC><B>import</B></FONT> *
+<FONT COLOR=#3333CC><B>import</B></FONT> glob
+
+txts = glob.glob(<FONT COLOR=#115511>'*.txt'</FONT>)
+cfg_dict = {<FONT COLOR=#115511>'type'</FONT>: <FONT COLOR=#115511>'SMART_ASCII'</FONT>,
+            <FONT COLOR=#115511>'proxy'</FONT>: <FONT COLOR=#115511>'NONE'</FONT> }
+<FONT COLOR=#3333CC><B>for</B></FONT> fname <FONT COLOR=#3333CC><B>in</B></FONT> txts:
+    cfg_dict[<FONT COLOR=#115511>'source'</FONT>] = fname
+    cfg_dict[<FONT COLOR=#115511>'target'</FONT>] = fname[:-3]+<FONT COLOR=#115511>'html'</FONT>
+    main(cfg_dict)
+
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

@@ -1,0 +1,53 @@
+<html>
+<title>Introduction to Python:  Commandline Arguments</title>
+<body>
+<h2>An Introduction to Python:  Commandline Arguments</h2>
+<h3><font color="blue">Commandline Argumetns</font></h3>
+<a href="../index.html">Table of Contents</a>
+<hr><!--^Header^-->
+<h4><font color="green">Passing input to your programs at startup</font></h4>
+<P>
+Commandline Arguments are used primarily to pass arguments to your code when you start your program, for instance:
+
+<ul><font color="green">$ python bilingual_hello.py german</font></ul>
+
+<P>I'm now going to walk through producing this extremely useful
+(<font color="red">:-)</font>) program shown above.  I'm going to show a 
+simple way to do arguments which is useful for many smaller programs.  
+Larger programs that require more then 2 or 3 arguments should probably look 
+into using the <font color="blue">getopt</font> and 
+<font color="blue">optparse</font> modules.
+
+<P>If you're looking do duplicate how many nicer commandline programs supply 
+arguments like <i>--help</i> and so on, you will also want to take a look at
+the <font color="blue">getopt</font> and <font color="blue">optparse</font>
+modules.  <font color="blue">getopt</font> is easier to get started with, but is less 
+sophisticated.  It requires a little more work to create a nice interface.
+<font color="blue">optparse</font> has a nice object oriented design and 
+provides a lot of powerful options and can handle a lot of options with not 
+much code.  
+
+<!--Include Sourcecode-->
+<ul><!--#include virtual="bilingual.py.html"--></ul>
+
+<P>The key thing to keep in mind here is the use of <font color="blue">sys
+</font> module, and the <font color="blue">sys.argv</font> parameter.
+The length of <font color="blue">sys.argv</font> is at least 1, where
+<font color="blue">sys.argv[0]</font> is the first argument passed to the 
+python interpreter.  That will pretty much always be the name of your script.
+So the first real commandline argument is actually the second argument in 
+the <font color="blue">sys.argv</font> list.  
+
+<P>This method for dealing with commandline arguments is awkward and 
+somewhat painstaking.  Notice how we have to have special cases dealing
+with the number of arguments and things like that.  Don't forget that for more 
+complex option lists there are a couple alternative modules that can be used
+to make life a little easier.  
+
+<P><font color="blue">getopt</font> is simpler then <font color="blue">optparse</font>, but less powerful.
+
+<!--\/Footer\/-->
+<hr>
+<a href="../index.html">Table of Contents</a>
+</body>
+</html>

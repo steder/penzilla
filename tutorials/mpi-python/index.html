@@ -1,0 +1,70 @@
+<html>
+<head>
+<title>Penzilla.net:  MPI on Python</title>
+</head>
+<body>
+<h1>Penzilla.net:  MPI on Python</h1>
+<!-- Creative Commons License -->
+<p>This website and all code examples are &#169; 
+<a href="mailto:steder@gmail.com">Mike Steder</a><br>and is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/1.0/">Creative Commons License</a>.<br/>
+<!-- /Creative Commons License -->
+<hr><!--^Header^-->
+<h4>1/2/06:</h4>
+Coming Soon!
+<hr>
+<h2><font color="green">About this document:</font></h2>
+<h3><font color="blue">The Goal:</font></h3>
+<P>The goal of this tutorial is to introduce people who might not be familiar with Parallel programming to MPI, a powerful library used for parallel programming on a wide variety of machines (from laptops to supercomputers).  Additionally I hope to show how MPI can be used with the Python programming language.  While many of the information covered here, along with the examples, can easily be (re)written in C or Fortran, I feel that using Python allows us to spend more time writing code and experimenting and less time debugging.</P>
+<h3><font color="blue">The Audience:</font></h3>
+<P>I'm trying to make this document suitable for readers with a basic familiarity with one or more programming languages, and an interest in 'supercomputing'.  I am still somewhat of a novice when it comes to explaining things and I'd appreciate any comments or suggestions you might have.  Please feel free to send me e-mail with questions/comments/etc.</p>  
+
+<h2><font color="green">Overview</font></h2>
+<P>See <a href="mpi-overview.html">the MPI overview.</a></P>
+
+<h2><font color="green">Table of Contents</font></h2>
+<P>
+<ul>
+  <li>Prerequisites
+    <ul>
+      <li>Python + MPI Implementation(s)
+         <ul>
+           <li><B><a href="http://www.penzilla.net/mmpi/">MMPI</a>("Mmm, PI!" or MikeMPI) is recommended for following along with the examples on this site.</B></li>
+           <li><a href="http://pympi.sf.net">PyMPI</a>: a powerful but complex MPI+Python implementation.</li>
+         </ul>
+      </li>
+      <li><a href="http://http://www-unix.mcs.anl.gov/mpi/mpich2/">MPICH (preferably MPICH-2)</a>
+         <ul>
+           <li><a href="bi-mpich2.html">Building and Installing MPICH-2 on Linux/Mac OS X</a></li>
+           <li><a href="setup-mpich2.html">Setting up and running jobs with MPICH-2</a></li>
+         </ul>
+      </li>
+      <li><a href="http://www.python.org">Python2.3</a>( or later )</li>
+    </ul>
+  </li><!--End Prerequisites-->
+  <li>Hello World
+    <ul>
+      <li>Initialization and Finalization</li>
+      <li>About Output</li>
+    </ul>
+  </li><!--End Hello World-->
+  <li>Basic MPI
+    <ul>
+      <li>Communicators</li>
+      <li>Synchronous I/O</li>
+      <li>Asynchronous I/O</li>
+      <li>Collective Operations</li>
+    </ul>
+  </li><!--End Basic MPI-->
+</ul><!--End of ToC-->
+
+<!--Include Sourcecode-->
+<ul><!--#include virtual=""--></ul>
+<hr>
+</body>
+<!--\/Footer\/-->
+<footer>
+<a href="http://www.python.org" style="color:white"><img src="images/PythonPoweredAnim.gif"></a>
+<a href="http://www-unix.mcs.anl.gov/mpi/" style="color:white"><img src="images/mpilogogreen.gif"></a>
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/1.0/"><img alt="Creative Commons License" border="0" src="http://creativecommons.org/images/public/somerights.gif" /></a>
+</footer>
+</html>

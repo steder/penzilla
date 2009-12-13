@@ -1,75 +1,78 @@
 <html>
-<title>Introduction to Python: Functions</title>
-<body>
-<h2>An Introduction to Python: Functions</h2>
-<a href="../index.html">Table of Contents</a>
-<hr>
-<h3><font color="green">Python and Functions:</font></h3>
-<P>Python is a little different from other languages like C/C++ and Java, in that functions are not magic constructs, but values.  Yes, functions in Python, are like integers in C.  They are simply values and can be passed to other functions/object constructors, and so forth.  We've already seen a pretty simple example of a Python function in the form of the venerable "Hello World!" program.  Let's take another look at it:
-<ul><!--#include virtual="hello.py.html"--></ul>
-<P>In the above code there is really only one new keyword: <font color="green">def</font>.  <font color="green">def</font> is the keyword used when defining functions.  Arguments are passed in paranthesis just like C, and the <font color="green">return</font> statement can't return <b>multiple</b> values.  However, since <font color="blue">lists, tuples,</font> and <font color="blue">dictionaries</font are basic types they can be returned instead.  I'll illustrate this later.  A quick thing to note about Python functions:  They always return a value.  However, if no return value is specified, or you don't use the return keyword, Python automatically returns the value <font color="green">None</font>.  
-<P>Now let's play around around a bit with the idea of functions as objects, and then will show some some more advanced functions.
-<P>Let's write a simple function called "map", which maps a function across a list, applying that function to each list element.  I'm also going to illustrate recursion by writing a recursive and non-recursive version of "map".  
-<ul><!--#include virtual="map.py.html"--></ul>
-<P>Now notice how a function, in this case <font color="purple"><i>increment</i></font> is passed to map and rmap, just as if it were a number or some other data.  Why is that?  Because functions <b>are</b> data in Python, not just special labels for code blocks(or whatever they are in C/C++).  There is also a nice example of the difference between recursive and non-recursive code in Python.  I find the first form more intuitive, but the second form is more interesting.
-<P>Pretty tame so far.  Aside from the fact that functions are (cs321)first-class values(/cs321) in Python, they don't seem to exciting.  So let's try showing off a few more features of Python functions.
+  <title>Introduction to Python: Functions</title>
+  <body>
+    <h2>An Introduction to Python: Functions</h2>
+    <a href="../index.html">Table of Contents</a>
+    <hr/>
+    <h3><font color="green">Python and Functions:</font></h3>
+    <P>Python is a little different from other languages like C/C++ and Java, in that functions are not magic constructs, but values.  Yes, functions in Python, are like integers in C.  They are simply values and can be passed to other functions/object constructors, and so forth.  We've already seen a pretty simple example of a Python function in the form of the venerable "Hello World!" program.  Let's take another look at it:
+    <ul><!--#include virtual="hello.py.html"--></ul>
+    <P>In the above code there is really only one new keyword: <font color="green">def</font>.  <font color="green">def</font> is the keyword used when defining functions.  Arguments are passed in paranthesis just like C, and the <font color="green">return</font> statement can't return <b>multiple</b> values.  However, since <font color="blue">lists, tuples,</font> and <font color="blue">dictionaries</font> are basic types they can be returned instead.  I'll illustrate this later.  A quick thing to note about Python functions:  They always return a value.  However, if no return value is specified, or you don't use the return keyword, Python automatically returns the value <font color="green">None</font>.  
+    <P>Now let's play around around a bit with the idea of functions as objects, and then will show some some more advanced functions.
+    <P>Let's write a simple function called "map", which maps a function across a list, applying that function to each list element.  I'm also going to illustrate recursion by writing a recursive and non-recursive version of "map".  
+    <ul><!--#include virtual="map.py.html"--></ul>
+    <P>Now notice how a function, in this case <font color="purple"><i>increment</i></font> is passed to map and rmap, just as if it were a number or some other data.  Why is that?  Because functions <b>are</b> data in Python, not just special labels for code blocks(or whatever they are in C/C++).  There is also a nice example of the difference between recursive and non-recursive code in Python.  I find the first form more intuitive, but the second form is more interesting.
+    <P>Pretty tame so far.  Aside from the fact that functions are first-class values in Python, they don't seem to exciting.  So let's try showing off a few more features of Python functions.
 
-<font color="green"><h3>Arguments in Python Functions</h3></font>
-<font color="blue"><h4>Multiple Return Values</h4></font>
-<P>Let's assume that I have a C++ code in which I want to return 3 values.
-There are a number of ways I could return
+    <font color="green"><h3>Arguments in Python Functions</h3></font>
+    <font color="blue"><h4>Multiple Return Values</h4></font>
+    <P>Let's assume that I have a C++ code in which I want to return 3 values.
+    There are a number of ways I could return
+    
+    <ul>-1,0,1</ul> 
 
-<ul>-1,0,1</ul> 
-
-from C++.
-
-<P>Possible Method I:
-<ul>
-void return3values( int &a, int &b, int &c ) { a = -1; b = 0; c = 1; }
-</ul>
-<P>Possible Method II:
-<ul>
-void returnArray( int *array ) { array[0] = -1; array[1] = 0; array[2] = 1; } 
-</ul>
-
-<P>Now I am not saying that these are the only ways to return multiple values 
-in C++, but they are a few possibilities.  However, in Python, "Possible Method I" would not work.  Python passes all arguments using "pass by reference".  However, numerical values and Strings are all immutable in place.  You cannot change the value of a passed in variable and see that value change in the caller.  
-Dictionaries and Lists on the other hand are mutable, and changes made to them
-by a called function will be preserved when the function returns.  This 
-behavior is confusing and can lead to common mistakes where lists are 
-accidentally modified when they shouldn't be.  However, there are many 
-reasons for this behavior, such as saving memory when dealing with large sets. 
-
-<P>Most often when you have to return multiple arguments you will probably just
-use something simple like this example.  Here we just take advantage of the 
-fact that Python includes built in Tuples, Lists, and Dictionaries, and return
-one of these objects to encapsulate the multiple values.
-<ul><!--#include virtual="multiple-returns.py.html"--></ul>
-
-<P>Sometimes, when dealing with lists and dictionaries it is actually more
-efficient or effective to take advantage of the fact that these more complex 
-objects are passed-by-reference.  Take a look at the following example:
-<ul><!--#include virtual="pass-by-reference1.py.html"--></ul>
-
-<P>Finally it is important to be aware of possible bugs that can occur 
-with references to Lists and Dictionaries.  Consider the following code 
-intended to...( I need to dig up an example of one of these pass-by-reference gotchas.)
-<ul><!--#include virtual="pass-by-reference-gotcha.py.html"--></ul>
-
-<font color="blue"><h4>Default Arguments and Argument Names</h4></font>
-<P>Python allows you to mess around with arguments a little more then C/C++.  Let's see a few examples of how functions can be defined and  how they can be used.
-<ul><!--#include virtual="arguments.py.html"--></ul>
-<P>Default arguments are nice, allowing you to simply define values to be used if none are specified.  This makes long argument lists a lot nicer to work with.  On the other hand, having default arguments, especially with complicated functions, you'll often end up with a mix of default and required variables.  However as soon as your function requires a variable it requires you to either re-order your argument list, or specify a bunch of arguments with default values(whether you want to set those defaults or not).  Python supplies you with an easy way to set just the arguments necessary and none that aren't.  Simply specify the name of the variable in the call to the function.  These "labels" can be used in any python function and they can help in dealing with complicated functions and arglists.  
-
-<h3><font color="green">Lambda Expressions (Anonymous Functions)</font></h3>
-<P>As if the last section wasn't cool enough, let's try "lambda expressions", a concept borrowed from Lisp and other functional languages.  Lambda expressions return functions as results.  They build functions without assigning names to them.  A normal function declaration assigns the functions value to the name of the function, but lambda expressions do not.  
-<p>Why would you want this dubious functionality?  Because lambda expressions are nice to use in places that a function declaration wouldn't normally be allowed, and to write quick and dirty functions on the fly.  Sometimes you want to build functions(callback handlers in gui's, object member data accessors, and so on), and using lambda expressions makes that a lot easier.
-<p>So lambda lets you define and use a function inside an if statement body, or inside a list.  However, lambda expressions are just that, expressions.  It is difficult to write a complicated function (unless you're a pro with languages like Lisp, Ocaml, etc.) 
-<p>Let's do a few examples of where lambda expressions could be useful:
-<ul><!--#include virtual="lambda.py.html"--></ul>
-<p>And that's all I have to say about functions for now.
-<hr>
-Links to code...<br>
-<a href="../index.html">Table of Contents</a>
-</body>
-</html>
+    from C++.
+    <P>Possible Method I:
+    <ul>
+      void return3values( int &a, int &b, int &c ) { a = -1; b = 0; c = 1; }
+    </ul>
+    <P>Possible Method II:
+    <ul>
+      void returnArray( int *array ) { array[0] = -1; array[1] = 0; array[2] = 1; } 
+    </ul>
+    
+    <P>Now I am not saying that these are the only ways to return multiple values 
+    in C++, but they are a few possibilities.  However, in Python, "Possible Method I" would not work.
+    Python passes all arguments using "pass by reference".  However, numerical values and Strings are all immutable.
+    You cannot change the value of a passed in immutable and see that value change in the caller.
+    Dictionaries and Lists on the other hand are mutable, and changes made to them
+    by a called function will be preserved when the function returns.  This 
+    behavior is confusing and can lead to common mistakes where lists are 
+    accidentally modified when they shouldn't be.  However, there are many 
+    reasons for this behavior, such as saving memory when dealing with large sets.
+    
+    <P>Most often when you have to return multiple arguments you will probably just
+    use something simple like this example.  Here we just take advantage of the 
+    fact that Python includes built in Tuples, Lists, and Dictionaries, and return
+    one of these objects to encapsulate the multiple values.
+    <ul><!--#include virtual="multiple-returns.py.html"--></ul>
+    
+    <P>Sometimes, when dealing with lists and dictionaries it is actually more
+    efficient or effective to take advantage of the fact that these more complex 
+    objects are passed-by-reference.  Take a look at the following example:
+    <ul><!--#include virtual="pass-by-reference1.py.html"--></ul>
+    
+    <P>Finally it is important to be aware of possible bugs that can occur 
+    with references to Lists and Dictionaries.  Consider the following code 
+    intended to...( I need to dig up an example of one of these pass-by-reference gotchas.)
+    <ul><!--#include virtual="pass-by-reference-gotcha.py.html"--></ul>
+    
+    <font color="blue"><h4>Default Arguments and Argument Names</h4></font>
+    <P>Python allows you to mess around with arguments a little more then C/C++.  Let's see a few examples of how functions can be defined and  how they can be used.
+    <ul><!--#include virtual="arguments.py.html"--></ul>
+    <P>Default arguments are nice, allowing you to simply define values to be used if none are specified.  This makes long argument lists a lot nicer to work with.  On the other hand, having default arguments, especially with complicated functions, you'll often end up with a mix of default and required variables.  However as soon as your function requires a variable it requires you to either re-order your argument list, or specify a bunch of arguments with default values(whether you want to set those defaults or not).  Python supplies you with an easy way to set just the arguments necessary and none that aren't.  Simply specify the name of the variable in the call to the function.  These "labels" can be used in any python function and they can help in dealing with complicated functions and arglists.  
+    
+    <h3><font color="green">Lambda Expressions (Anonymous Functions)</font></h3>
+    <P>As if the last section wasn't cool enough, let's try "lambda expressions", a concept borrowed from Lisp and other functional languages.  Lambda expressions return functions as results.  They build functions without assigning names to them.  A normal function declaration assigns the functions value to the name of the function, but lambda expressions do not.  
+    <p>Why would you want this dubious functionality?  Because lambda expressions are nice to use in places that a function declaration wouldn't normally be allowed, and to write quick and dirty functions on the fly.  Sometimes you want to build functions(callback handlers in gui's, object member data accessors, and so on), and using lambda expressions makes that a lot easier.
+    <p>So lambda lets you define and use a function inside an if statement body, or inside a list.  However, lambda expressions are just that, expressions.  It is difficult to write a complicated function because statements
+      are not allowed.</p>
+    <p>Let's do a few examples of where lambda expressions could be useful:
+    <ul><!--#include virtual="lambda.py.html"--></ul>
+    <p>And that's all I have to say about functions for now.
+    <hr>
+      Links to code...<br/>
+      <a href="../index.html">Table of Contents</a>
+    </body>
+  </html>
+  

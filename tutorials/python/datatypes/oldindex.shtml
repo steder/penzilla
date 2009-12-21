@@ -1,0 +1,53 @@
+<html>
+<title>Introduction to Python: Datatypes, Typing, and More Syntax</title>
+<body>
+<h2>An Introduction to Python:</h2>
+<h3>Datatypes, Typing, and More Syntax</h3>
+<a href="../index.html">Table of Contents</a>
+<hr>
+<!--The Python Types, with brief discussion-->
+<h3><font color="green">The Basic Python Types:</font></h3>
+<ul>
+  <li>The "uncool" python types
+    <ul>  
+      <li><font color="green">int</font>:  Integer values (-2^32 , 2^32)</li>
+      <li><font color="green">long</font>:  Any integer larger then a plain <font color="green">int</font>.</li>
+      <li><font color="green">float</font>:  All floating point values.
+      <li><font color="green">str</font>:  Strings and characters are represented as the same type.</li>
+    </ul>
+  <li><font color="blue">The "Cool" Python Types</font>
+    <ul>
+      <li><font color="green">tuple</font>:  Immutable groups of elements.
+        <ul>Elements can have <font color="red">different</font> types</ul>
+        <ul>Coordinates:  p1 = (0, 1)</ul>
+        <ul>Used to return more then one value:  return (name, address)</ul>
+      </li>
+  <li>
+    <font color="green">list</font>:  Mutable "lists" of elements.
+      <ul>Elements can have <font color="red">different</font> types</ul>
+      <ul>Similar to arrays or linked lists, with similar uses.</ul>
+  </li>
+  <li>
+    <font color="green">dict</font>:  Dictionaries are mutable and keyed datastructures.  They store and retrieve elements based on hashed keys (of type <font color="green">str</font>).
+      <ul>Elements can be of <font color="red">different</font> types.</ul>
+</ul>
+</ul>
+<!--Code Example:  Types-->
+<ul><!--#include virtual="datatypes.py.html"--></ul>
+
+<!--A Note about Typing-->
+<h3><font color="green">Typing</font></h3>
+<P>Python features a "dynamic" typing model, where types are allocated on the fly and can be changed mid program.  From one line to the next a variable "x" could be an integer, a string, and a list.  Not all at the same time of course, but x could be set to 3 different values, and Python would accept it as completely valid.  This flexible and powerful type system is useful because it is generally very intuitive, and doesn't really intrude when you're writing code.  You rarely have to go back and define variables, nor do you have to define lots of temporary variables for different types of data.  Let's look at a simple example or two.
+<!--Code Example: Typing-->
+<ul><!--#include virtual="typing.py.html"--></ul>
+
+<!--Introduction of some type functions-->
+<h3><font color="green">Type Specific Functions</font></h3>
+<P>Here I'd like to illustrate a bunch of type specific operations and functions as a reference.  A lot of these functions you'll need often, so it seems only fair to introduce them early on.  On to the examples:# 
+<!--Code Example:  Keywords/Syntax-->
+<ul><!--#include virtual="type-functions.py.html"--></ul>
+<hr>
+<a href="datatypes.py">Download the above source</a><br>
+<a href="../index.html">Table of Contents</a>
+</body>
+</html>

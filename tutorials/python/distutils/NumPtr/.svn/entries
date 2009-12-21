@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="13"
+   name=""
+   committed-date="2004-01-15T14:29:37.920952Z"
+   url="http://www.ripplefx.net:81/svn/python/distutils/NumPtr"
+   last-author="steder"
+   kind="dir"
+   uuid="996777e2-3ecf-0310-aa64-e0ff611b1bef"
+   revision="17"/>
+<entry
+   committed-rev="13"
+   name="test.c"
+   text-time="2004-09-20T02:22:27.000000Z"
+   committed-date="2004-01-15T14:29:37.920952Z"
+   checksum="06415996ee1ac37edbca073d69c4da88"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:27.000000Z"/>
+<entry
+   committed-rev="13"
+   name="getpointer.c"
+   text-time="2004-09-20T02:22:27.000000Z"
+   committed-date="2004-01-15T14:29:37.920952Z"
+   checksum="6aeab09220bcc13d239f3cf330535d34"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:27.000000Z"/>
+<entry
+   name=".d"
+   kind="dir"/>
+<entry
+   committed-rev="13"
+   name="NumPtr_lib.py"
+   text-time="2004-09-20T02:22:27.000000Z"
+   committed-date="2004-01-15T14:29:37.920952Z"
+   checksum="b482d111a8e9c9d58598846a2b54dcbf"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:27.000000Z"/>
+<entry
+   committed-rev="13"
+   name="MANIFEST"
+   text-time="2004-09-20T02:22:27.000000Z"
+   committed-date="2004-01-15T14:29:37.920952Z"
+   checksum="883657ab620e06920dacc022175ee8dc"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:27.000000Z"/>
+<entry
+   committed-rev="13"
+   name="test.py"
+   text-time="2004-09-20T02:22:27.000000Z"
+   committed-date="2004-01-15T14:29:37.920952Z"
+   checksum="bf6300697894cf53399f3d2bafbcc2ae"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:27.000000Z"/>
+<entry
+   committed-rev="13"
+   name="setup.py"
+   text-time="2004-09-20T02:22:27.000000Z"
+   committed-date="2004-01-15T14:29:37.920952Z"
+   checksum="3638f57a39d7f554420e946d2751a7b4"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:27.000000Z"/>
+<entry
+   committed-rev="13"
+   name="Makefile.old"
+   text-time="2004-09-20T02:22:27.000000Z"
+   committed-date="2004-01-15T14:29:37.920952Z"
+   checksum="80facb4ab9e90edf13b95aef2181f257"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:27.000000Z"/>
+<entry
+   committed-rev="13"
+   name="NumPtr.i"
+   text-time="2004-09-20T02:22:27.000000Z"
+   committed-date="2004-01-15T14:29:37.920952Z"
+   checksum="ede83c15125431e1a94e93d02ec3ffcb"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:27.000000Z"/>
+<entry
+   committed-rev="13"
+   name="NumPtr.py"
+   text-time="2004-09-20T02:22:27.000000Z"
+   committed-date="2004-01-15T14:29:37.920952Z"
+   checksum="9e6585c0438699a558dbfeac434edf1f"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:27.000000Z"/>
+<entry
+   committed-rev="13"
+   name="Makefile"
+   text-time="2004-09-20T02:22:27.000000Z"
+   committed-date="2004-01-15T14:29:37.920952Z"
+   checksum="b9569f70c1dfca72001efbc9e5c46f31"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:27.000000Z"/>
+</wc-entries>

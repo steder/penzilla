@@ -1,0 +1,56 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Student"><FONT COLOR=#CC0000><B> Student</B></FONT></A>:
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, name=<FONT COLOR=#115511>"John Doe"</FONT>, age=18, year=<FONT COLOR=#115511>"Freshman"</FONT>, gpa=0.0):
+        self.name = name
+        self.age = age
+        self.year = year
+        self.gpa = gpa
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="setName"><FONT COLOR=#CC0000><B> setName</B></FONT></A>(self, name):
+        self.name = name
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="setAge"><FONT COLOR=#CC0000><B> setAge</B></FONT></A>(self, age):
+        self.age = age
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="setYear"><FONT COLOR=#CC0000><B> setYear</B></FONT></A>(self, year):
+        self.year = year
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="setGpa"><FONT COLOR=#CC0000><B> setGpa</B></FONT></A>(self, gpa):
+        self.gpa = gpa
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getName"><FONT COLOR=#CC0000><B> getName</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.name
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getAge"><FONT COLOR=#CC0000><B> getAge</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.age
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getYear"><FONT COLOR=#CC0000><B> getYear</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.year
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getGpa"><FONT COLOR=#CC0000><B> getGpa</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.gpa
+
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="MaleStudent"><FONT COLOR=#CC0000><B> MaleStudent</B></FONT></A>(Student):
+    GENDER = <FONT COLOR=#115511>"MALE"</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getGender"><FONT COLOR=#CC0000><B> getGender</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.GENDER
+
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="FemaleStudent"><FONT COLOR=#CC0000><B> FemaleStudent</B></FONT></A>(Student):
+    GENDER = <FONT COLOR=#115511>"FEMALE"</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getGender"><FONT COLOR=#CC0000><B> getGender</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.GENDER
+
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
+    A = MaleStudent()
+    B = FemaleStudent()
+    <FONT COLOR=#3333CC><B>print</B></FONT> A.getGender()
+    <FONT COLOR=#3333CC><B>print</B></FONT> B.getGender()
+
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

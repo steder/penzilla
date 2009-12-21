@@ -1,0 +1,84 @@
+alias	hw0	hw1	hw2	hw3	midterm 1
+Pootie-Tang	32	34		15.5	46
+dune	47	31		27	32
+Iconoclast	29	33.5		27	
+HealeySt	30	27		7.5	64
+NiceMan	60.5				
+Bib-B	47.5	56			62
+the257	44.5	16		26	56
+6493	41	32		27	54
+spidey	48.5	23		23	44
+Lock	39	26		27	34
+Araldor	47	31		27	67
+Sammy	43.5	44		23	46
+skv9	66	44		27	52
+moses	42.5	30		24	51
+cheese	47.5	18		25	70
+Monkey Man Dan	35.5	31		27	54
+epsilonought	58	56		27	59
+IlliniSgEp	24			20	62
+Dave	32	24		26	46
+klee		39		27	50
+Isles311	58.5	50		27	43
+ Very Sleepy #219	63.5	44		26	77
+Rollo Tamasi	27	33		28	29
+Alpha Quadrant	62	48		17	68
+dbrown	49.5	43		23	59
+1234	58.5	41		27	64
+Slayn	39	26		27	63
+flag1	58.5	30		1	35
+Ben Kenobi	32.5	19		12.5	36
+og4l	51.5	38		21	48
+spoonman2530	58.5	50		27	58
+Barney	47.5	56			81
+klee		39		27	68
+Komputer Kontroller	33	27		27	50
+slapper	33	27		27	32
+SuperGrip	58.5	30		1	32
+buan	35.5	44		15.5	36
+		18.5		26	70
+The Third Amigo	33	27		27	54
+dutch	38.5	33		28	36
+khalas	52.5	46.5		27	67
+kaycee	12.5	13		23	38
+jorin	58	56		27	90
+KWO	60.5				
+ChinDaddy	66	44		27	38
+eggman	47.5	18		25	47
+fuzzy	66	44		27	34
+HockeyBoy	58.5	33		27	65
+xtreme	51	50		27	46
+ziggy43	19				
+Very Sleepy	63.5	44		26	48
+	58.5	41		27	67
+373sucks	42.5	32		7.5	30
+spoonman	43.5	44		23	62
+1883	52.5	46.5		27	52
+washu	60	53			
+brit1	42.5	32		7.5	32
+nvp	20.5			23	29
+Big-P	47.5	56			55
+bikerider	38.5	33		28	45
+fuan	35.5	44		15.5	45
+Clockwisefoot	47.5	18		25	62
+liren	42.5	30		24	48
+meruru	63.5	44		26	43
+gilman	60	53		27	40
+ASPWizKid	58.5	33		27	46
+		16		22	75
+ljn35	58.5	50		27	50
+elf2582	58	56		27	38
+photon	51	50		27	67
+bfavre	49.5	43		23	39
+banana	42.5	30		24	34
+HUMAN#31B8A	62	48		17	71
+crzyfk	51.5	38		21	
+	66.5	47		27	
+fats403	60	53		27	52
+lcoker	49.5	43		23	41
+plethora		39		27	
+lostone	18	6			34
+Shodan	39	26		27	63
+siva	66.5	47		27	37
+summy	43.5	44		23	48
+

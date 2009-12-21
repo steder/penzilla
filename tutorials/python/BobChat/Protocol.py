@@ -1,0 +1,296 @@
+"""
+Protocol.py
+---
+Defines the BobChat Protocol:
+Message Objects,
+Protocol Constants,
+Commands.
+"""
+
+import string # we do a lot of string processing
+
+"""
+Protocol Constants
+"""
+
+"""
+Command List
+"""
+COMMANDS = {"QUIT":"\QUIT password"+
+            "Kill the server, disconnect everyone, and shutdown.",
+            "EXIT":"\EXIT"+
+            "Inform all you're quitting the chat, then quit.",
+            # Everything below here needs additional server support.
+            # Conspire would maybe be better then whisper
+            "STAB":"\STAB username"+
+            "Kick a user out of the Chatroom.",
+            "WHISPER":"\WHISPER username message"+ 
+            "Send a private message to the specified user.",
+            "JOIN":"\JOIN"+ # this needs to be automated
+            "Politely Join the Chat",
+            "NICK":"\NICK newname"+ 
+            "Change your Nickname/Username",
+            "EMOTE":"This one is for Rob Jacob",
+            # Be careful of these two commands.
+            # They should not be used by clients
+            # except in making their initial connections.
+            "_WRITE_":"Internal Command, setup Write Socket",
+            "_READ_":"Internal Command, setup Read Socket"}
+
+COMMANDLIST = COMMANDS.keys()
+MESSAGETYPES=['Message','Command','ServerCommand','AdminCommands']
+
+"""
+Bob Message Objects
+"""
+class Message:
+    """
+    Message( username, message[, command, password] )
+
+    Examples of Usage:
+    1).  msg = Message('steder', 'Hey Phil, how's it going?')
+      This creates a message in this format and sends it to the
+      server, which timestamps it and returns it to all clients.
+      It is then interpreted by the read client process into:
+      'steder(4:03:21pm):  Hey Phil, how\'s it going?'
+    2).  cmd = Message('steder', 'I'm out of here, bis spater!', '<EXIT>')
+      This creates a message like the above command, the message is
+      simply printed as a comment.  It's really just a placeholder
+      for the executed command.  In this case, <EXIT> is just an example
+      (I'm not settled on a command syntax yet), but intuitively
+      this is the command a client sends when it wishes to disconnect
+      from the chat.
+      So the message object arrives at the server, and the <EXIT>
+      is interpreted, which generates a message in this way:
+      a).  Lookup command('<EXIT>')
+      b).  'User '+username+' has left, saying:'+message
+        'User steder has left, saying: I'm out of here, bis spater!'
+    3).  servercommand = Message('root','Server is going down for maintenance',
+    '<QUIT>','2l33t')
+      OR
+      bootmsg = Message('moderator', 'Die annoying guy!', '<KICK>AnnoyingGuy</KICK>', 'r0xx0r')
+    """
+    MESSAGETYPES=['Message','Command','ServerCommand']
+    def __init__(self, username, message, command=None, password=None):
+        self.username = username
+        self.message = message
+        self.command = command
+        self.password = password
+        if command != None and password != None:
+            # Server Command
+            self.type = 2
+        elif command != None:
+            # Client Command
+            self.type = 1
+        else:
+            # Message
+            self.type = 0
+        # A timestamp variable.
+        # All messages are touched by the server,
+        # which places a timestamp on them.
+        self.time = ""
+        return
+    """
+    The server calls this function to set the time stamp on
+    each message as it arrives.  More sophisticated versions
+    of this program my encrypt some sort of secure key or something
+    to 'sign' each message.
+    """
+    def approve(self,time):
+        self.time = time
+        return
+
+    """
+    Returns the Typecode of a message object.
+    Type 2 Messages are Server Commands, and need to be handled there
+    
+    Type 1 Messages are Client Commands, and are generally ignored by
+    The server and dealt with by the client.  Usually these are just
+    things like emote that require special formatting.
+
+    Type 0 Messages are just plain simple messages.
+
+    ADDITION:  Type 3 Messages should be added (or these should be Type 2)
+    and Type 2 Server Commands should be called Type 3.
+    We need a new type of message for things like private messages
+    (if we want to implement them.)
+    """
+    def type(self):
+        return MESSAGETYPES[self.type]
+
+    """
+    Designed to allow the following user/Client code:
+      input = 'Hello Friend!'
+      input2 = '\stab friendlyuser'
+      message = Protocol.Message('friendlyuser',input)
+      message2 = Protocol.Message('meanuser', input2)
+      if message.isCommand():
+          message.makeCommand()
+      if message2.isCommand():
+          message.makeCommand()
+    """
+    def isCommand(self):
+        # Standardize the message
+        message = self.message.upper()
+        # Check for command tags at the beginning of the message.
+        temp = message.split()
+        for command in COMMANDLIST:
+            if temp[0] == "\\"+command:
+                return self.write_handle( command, len(temp) )
+        return 0
+
+    """
+    write_handle(self, commandlist, length):
+
+    Verifys the command is syntactically correct
+    then calls pack to get it ready to send.
+    """
+    def write_handle(self, command, length):
+        """
+        _WRITE_ and _READ_ are commented out to
+        prevent users from sending these commands.
+        I just build these manually in the client code.
+        """
+        commandlist = self.message.split()
+        if command == "_WRITE_":
+            #self.message = "Connecting Client _WRITE_ Thread"
+            #self.command = "<_WRITE_>"
+            #self.password = None
+            #self.type = 2 # Server Commands that aren't protected
+            return 1
+        elif command == "_READ_":
+            #self.message = "Connecting Client _READ_ Thread"
+            #self.command = "<_READ_>"
+            #self.password = None
+            #self.type = 2 # Server Commands that aren't protected
+            return 1
+        elif command == "QUIT":
+            if length >= 3:
+                self.message = string.join(commandlist[2:]," ")
+                self.command = command
+                self.password = commandlist[1]
+                self.type = 3 # Password protected server command
+                return 1
+            elif length == 2:
+                self.message = "Admin is bringing the server down."
+                self.command = command
+                self.password = commandlist[1]
+                self.type = 3
+                return 1
+            else:
+                return 0
+        elif command == "JOIN":
+            if length >= 2:
+                self.message = "< "+self.username+": "+\
+                               string.join(commandlist[1:]," ")
+                self.command = command
+                self.type = 1
+            else:
+                self.message = "< "+ self.username + " has joined the chat.>"
+                self.command = command
+                self.type = 1
+            return 1
+        elif command == "EMOTE":
+            if length >= 2:
+                self.message = string.join(commandlist[1:]," ")
+                self.command = command
+                self.type = 1
+                return 1
+            else:
+                return 0
+        else:
+            """
+            There is a syntax error in the command so don't
+            bother changing anything.  
+            """
+        return 0
+    
+    """
+    string = read_handle(self)
+    
+    Based upon message type this function is called to
+    actually return the string representation of the
+    command as a message object for printing.
+
+    This is usually executed on the recieving client side.
+    """
+    def read_handle(self):
+        # Client Side Commands
+        if self.type == 1:
+            if self.command == "JOIN":
+                string = self.message
+            elif self.command == "EMOTE":
+                string = "*** " + self.username + " " + self.message + " ***"
+            else: # Default Case
+                string = self.username+": " + self.message + \
+                         "( "+ self.command + " )"
+        # Basic Messages
+        elif self.type == 0:
+            string = self.username + "( " + \
+                     self.time + " ): " + self.message
+        else:
+            return "Type 2 or 3 messages arriving on Clients are Bugs"
+        return string
+    
+    def getCommand(self):
+        """
+        Called by the Server if self.type == 1 or 2
+        Returns a tuple of the Name of the Command,
+        and the argument that command requires, if anything.
+        Kick takes a username,
+        Exit takes a message,
+        Private takes a username, etc.
+        """
+        cmd = self.command.split("<")
+        # cmd = ["ANY>ANYTHING","/ANY>"]
+        cmd = cmd[1].split(">") # cmd[0]=="ANY>ANYTHING"
+        # cmd = ["ANY","ANYTHING"]
+        if len(cmd) > 1:
+            return (cmd[0],cmd[1]) # ( Command Type, Value )
+        else:
+            return (cmd[0],)
+
+    def str(self):
+        string = self.read_handle()
+        return string
+
+    def __repr__(self):
+        return self.str()
+
+    def __str__(self):
+        return self.str()
+
+def ConnectRead( username ):
+    connect = Message(username,"Connecting Client Read Thread",
+                                   "<_READ_>",None)
+    connect.type = 2
+    return connect
+
+def ConnectWrite( username ):
+    connect = Message(username,"Connecting Client Write Thread",
+                                   "<_WRITE_>",None)
+    connect.type = 2
+    return connect
+
+# This command needs to be replaced with more robust
+# calls that actually do the work of determining
+# what the command is, or whether a plaintext string is a command.
+def splitCommand(command):
+    """
+    Called by the Server if self.type == 1 or 2
+    Returns a tuple of the Name of the Command,
+    and the argument that command requires, if anything.
+    Kick takes a username,
+    Exit takes a message,
+    Private takes a username, etc.
+    """
+    cmd = command.split("<")
+    # cmd = ["ANY>ANYTHING","/ANY>"]
+    cmd = cmd[1].split(">") # cmd[0]=="ANY>ANYTHING"
+    # cmd = ["ANY","ANYTHING"]
+    if len(cmd) > 1:
+        return (cmd[0],cmd[1]) # ( Command Type, Value )
+    else:
+            return (cmd[0],)
+
+    

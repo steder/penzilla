@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content=
+          "HTML Tidy for Linux/x86 (vers 1st August 2004), see www.w3.org" />
+    <title>Penzilla.net's Python Tutorial</title>
+    <link rel="StyleSheet" href="style.css" type="text/css" media="screen" />
+  </head>
+  <body>
+    <div id="header">
+      <h1>Penzilla.net's Python Tutorial</h1>
+      <hr /></div>
+    <div id="sidebar">
+      <div id="menu"><a href="index.shtml">&raquo;Tutorial Home</a> 
+        <!--#include virtual="/tutorials/python/menu.html"--></div>
+      <!--#include virtual="/tutorials/python/linkads.html"-->
+      <!--#include virtual="/tutorials/python/skyscraper_ads.html"-->
+      </div>
+    <div id="content"><!-- Comments -->
+      <h3>1/12/06:</h3>
+      <p>I'm still in the process of moving old pages to the new layout, sorry
+        it's taking so long.  I'm also updating/rewriting pages as I go.  I'm hitting the most
+        popular pages first but I will get to everything.</p>
+      <p>The <a href="pygame/">PyGame Page</a> is finally setup and 
+        getting filled in.  There are 3 examples available, and not nearly enough
+        documentation for them.  Hopefully they're still useful to look at and
+        tinker with.</p>
+      <p>If you're interested in a specific topic and toss me an e-mail about it
+        I'll do my best to get pages for that topic up sooner.</p>
+      <h3>1/6/06:</h3>
+      <p>Spent a day or two figuring out CSS and porting these pages into
+        it. In my opinion the site looks better, is now more consistent,
+        and easier to use. If you like(or dislike) the changes please feel
+        free to drop me an e-mail about them.</p>
+      <p>I have a <a href="http://www.pygame.org">PyGame</a> example or
+        two coming. I just need to write up an overview and post them.</p>
+      <h3>1/2/06:</h3>
+      <p>Fixed a problem related to my server move that prevented a
+        number of code examples from showing up. Also added some more
+        Numeric content, including some information about the NumPtr
+        package which can be used to simplify passing Numeric Arrays to and
+        from SWIG'ed code.</p>
+      <h3>11/29/05:</h3>
+      <p>After an extremely long period of ignoring this page I'm finally
+        back at it. I've already made some updates and will be continuing
+        to do so over the next few weeks as time permits.</p>
+      <p>Thanks to the people who have sent me e-mails over the last few
+        months!</p>
+      <!-- Body -->
+      <h2>Table of Contents</h2>
+      <ul>
+        <li><span class="topic">Basic Python</span>
+          <ul>
+            <li>Syntax and Datatypes
+              <ul>
+                <li><a href="intro/index.shtml">Hello World!</a></li>
+                <li><a href="datatypes/index.shtml">Basic Types</a> And a Note
+                  about <a href="datatypes">Typing</a>
+                </li>
+                <li><a href="control/index.shtml">Python Control
+                    Statements</a></li>
+                <li>
+                  <a href="numeric/index.shtml">Numeric Arrays</a>
+                  <ul>
+                    <li><a href="numpyc/index.shtml">Numeric
+                        Arrays and C Extensions</a></li>
+                    <li><a href="numptr/index.shtml">NumPtr
+                        Module</a> for interfacing SWIG'ed C code with Numeric (Python)
+                      Arrays.</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li><a href="functions/index.shtml">Functions</a>
+              <ul>
+                <li>
+                  <a href="generators/index.shtml">Generator Functions(Coming Soon)</a>
+                </li>
+              </ul>
+            </li>
+            <li><a href="modules/index.shtml">Modules</a></li>
+            <li><a href="classes/index.shtml">Classes</a></li>
+            <li>I/O
+              <ul>
+                <li><a href="io_song.shtml">The I/O Song</a></li>
+                <li><a href="consoleio/index.html">Console I/O</a></li>
+                <li><a href="cmdlineargs/index.shtml">Command Line
+                    Arguments</a></li>
+                <li><a href="fileio/index.shtml">File I/O</a></li>
+              </ul>
+            </li>
+            <li><a href="scripting/index.shtml">Python Scripting</a>
+            </li>
+            <li><a href="exceptions/index.shtml">Exceptions</a></li>
+          </ul>
+        </li>
+        <li><span class="topic">Advanced Python: Graphics, Sound, Etc</span>
+          <ul>
+            <li><a href="tkinter/index.shtml">Tkinter(Coming Soon)</a>
+            </li>
+            <li><a href="pygame/index.shtml">Pygame(Coming Soon)</a>
+            </li>
+            <li><a href="threading/index.shtml">Threading(Coming Soon)</a>
+            </li>
+            <li><a href="/mmpi/index.shtml">Parallel Python</a>
+            </li>
+            <li><a href="networking/index.shtml">Networking(Example is up)</a>
+              <ul>
+                <li>An example using threads, sockets, and an asynchronus server to
+                  create a simple client/server chat program. <a href=
+                                                                 "BobChat">BobChat</a></li>
+              </ul>
+            </li>
+            <li><a href="cgi/index.shtml">CGI Scripting</a>
+              <ul>
+                <li><a href="http://www.penzilla.net/cgi-bin/wittime.py">What is
+                    the time?</a></li>
+                <li><a href=
+                       "http://www.penzilla.net/tutorials/python/cgi/rpssl.html">Rock
+                    Paper Scissors Spock Lizard</a></li>
+              </ul>
+            </li>
+            <li>Language Interoperability
+              <ul>
+                <li><a href="swig/index.html">SWIG</a></li>
+              </ul>
+            </li>
+            <!---
+                <li>Stuff Python can do that we will talk about
+                upon request.
+              <ul>
+                <li>Jython, Python embedded in a browser through Java</li>
+                <li>Interfacing Python and Fortran (Although it can be done!)</li>
+                <li>Distutils - Crossplatform installer for python
+                  applications</li>
+              </ul>
+            You can download the entire tutorial include both html pages and Python code in a couple convenient forms:<br>
+                <a href="python_tutorial.tar.gz">Python Tutorial as  Gzipped Tarball (*.tar.gz)</a><br>
+                  <a href="python_tutorial.tar.bzip2">NEW!  Save a "nibble" with bzip :~)</a><br>:
+                    <a href="python_tutorial.zip">... As a zip archive (*.zip)</a>
+                    
+                    <br>=-->
+            </li>
+          </ul>
+        </li>
+      <li><a href="ide/index.html">Python Integrated Development
+          Environments</a></li>
+      <li><a href="PyQuickRef.pdf">Python Quick Reference:</a> Still
+        valid, but written for Python 1.5.2. Look for an updated version(to
+        2.3) later.</li>
+      </ul>
+      <h4>About this document</h4>
+          <ul>
+            <li><a href="readme.html">README</a></li>
+            <!--<li><a href="html_source">Browseable Source</a></li>-->
+          </ul>
+    </div>
+    <div id="footer">
+      <!--#include virtual="/tutorials/python/footer.shtml"-->
+    </div>
+  </body>
+</html>

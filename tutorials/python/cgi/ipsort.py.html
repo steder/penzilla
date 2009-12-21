@@ -1,0 +1,135 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#!/usr/bin/python</FONT>
+<FONT COLOR=#115511>"""
+Sorts Dotted Decimal IP Addresses
+
+xxx.yyy.zzz.www
+"""</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> cgi, cgitb
+cgitb.enable()
+<FONT COLOR=#1111CC># Useful for a little error checking</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> string
+
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="IP"><FONT COLOR=#CC0000><B> IP</B></FONT></A>:
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, address_string=None):
+        self.a,self.b,self.c,self.d = -1,-1,-1,-1
+        <FONT COLOR=#3333CC><B>if</B></FONT> address_string!=None:
+            self.set(address_string)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="set"><FONT COLOR=#CC0000><B> set</B></FONT></A>( self, address ):                
+        quads = address.split(<FONT COLOR=#115511>"."</FONT>)
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            self.a = int(quads[0])
+            self.b = int(quads[1])
+            self.c = int(quads[2])
+            self.d = int(quads[3])
+        <FONT COLOR=#3333CC><B>except</B></FONT> ValueError:
+            self.a,self.b,self.c,self.d=-1,-1,-1,-1
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__cmp__"><FONT COLOR=#CC0000><B> __cmp__</B></FONT></A>(self, addr2):
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.greaterthen(addr2):
+            <FONT COLOR=#3333CC><B>return</B></FONT> 1
+        <FONT COLOR=#3333CC><B>elif</B></FONT> self.equalto(addr2):
+            <FONT COLOR=#3333CC><B>return</B></FONT> 0
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#3333CC><B>return</B></FONT> -1
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="greaterthen"><FONT COLOR=#CC0000><B> greaterthen</B></FONT></A>( self,  addr2 ):
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.a &gt; addr2.a:
+            <FONT COLOR=#3333CC><B>return</B></FONT> 1
+        <FONT COLOR=#3333CC><B>elif</B></FONT> self.a == addr2.a <FONT COLOR=#3333CC><B>and</B></FONT> self.b &gt; addr2.b:
+            <FONT COLOR=#3333CC><B>return</B></FONT> 1
+        <FONT COLOR=#3333CC><B>elif</B></FONT> self.b == addr2.b <FONT COLOR=#3333CC><B>and</B></FONT> self.c &gt; addr2.c:
+            <FONT COLOR=#3333CC><B>return</B></FONT> 1
+        <FONT COLOR=#3333CC><B>elif</B></FONT> self.c == addr2.c <FONT COLOR=#3333CC><B>and</B></FONT> self.d &gt; addr2.d:
+            <FONT COLOR=#3333CC><B>return</B></FONT> 1
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#3333CC><B>return</B></FONT> 0
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="equalto"><FONT COLOR=#CC0000><B> equalto</B></FONT></A>( self, addr2 ):
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.a == addr2.a <FONT COLOR=#3333CC><B>and</B></FONT> \
+               self.b == addr2.b <FONT COLOR=#3333CC><B>and</B></FONT> \
+               self.c == addr2.c <FONT COLOR=#3333CC><B>and</B></FONT> \
+               self.d == addr2.d:
+            <FONT COLOR=#3333CC><B>return</B></FONT> 1
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#3333CC><B>return</B></FONT> 0
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__str__"><FONT COLOR=#CC0000><B> __str__</B></FONT></A>( self ):
+        string = str(self.a) + <FONT COLOR=#115511>"."</FONT>
+        string += str(self.b) + <FONT COLOR=#115511>"."</FONT>
+        string += str(self.c) + <FONT COLOR=#115511>"."</FONT>
+        string += str(self.d)
+        <FONT COLOR=#3333CC><B>return</B></FONT> string
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__hash__"><FONT COLOR=#CC0000><B> __hash__</B></FONT></A>( self ):
+        num = self.a * 1000
+        num += self.b * 100
+        num += self.c * 10
+        num += self.d
+        <FONT COLOR=#3333CC><B>return</B></FONT> int(num)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__repr__"><FONT COLOR=#CC0000><B> __repr__</B></FONT></A>( self ):
+        string = str(self.a) + <FONT COLOR=#115511>"."</FONT>
+        string += str(self.b) + <FONT COLOR=#115511>"."</FONT>
+        string += str(self.c) + <FONT COLOR=#115511>"."</FONT>
+        string += str(self.d)
+        <FONT COLOR=#3333CC><B>return</B></FONT> string
+
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Content-Type: text/html"</FONT>
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#1111CC># Blank Line</FONT>
+    
+    file_numbers = [1,2,3,4,5,6,7,8]
+    filenames = []
+    <FONT COLOR=#3333CC><B>for</B></FONT> each <FONT COLOR=#3333CC><B>in</B></FONT> file_numbers:
+        filenames.append(<FONT COLOR=#115511>"../hits"</FONT>+str(each)+<FONT COLOR=#115511>".txt"</FONT>)
+    
+    
+                
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;html&gt;"</FONT>
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;HEAD&gt;"</FONT>
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;TITLE&gt;"</FONT>
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"IP Stats"</FONT>
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;/TITLE&gt;"</FONT>
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;body&gt;"</FONT>
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;H1&gt;IP Stats&lt;/H1&gt;"</FONT>
+
+    <FONT COLOR=#3333CC><B>for</B></FONT> filename <FONT COLOR=#3333CC><B>in</B></FONT> filenames:
+        <FONT COLOR=#1111CC># 1). Read in the file</FONT>
+        file = open(filename,<FONT COLOR=#115511>"r"</FONT>)
+        lines = file.readlines()
+        <FONT COLOR=#1111CC># 2). Get the IP's</FONT>
+        addresses = {}
+        
+        <FONT COLOR=#3333CC><B>for</B></FONT> line <FONT COLOR=#3333CC><B>in</B></FONT> lines:
+            <FONT COLOR=#3333CC><B>if</B></FONT> ( string.strip( line, string.whitespace )==<FONT COLOR=#115511>''</FONT> ):
+                <FONT COLOR=#3333CC><B>continue</B></FONT>
+            temp = IP( line )
+            <FONT COLOR=#3333CC><B>if</B></FONT> temp <FONT COLOR=#3333CC><B>in</B></FONT> addresses.keys():
+                addresses[temp] += 1
+            <FONT COLOR=#3333CC><B>else</B></FONT>:
+                addresses[temp] = 1
+                
+        <FONT COLOR=#1111CC># 2). Sort the IP's</FONT>
+        keys = addresses.keys()
+        keys.sort()
+
+        <FONT COLOR=#1111CC># 3). Print a Table of Sorted Ip's</FONT>
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;H2&gt;"</FONT>,<FONT COLOR=#115511>"IP's in file:"</FONT>,filename,<FONT COLOR=#115511>"&lt;/h2&gt;"</FONT>
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;table&gt;"</FONT>
+        <FONT COLOR=#3333CC><B>for</B></FONT> key <FONT COLOR=#3333CC><B>in</B></FONT> keys:
+            <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;tr&gt;"</FONT>
+            <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;td&gt;"</FONT>,key,<FONT COLOR=#115511>"&lt;/td&gt;&lt;td&gt;"</FONT>, addresses[key],<FONT COLOR=#115511>"&lt;/td&gt;"</FONT>
+            <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;/tr&gt;"</FONT>
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;/table&gt;"</FONT>
+
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;/body&gt;"</FONT>
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;/html&gt;"</FONT>
+    
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

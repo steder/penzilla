@@ -1,0 +1,68 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># Let's get the average and our grades:</FONT>
+US = {<FONT COLOR=#115511>"Sammy"</FONT>:0,<FONT COLOR=#115511>"summy"</FONT>:0,<FONT COLOR=#115511>"spoonman"</FONT>:0}
+HWAVE = 0
+TOTAL = 0
+FILES = [<FONT COLOR=#115511>"hw0grades.txt"</FONT>]
+
+STUDENTS = 0
+
+<FONT COLOR=#1111CC># Get the Data</FONT>
+<FONT COLOR=#3333CC><B>for</B></FONT> file <FONT COLOR=#3333CC><B>in</B></FONT> FILES:
+    infile = open(file,<FONT COLOR=#115511>"r"</FONT>)
+    <FONT COLOR=#3333CC><B>while</B></FONT> infile:
+        line = infile.readline()
+        <FONT COLOR=#3333CC><B>for</B></FONT> person <FONT COLOR=#3333CC><B>in</B></FONT> US:
+            <FONT COLOR=#3333CC><B>if</B></FONT> line.find(person) &gt;= 0 <FONT COLOR=#3333CC><B>and</B></FONT> len(line.split()[0])==len(person):
+                US[person] = float( line.split()[1] )
+        s = line.split()
+        n = len(s)
+        <FONT COLOR=#3333CC><B>if</B></FONT> n == 0:
+            <FONT COLOR=#3333CC><B>break</B></FONT>
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            TOTAL += float( s[ n-1 ] )
+        <FONT COLOR=#3333CC><B>except</B></FONT>:
+            <FONT COLOR=#3333CC><B>pass</B></FONT>
+        STUDENTS += 1
+
+<FONT COLOR=#1111CC># Compute the Average</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> TOTAL, STUDENTS
+HWAVE = TOTAL / ( STUDENTS * (1.0) )
+
+<FONT COLOR=#1111CC># Assume the average is C</FONT>
+<FONT COLOR=#1111CC># Define grade ranges:</FONT>
+C = HWAVE 
+Cmax = C + HWAVE * .05
+Cmin = C - HWAVE * .05
+Bmax = Cmax + HWAVE * .1
+Bmin = Cmax
+Amin = Bmax
+Dmax = Cmin
+Dmin = Cmin - HWAVE * .1
+Emax = Dmin
+<FONT COLOR=#1111CC># Print out some STATS:</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"The AVERAGE for this homework:"</FONT>, HWAVE
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"The A range:"</FONT>, <FONT COLOR=#115511>"&gt;="</FONT>+str(Amin)
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"The B range:"</FONT>, Bmax,<FONT COLOR=#115511>"-"</FONT>, Bmin
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"The C range:"</FONT>, Cmax,<FONT COLOR=#115511>"-"</FONT>, Cmin
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"The D range:"</FONT>, Dmax,<FONT COLOR=#115511>"-"</FONT>, Dmin
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"The E range:"</FONT>, <FONT COLOR=#115511>"&lt;"</FONT>+str(Emax)
+
+<FONT COLOR=#1111CC># Assign grades to US:</FONT>
+<FONT COLOR=#3333CC><B>for</B></FONT> person <FONT COLOR=#3333CC><B>in</B></FONT> US:
+    <FONT COLOR=#3333CC><B>if</B></FONT> US[person] &gt;= Amin:
+        <FONT COLOR=#3333CC><B>print</B></FONT> person,<FONT COLOR=#115511>"("</FONT>,US[person],<FONT COLOR=#115511>")"</FONT>,<FONT COLOR=#115511>"probably got an A on this assignment."</FONT>
+    <FONT COLOR=#3333CC><B>elif</B></FONT> Bmax &gt; US[person] &gt;= Bmin:
+        <FONT COLOR=#3333CC><B>print</B></FONT> person,<FONT COLOR=#115511>"("</FONT>,US[person],<FONT COLOR=#115511>")"</FONT>,<FONT COLOR=#115511>"probably got a B on this assignment."</FONT>
+    <FONT COLOR=#3333CC><B>elif</B></FONT> Cmax &gt; US[person] &gt;= Cmin:
+        <FONT COLOR=#3333CC><B>print</B></FONT> person,<FONT COLOR=#115511>"("</FONT>,US[person],<FONT COLOR=#115511>")"</FONT>,<FONT COLOR=#115511>"probably got a C on this assignment."</FONT>
+    <FONT COLOR=#3333CC><B>elif</B></FONT> Dmax &gt; US[person] &gt;= Dmin:
+        <FONT COLOR=#3333CC><B>print</B></FONT> person,<FONT COLOR=#115511>"("</FONT>,US[person],<FONT COLOR=#115511>")"</FONT>,<FONT COLOR=#115511>"probably got a D on this assignment."</FONT>
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#3333CC><B>print</B></FONT> person,<FONT COLOR=#115511>"("</FONT>,US[person],<FONT COLOR=#115511>")"</FONT>,<FONT COLOR=#115511>"probably got a E on this assignment."</FONT>
+        
+</PRE>
+                  <!--footer-->
+                  </BODY>

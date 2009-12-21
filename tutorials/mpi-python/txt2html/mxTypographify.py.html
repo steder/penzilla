@@ -1,0 +1,205 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/mpi-python/pympi/max.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#!/usr/bin/python</FONT>
+
+<FONT COLOR=#115511>"""mxTextTools version of Typographify() in dmTxt2Html.py
+    
+The hope here is that this version will be dramatically faster 
+than the regular-expression based version.
+"""</FONT>
+<FONT COLOR=#3333CC><B>from</B></FONT> TextTools <FONT COLOR=#3333CC><B>import</B></FONT> *
+<FONT COLOR=#3333CC><B>import</B></FONT> string, re
+
+<FONT COLOR=#1111CC>#-- List to contain all words with adjusted markup</FONT>
+ws = []
+head_pos = None
+loops = 0
+
+<FONT COLOR=#1111CC>#-- Define "emitter" callbacks for each output format</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="emit_misc"><FONT COLOR=#CC0000><B> emit_misc</B></FONT></A>(tl,txt,l,r,s): ws.append(txt[l:r])
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="emit_func"><FONT COLOR=#CC0000><B> emit_func</B></FONT></A>(tl,txt,l,r,s): ws.append(<FONT COLOR=#115511>'&lt;code&gt;'</FONT>+txt[l+1:r-1]+<FONT COLOR=#115511>'&lt;/code&gt;'</FONT>)
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="emit_modl"><FONT COLOR=#CC0000><B> emit_modl</B></FONT></A>(tl,txt,l,r,s): ws.append(<FONT COLOR=#115511>'&lt;em&gt;&lt;code&gt;'</FONT>+txt[l+1:r-1]+<FONT COLOR=#115511>'&lt;/code&gt;&lt;/em&gt;'</FONT>)
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="emit_emph"><FONT COLOR=#CC0000><B> emit_emph</B></FONT></A>(tl,txt,l,r,s): ws.append(<FONT COLOR=#115511>'&lt;em&gt;'</FONT>+txt[l+1:r-1]+<FONT COLOR=#115511>'&lt;/em&gt;'</FONT>)
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="emit_strg"><FONT COLOR=#CC0000><B> emit_strg</B></FONT></A>(tl,txt,l,r,s): ws.append(<FONT COLOR=#115511>'&lt;strong&gt;'</FONT>+txt[l+1:r-1]+<FONT COLOR=#115511>'&lt;/strong&gt;'</FONT>)
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="emit_titl"><FONT COLOR=#CC0000><B> emit_titl</B></FONT></A>(tl,txt,l,r,s): ws.append(<FONT COLOR=#115511>'&lt;cite&gt;'</FONT>+txt[l+1:r-1]+<FONT COLOR=#115511>'&lt;/cite&gt;'</FONT>)
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="jump_count"><FONT COLOR=#CC0000><B> jump_count</B></FONT></A>(tl,txt,l,r,s):
+    <FONT COLOR=#3333CC><B>global</B></FONT> head_pos, loops
+    loops = loops+1
+    <FONT COLOR=#3333CC><B>if</B></FONT> head_pos <FONT COLOR=#3333CC><B>is</B></FONT> None: head_pos = r
+    <FONT COLOR=#3333CC><B>elif</B></FONT> head_pos == r: 
+        <FONT COLOR=#3333CC><B>raise</B></FONT> <FONT COLOR=#115511>"InfiniteLoopError"</FONT>, txt[l-20:l]+<FONT COLOR=#115511>'{'</FONT>+txt[l]+<FONT COLOR=#115511>'}'</FONT>+txt[l+1:r+15]
+    <FONT COLOR=#3333CC><B>else</B></FONT>: head_pos = r
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="emit_debug"><FONT COLOR=#CC0000><B> emit_debug</B></FONT></A>(tl,txt,l,r,s): 
+    ws.append(txt[l:r])
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'&lt;&lt;'</FONT>, txt[l:r], <FONT COLOR=#115511>'&gt;&gt;'</FONT>
+    
+<FONT COLOR=#1111CC>#-- What can appear inside, and what can be, markups?</FONT>
+punctuation = <FONT COLOR=#115511>"`!@#$%^&*()_-+=|\{}[]:;'&lt;&gt;,.?/"</FONT>+<FONT COLOR=#115511>'"'</FONT>
+punct_set = set(punctuation)
+markable = alphanumeric+whitespace+<FONT COLOR=#115511>"`!@#$%^&()+=|\{}:;&lt;&gt;,.?/"</FONT>+<FONT COLOR=#115511>'"'</FONT>
+markable_func = set(markable+<FONT COLOR=#115511>"*-_[]"</FONT>)
+markable_modl = set(markable+<FONT COLOR=#115511>"*-_'"</FONT>)
+markable_emph = set(markable+<FONT COLOR=#115511>"*_'[]"</FONT>)
+markable_strg = set(markable+<FONT COLOR=#115511>"-_'[]"</FONT>)
+markable_titl = set(markable+<FONT COLOR=#115511>"*-'[]"</FONT>)
+
+markups = <FONT COLOR=#115511>"-*'[]_"</FONT>
+markup_set = set(markups)
+
+<FONT COLOR=#1111CC># What can precede and follow markup phrases? </FONT>
+darkins = <FONT COLOR=#115511>'(/"'</FONT>
+leadins = whitespace+darkins      <FONT COLOR=#1111CC># might add from "-*'[]_"  </FONT>
+darkouts = <FONT COLOR=#115511>'/.),:;?!"'</FONT>   
+darkout_set = set(darkouts)
+leadouts = whitespace+darkouts    <FONT COLOR=#1111CC># for non-conflicting markup</FONT>
+leadout_set = set(leadouts)
+
+<FONT COLOR=#1111CC># What can appear inside plain words?</FONT>
+wordish = alphanumeric+<FONT COLOR=#115511>'{}/@#$%^&-_+=|\&gt;&lt;'</FONT>+darkouts
+word_set = set(wordish)
+wordinit = alphanumeric+<FONT COLOR=#115511>"$#+\&lt;.&{"</FONT>+darkins 
+wordinit_set = set(wordinit)
+
+<FONT COLOR=#1111CC>#-- Define the word patterns (global so as to do it only at import)</FONT>
+
+<FONT COLOR=#1111CC># Special markup</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="markup_struct"><FONT COLOR=#CC0000><B> markup_struct</B></FONT></A>(lmark, rmark, callback, markables, x_post=<FONT COLOR=#115511>"-"</FONT>):
+    struct = \
+      ( callback, Table+CallTag,
+        ( (None, Is, lmark),                 <FONT COLOR=#1111CC># Starts with left marker</FONT>
+          (None, AllInSet, markables),       <FONT COLOR=#1111CC># All stuff marked (that looks right) </FONT>
+     	  (None, Is, rmark),                 <FONT COLOR=#1111CC># Ends with right maker</FONT>
+     	  (None, IsInSet, leadout_set,+2,+1),<FONT COLOR=#1111CC># EITHER: postfixed with lead-out </FONT>
+	  (None, Skip, -1,+1, MatchOk),      <FONT COLOR=#1111CC># ..give back trailing lead-out char</FONT>
+	  (None, IsIn, x_post, MatchFail),   <FONT COLOR=#1111CC># OR: special case postfix</FONT>
+          (None, Skip, -1,+1, MatchOk)       <FONT COLOR=#1111CC># ..give back special trailing char</FONT>
+	)
+      )
+    <FONT COLOR=#3333CC><B>return</B></FONT> struct
+funcs   = markup_struct(<FONT COLOR=#115511>"'"</FONT>, <FONT COLOR=#115511>"'"</FONT>, emit_func, markable_func)
+modules = markup_struct(<FONT COLOR=#115511>"["</FONT>, <FONT COLOR=#115511>"]"</FONT>, emit_modl, markable_modl)
+emphs   = markup_struct(<FONT COLOR=#115511>"-"</FONT>, <FONT COLOR=#115511>"-"</FONT>, emit_emph, markable_emph, x_post=<FONT COLOR=#115511>""</FONT>) 
+strongs = markup_struct(<FONT COLOR=#115511>"*"</FONT>, <FONT COLOR=#115511>"*"</FONT>, emit_strg, markable_strg) 
+titles  = markup_struct(<FONT COLOR=#115511>"_"</FONT>, <FONT COLOR=#115511>"_"</FONT>, emit_titl, markable_titl)
+
+<FONT COLOR=#1111CC># All the stuff not specially marked</FONT>
+plain_words = \
+ ( ws, Table+AppendMatch,               <FONT COLOR=#1111CC># AppendMatch is only -slightly- </FONT>
+   ( (None, IsInSet,                    <FONT COLOR=#1111CC>#   faster than emit_misc callback</FONT>
+	    wordinit_set, MatchFail),   <FONT COLOR=#1111CC># Must start with word-initial</FONT>
+     (None, Is, <FONT COLOR=#115511>"'"</FONT>,+1),                <FONT COLOR=#1111CC># May have apostrophe next</FONT>
+     (None, AllInSet, word_set,+1),     <FONT COLOR=#1111CC># May have more word-internal</FONT>
+     (None, Is, <FONT COLOR=#115511>"'"</FONT>, +2),               <FONT COLOR=#1111CC># May have trailing apostrophe</FONT>
+     (None, IsIn, <FONT COLOR=#115511>"st"</FONT>,+1),             <FONT COLOR=#1111CC># May have [ts] after apostrophe </FONT>
+     (None, IsInSet,
+	    darkout_set,+1, MatchOk),   <FONT COLOR=#1111CC># Postfixed with dark lead-out</FONT>
+     (None, IsInSet, 
+	    whitespace_set, MatchFail), <FONT COLOR=#1111CC># Give back trailing whitespace</FONT>
+     (None, Skip, -1)
+   )
+ )
+
+<FONT COLOR=#1111CC># Catch some special cases </FONT>
+bullet_point = \
+ ( ws, Table+AppendMatch,
+   ( (None, Word+CallTag, <FONT COLOR=#115511>"* "</FONT>),       <FONT COLOR=#1111CC># Asterisk bullet is a word</FONT>
+   )
+ )  
+
+horiz_rule = \
+ ( None, Table,
+   ( (None, Word, <FONT COLOR=#115511>"-"</FONT>*50),             <FONT COLOR=#1111CC># 50 dashes in a row</FONT>
+     (None, AllIn, <FONT COLOR=#115511>"-"</FONT>),               <FONT COLOR=#1111CC># More dashes</FONT>
+   )
+ )
+
+into_mark = \
+ ( ws, Table+AppendMatch,             <FONT COLOR=#1111CC># Special case where dark lead-in</FONT>
+   ( (None, IsInSet, set(darkins)),   <FONT COLOR=#1111CC># is followed by markup char</FONT>
+     (None, IsInSet, markup_set),
+     (None, Skip, -1)                 <FONT COLOR=#1111CC># Give back the markup char</FONT>
+   )
+ )
+
+stray_punct = \
+ ( ws, Table+AppendMatch,              <FONT COLOR=#1111CC># Pickup any cases where multiple</FONT>
+   ( (None, IsInSet, punct_set),       <FONT COLOR=#1111CC># punctuation character occur </FONT>
+     (None, AllInSet, punct_set),      <FONT COLOR=#1111CC># alone (followed by whitespace)</FONT>
+     (None, IsInSet, whitespace_set), 
+     (None, Skip, -1)                  <FONT COLOR=#1111CC># Give back the whitespace</FONT>
+   )
+ )
+
+leadout_eater = (ws, AllInSet+AppendMatch, leadout_set)
+ 
+<FONT COLOR=#1111CC># Tag all the (possibly marked-up) words </FONT>
+tag_words = \
+ ( bullet_point+(+1,),
+   horiz_rule + (+1,),
+   into_mark  + (+1,),
+   stray_punct+ (+1,),
+   emphs   + (+1,),
+   funcs   + (+1,),
+   strongs + (+1,),
+   modules + (+1,),
+   titles  + (+1,),
+   into_mark+(+1,),
+   plain_words +(+1,),                 <FONT COLOR=#1111CC># Since file is mostly plain words, can</FONT>
+   leadout_eater+(+1,-1),              <FONT COLOR=#1111CC># shortcut by tight looping (with escape)</FONT>
+   (jump_count, Skip+CallTag, 0),      <FONT COLOR=#1111CC># Check for infinite loop</FONT>
+   (None, EOF, Here, -13)              <FONT COLOR=#1111CC># Check for EOF</FONT>
+ ) 
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="Typographify"><FONT COLOR=#CC0000><B> Typographify</B></FONT></A>(txt):
+    <FONT COLOR=#3333CC><B>global</B></FONT> ws
+    ws = []    <FONT COLOR=#1111CC># clear the list before we proceed</FONT>
+    tag(txt, tag_words, 0, len(txt), ws)
+    <FONT COLOR=#3333CC><B>return</B></FONT> string.join(ws, <FONT COLOR=#115511>''</FONT>)
+
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__ == <FONT COLOR=#115511>'__main__'</FONT>:
+    <FONT COLOR=#3333CC><B>import</B></FONT> sys, time
+    txt = open(sys.argv[1]).read()
+    start = time.time()
+    mx_txt = Typographify(txt)
+    sys.stderr.write(<FONT COLOR=#115511>'*** TextTools processing ***\n'</FONT>)
+    sys.stderr.write(sys.argv[1]+<FONT COLOR=#115511>' processed in %.3f seconds'</FONT> 
+                     % (time.time()-start)+<FONT COLOR=#115511>'\n'</FONT>)
+    sys.stderr.write(<FONT COLOR=#115511>'%d full tagging loops\n'</FONT> % loops) 
+    <FONT COLOR=#3333CC><B>print</B></FONT> mx_txt
+
+    <FONT COLOR=#1111CC># Just for comparison, let us time the [re] version being replaced</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="reTypographify"><FONT COLOR=#CC0000><B> reTypographify</B></FONT></A>(txt):
+    	<FONT COLOR=#1111CC># [module] names</FONT>
+    	r = re.compile(r<FONT COLOR=#115511>"""([\(\s'/"&gt;]|^)\[(.*?)\]([&lt;\s\.\),:;'"?!/-])"""</FONT>, re.M | re.S)
+    	txt = r.sub(<FONT COLOR=#115511>'\\1&lt;em&gt;&lt;code&gt;\\2&lt;/code&gt;&lt;/em&gt;\\3'</FONT>,txt)
+    	<FONT COLOR=#1111CC># *strongly emphasize* words</FONT>
+    	r = re.compile(r<FONT COLOR=#115511>"""([\(\s'/"]|^)\*(.*?)\*([\s\.\),:;'"?!/-])"""</FONT>, re.M | re.S)
+    	txt = r.sub(<FONT COLOR=#115511>'\\1&lt;strong&gt;\\2&lt;/strong&gt;\\3'</FONT>, txt)
+    	<FONT COLOR=#1111CC># -emphasize- words</FONT>
+    	r = re.compile(r<FONT COLOR=#115511>"""([\(\s'/"]|^)-(.*?)-([\s\.\),:;'"?!/])"""</FONT>, re.M | re.S)
+    	txt = r.sub(<FONT COLOR=#115511>'\\1&lt;em&gt;\\2&lt;/em&gt;\\3'</FONT>, txt)
+    	<FONT COLOR=#1111CC># _Book Title_ citations</FONT>
+    	r = re.compile(r<FONT COLOR=#115511>"""([\(\s'/"]|^)_(.*?)_([\s\.\),:;'"?!/-])"""</FONT>, re.M | re.S)
+    	txt = r.sub(<FONT COLOR=#115511>'\\1&lt;cite&gt;\\2&lt;/cite&gt;\\3'</FONT>, txt)
+    	<FONT COLOR=#1111CC># 'Function()' names</FONT>
+    	r = re.compile(r<FONT COLOR=#115511>"""([\(\s/"]|^)'(.*?)'([\s\.\),:;"?!/-])"""</FONT>, re.M | re.S)
+    	txt = r.sub(<FONT COLOR=#115511>"\\1&lt;code&gt;\\2&lt;/code&gt;\\3"</FONT>, txt)
+    	<FONT COLOR=#3333CC><B>return</B></FONT> txt
+    start = time.time()
+    re_txt = reTypographify(txt)
+    sys.stderr.write(<FONT COLOR=#115511>'*** re processing ***\n'</FONT>)
+    sys.stderr.write(sys.argv[1]+<FONT COLOR=#115511>' processed in %.3f seconds'</FONT> 
+                     % (time.time()-start)+<FONT COLOR=#115511>'\n'</FONT>)
+
+    
+
+    
+
+
+    
+
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

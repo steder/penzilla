@@ -1,0 +1,50 @@
+<html>
+<title>Introduction to Python:  Networking Examples</title>
+<body>
+<h2>An Introduction to Python:  Networking Examples</h2>
+<h3><font color="blue">Networking Examples</font></h3>
+<a href="../index.html">Table of Contents</a>
+<hr><!--^Header^-->
+<h4><font color="green">BobChat, A "Not So Simple" Simple Example</font></h4>
+<P>I've recently spent a couple days hacking on a little chat application.  It still needs some work, but mostly in terms of GUI things and making the output prettier and more full featured.  The guts are all there, ready to be poked and prodded by eager Pythonistas.
+<P>I'm going to be writing this example up and explaining how I wrote each specific piece, however I'm going to take a nap, or study for my CS373 exam first!
+<P>So in the meantime, please feel free to check through all the example code.  It's just resting <a href="../BobChat">here</a>.  Check it out.
+<h4><font color="green">Enter the Bob</font></h4>
+<P>Since this is a fairly complicated example I'm going to break it up a little more then I've done with previous code samples.  Hopefully doing this makes it easy to read and think about.  Here's a breakdown of the areas we're going to look at in <b>BobChat.</b>  
+<i>Note:  these version numbers are pretty loose</i>
+<ul><b>BobChat</b>
+  <li>
+    <ul>Version 0.1
+      <li>Asynchronus Server (select-based)</li>
+      <li>Threaded Client (One thread reads, one thread writes)</li>
+      <li>Totally Function Based (No Objects or Components)</li>
+    </ul>
+  </li>
+  <li>
+    <ul>Version 0.2
+      <li>Object Oriented examples of BobChat</li>
+      <li>Commands and Administration</li>
+    </ul>
+  </li>
+  <li>
+    <ul>Version 0.3
+      <li>Continued Object Orientation</li>
+      <li>Introduction of the Protocol Module</li>
+      <li>Concept of a Message Object</li>
+    </ul>
+  </li>
+  <li>
+    <ul>Current Version
+      <li>Almost entirely converted to message objects</li>
+      <li>Commands are handled internally by the Protocol Module</li>
+      <li>GUI doesn't look completely like crap, yeah!</li>
+    </ul>
+  </li>
+</ul>
+
+<!--\/Footer\/-->
+<hr>
+<a href="../BobChat.zip">BobChat.zip</a>
+<a href="../index.html">Table of Contents</a>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#!/usr/bin/env python</FONT>
+<FONT COLOR=#1111CC># pygame + PyOpenGL version of Nehe's OpenGL lesson09</FONT>
+<FONT COLOR=#1111CC># Paul Furber 2001 - m@verick.co.za</FONT>
+
+<FONT COLOR=#3333CC><B>import</B></FONT> os, random
+<FONT COLOR=#3333CC><B>from</B></FONT> OpenGL.GL <FONT COLOR=#3333CC><B>import</B></FONT> *
+<FONT COLOR=#3333CC><B>from</B></FONT> OpenGL.GLU <FONT COLOR=#3333CC><B>import</B></FONT> *
+<FONT COLOR=#3333CC><B>import</B></FONT> pygame, pygame.image, pygame.key
+<FONT COLOR=#3333CC><B>from</B></FONT> pygame.locals <FONT COLOR=#3333CC><B>import</B></FONT> *
+
+
+textures = []
+stars = []
+twinkle = 0
+zoom = -15.0
+tilt = 90.0
+spin = 0.0
+
+
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="star"><FONT COLOR=#CC0000><B> star</B></FONT></A>:
+    <FONT COLOR=#115511>""" simple star class that (hopefully) demonstrates
+    how to move functionality out of a main loop and into
+    an object - the logic remains unchanged from the
+    original tutorial C code"""</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, index, max=50):
+        self.angle = 0.0
+        self.index = index
+        self.max = max
+        self.dist = (1.0 * index/max) * 5.0
+        self.r = random.randrange(0,256)
+        self.g = random.randrange(0,256)
+        self.b = random.randrange(0,256)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="draw"><FONT COLOR=#CC0000><B> draw</B></FONT></A>(self):
+        glBegin( GL_QUADS )
+        glTexCoord2f( 0.0, 0.0 ); glVertex3f( -1.0, -1.0, 0.0 )
+        glTexCoord2f( 1.0, 0.0 ); glVertex3f(  1.0, -1.0, 0.0 )
+        glTexCoord2f( 1.0, 1.0 ); glVertex3f(  1.0,  1.0, 0.0 )
+        glTexCoord2f( 0.0, 1.0 ); glVertex3f( -1.0,  1.0, 0.0 )
+        glEnd( )
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="set_color"><FONT COLOR=#CC0000><B> set_color</B></FONT></A>(self):
+        glColor4ub(self.r, self.g, self.b, 255)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="orient"><FONT COLOR=#CC0000><B> orient</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>global</B></FONT> zoom, tilt, twinkle, stars
+        glLoadIdentity( )
+        glTranslatef( 0.0, 0.0, zoom )
+        glRotatef( tilt, 1.0, 0.0, 0.0 )
+        glRotatef( self.angle, 0.0, 1.0, 0.0 )
+        glTranslatef( self.dist, 0.0, 0.0 )
+        glRotatef( -self.angle, 0.0, 1.0, 0.0 )
+        glRotatef( -tilt, 1.0, 0.0, 0.0 )
+        <FONT COLOR=#3333CC><B>if</B></FONT> twinkle:
+            self.r = stars[self.max - self.index - 1].r
+            self.g = stars[self.max - self.index - 1].g
+            self.b = stars[self.max - self.index - 1].b
+            self.set_color()
+            self.draw()
+        glRotatef( spin, 0.0, 0.0, 1.0 )
+ 
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="update"><FONT COLOR=#CC0000><B> update</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>global</B></FONT> spin
+        self.orient()
+        self.set_color()
+        self.draw()
+        spin += 0.01
+        self.angle += 1.0*self.index / self.max
+        self.dist -= 0.01
+        <FONT COLOR=#3333CC><B>if</B></FONT> ( self.dist &lt; 0.0 ):
+            self.dist += 5.0
+            self.r = random.randrange(0,256)
+            self.g = random.randrange(0,256)
+            self.b = random.randrange(0,256)
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="resize"><FONT COLOR=#CC0000><B> resize</B></FONT></A>((width, height)):
+    <FONT COLOR=#3333CC><B>if</B></FONT> height==0:
+        height=1.0
+    glViewport(0, 0, width, height)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    gluPerspective(45, 1.0*width/height, 0.1, 100.0)
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="init"><FONT COLOR=#CC0000><B> init</B></FONT></A>():
+    <FONT COLOR=#3333CC><B>global</B></FONT> stars
+    
+    glEnable(GL_TEXTURE_2D)
+    load_textures()
+    glShadeModel(GL_SMOOTH)
+    glClearColor(0.0, 0.0, 0.0, 0.0)
+    glClearDepth(1.0)
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE )
+    glEnable(GL_BLEND)
+    <FONT COLOR=#3333CC><B>for</B></FONT> x <FONT COLOR=#3333CC><B>in</B></FONT> range(50):
+        stars.append(star(x))
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="load_textures"><FONT COLOR=#CC0000><B> load_textures</B></FONT></A>():
+    <FONT COLOR=#3333CC><B>global</B></FONT> textures
+    
+    texturefile = os.path.join(<FONT COLOR=#115511>'data'</FONT>,<FONT COLOR=#115511>'star.bmp'</FONT>)
+    textureSurface = pygame.image.load(texturefile)
+    textureData = pygame.image.tostring(textureSurface, <FONT COLOR=#115511>"RGBX"</FONT>, 1)
+
+    textures = glGenTextures(2)
+    
+    glBindTexture(GL_TEXTURE_2D, textures[0])
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, textureSurface.get_width(), textureSurface.get_height(), 0,
+                  GL_RGBA, GL_UNSIGNED_BYTE, textureData )
+    
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="draw"><FONT COLOR=#CC0000><B> draw</B></FONT></A>():
+    <FONT COLOR=#3333CC><B>global</B></FONT> stars
+    
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
+    glBindTexture( GL_TEXTURE_2D, textures[0] )
+    glLoadIdentity( );
+    <FONT COLOR=#3333CC><B>for</B></FONT> x <FONT COLOR=#3333CC><B>in</B></FONT> range(50):
+        stars[x].update()
+
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="handle_keys"><FONT COLOR=#CC0000><B> handle_keys</B></FONT></A>(key):
+    <FONT COLOR=#3333CC><B>global</B></FONT> tilt, zoom, twinkle
+    
+    <FONT COLOR=#3333CC><B>if</B></FONT> key==K_ESCAPE:
+        <FONT COLOR=#3333CC><B>return</B></FONT> 0
+
+    <FONT COLOR=#3333CC><B>if</B></FONT> key==K_UP:
+        tilt += 2.0
+    <FONT COLOR=#3333CC><B>elif</B></FONT> key==K_DOWN:
+        tilt -= 2.0
+    <FONT COLOR=#3333CC><B>elif</B></FONT> key==K_PAGEUP:
+        zoom += 0.5
+    <FONT COLOR=#3333CC><B>elif</B></FONT> key==K_PAGEDOWN:
+        zoom -=0.5
+    <FONT COLOR=#3333CC><B>elif</B></FONT> key==K_t:
+        twinkle = <FONT COLOR=#3333CC><B>not</B></FONT> twinkle
+
+    <FONT COLOR=#3333CC><B>return</B></FONT> 1
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="main"><FONT COLOR=#CC0000><B> main</B></FONT></A>():
+
+    <FONT COLOR=#3333CC><B>global</B></FONT> surface
+
+    video_flags = OPENGL|DOUBLEBUF
+    
+    pygame.init()
+    surface = pygame.display.set_mode((640,480), video_flags)
+    pygame.key.set_repeat(100,30)
+
+    random.seed()
+    resize((640,480))
+    init()
+
+    frames = 0
+    done = 0
+    ticks = pygame.time.get_ticks()
+    <FONT COLOR=#3333CC><B>while</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> done:
+        <FONT COLOR=#3333CC><B>while</B></FONT> 1:
+            event = pygame.event.poll()
+            <FONT COLOR=#3333CC><B>if</B></FONT> event.type == NOEVENT:
+                <FONT COLOR=#3333CC><B>break</B></FONT>
+            <FONT COLOR=#3333CC><B>if</B></FONT> event.type == KEYDOWN:
+                <FONT COLOR=#3333CC><B>if</B></FONT> handle_keys(event.key) == 0:
+                    done = 1
+            <FONT COLOR=#3333CC><B>if</B></FONT> event.type == QUIT:
+                done = 1
+        
+        draw()
+        pygame.display.flip()
+        frames += 1
+
+
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"fps:  %d"</FONT> % ((frames*1000)/(pygame.time.get_ticks()-ticks))
+
+
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__ == <FONT COLOR=#115511>'__main__'</FONT>: main()
+</PRE>
+                  <!--footer-->
+                  </BODY>

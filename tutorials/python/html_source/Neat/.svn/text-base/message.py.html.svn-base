@@ -1,0 +1,377 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#!/usr/bin/env python</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC># message.py:               Message & Part classes</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># See __doc__ string below.</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC>#   This module defines the following classes:</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># Requires:</FONT>
+<FONT COLOR=#1111CC>#   Python &gt;=1.5.1</FONT>
+<FONT COLOR=#1111CC>#   OS: portable</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># $Id: //depot/rgutils/rgutils/message.py#1 $</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#115511>'''
+This module defines 2 classes used by the modules C{pop3.py} and C{imap.py}:
+    - L{Message}  -- a class representing a mail in RFC822 format.
+    - L{Part} -- a class representing ONE part (or attachment) in a (possibly
+      multipart) message.
+
+It also includes some trace utilities.
+'''</FONT>
+__version__ = <FONT COLOR=#115511>'1.1.'</FONT> + <FONT COLOR=#115511>'$Revision: #1 $'</FONT>[12:-2]
+__author__ = <FONT COLOR=#115511>'Richard Gruet'</FONT>, <FONT COLOR=#115511>'rjgruet@yahoo.com'</FONT>
+__date__    = <FONT COLOR=#115511>'$Date: 2003/05/23 $'</FONT>[7:-2], <FONT COLOR=#115511>'$Author: rgruet $'</FONT>[9:-2]
+__since__ = <FONT COLOR=#115511>'2000/10/19'</FONT>
+__doc__ += <FONT COLOR=#115511>'\n@author: %s (U{%s})\n@version: %s'</FONT> % (__author__[0],
+                                            __author__[1], __version__)
+
+<FONT COLOR=#3333CC><B>import</B></FONT> os, sys, cStringIO, time, string, types
+
+true, false = -1, 0
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Message"><FONT COLOR=#CC0000><B> Message</B></FONT></A>:
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#115511>''' One mail message.
+
+        The message header is represented by object attributes (To, From,
+        Subject, Date...).
+        The various parts of the message body are represented as a list of
+        1 to N x Part objects (see class L{Part}) in C{self.parts}.
+
+        B{Limitations}
+            - doesn't handle B{nested} multi-part messages.
+            - full MIME handling is not guaranteed!
+    '''</FONT>
+    MULTIPART = <FONT COLOR=#115511>'multipart/mixed'</FONT>
+
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, msgLen, msgLines):
+        <FONT COLOR=#115511>''' Constructor.
+            @param msgLen: The length of the message in RFC822 format.
+            @param msgLines: The message in RFC822 format, either the list
+                            of message lines or the whole msg as a string.
+        '''</FONT>
+        self.size = msgLen
+        self.lines = []     <FONT COLOR=#1111CC># [list] message lines</FONT>
+
+        <FONT COLOR=#1111CC># Parse message header into attributes:</FONT>
+        <FONT COLOR=#3333CC><B>import</B></FONT> rfc822
+        <FONT COLOR=#3333CC><B>if</B></FONT> isinstance(msgLines, types.StringType):
+            self.lines = string.split(msgLines, <FONT COLOR=#115511>'\n'</FONT>)
+            lines = msgLines
+        <FONT COLOR=#3333CC><B>else</B></FONT>:   <FONT COLOR=#1111CC># assume list</FONT>
+            self.lines = msgLines
+            lines = string.join(msgLines, <FONT COLOR=#115511>'\n'</FONT>)
+            
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            fLines = cStringIO.StringIO(lines)
+            self.rfc822 = rfc822.Message(fLines, true)
+            self.headers = self.rfc822.headers  <FONT COLOR=#1111CC># list of all header lines</FONT>
+                                                <FONT COLOR=#1111CC># (raw text)</FONT>
+
+            <FONT COLOR=#1111CC># Missing fields are given the value None [strings, dates] or</FONT>
+            <FONT COLOR=#1111CC># (None, None) [adresses]:</FONT>
+            self.Return_Path = self.rfc822.getheader(<FONT COLOR=#115511>'Return-Path'</FONT>) <FONT COLOR=#1111CC># a string</FONT>
+            self.From = self.rfc822.getaddr(<FONT COLOR=#115511>'From'</FONT>) <FONT COLOR=#1111CC># (name, e-mail) or (None, None)</FONT>
+            self.To = self.rfc822.getaddr(<FONT COLOR=#115511>'To'</FONT>)     <FONT COLOR=#1111CC># (name, e-mail)    "       "</FONT>
+            self.ID = self.rfc822.getheader(<FONT COLOR=#115511>'Message-ID'</FONT>)   <FONT COLOR=#1111CC># a string</FONT>
+            self.Subject = self.rfc822.getheader(<FONT COLOR=#115511>'Subject'</FONT>) <FONT COLOR=#1111CC># a string</FONT>
+            self.Date = self.rfc822.getdate(<FONT COLOR=#115511>'Date'</FONT>) <FONT COLOR=#1111CC># a 9-tuple compatible with time.mktime() or None</FONT>
+            self.Organization = self.rfc822.getheader(<FONT COLOR=#115511>'Organization'</FONT>) <FONT COLOR=#1111CC># a string</FONT>
+            self.MIME_Version = self.rfc822.getheader(<FONT COLOR=#115511>'MIME-Version'</FONT>) <FONT COLOR=#1111CC># a string</FONT>
+
+            <FONT COLOR=#1111CC># Resync current pos on 'Content_type' in file:</FONT>
+            fLines.seek(0); lastLineOffset = -1
+            <FONT COLOR=#3333CC><B>while</B></FONT> true:
+                line = fLines.readline()
+                <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> line:
+                    lastLineOffset = 0
+                    <FONT COLOR=#3333CC><B>break</B></FONT>
+                <FONT COLOR=#3333CC><B>if</B></FONT> line[:12]  == <FONT COLOR=#115511>'Content-Type'</FONT>:
+                    <FONT COLOR=#3333CC><B>break</B></FONT>
+                lastLineOffset = fLines.tell()
+            assert lastLineOffset &gt;= 0
+            fLines.seek(lastLineOffset) <FONT COLOR=#1111CC># back one line</FONT>
+
+            <FONT COLOR=#1111CC># Split the messages into its parts (one or more):</FONT>
+            parts = []
+            part = Part(fLines, self)
+            self.multipart = (part.mainType == <FONT COLOR=#115511>'multipart'</FONT>)
+
+            <FONT COLOR=#3333CC><B>if</B></FONT> self.multipart:
+                self.boundary = part.params[<FONT COLOR=#115511>'boundary'</FONT>]
+                <FONT COLOR=#1111CC>#trace('boundary = "%s"' % self.boundary', 10)##</FONT>
+                sectionDivider = <FONT COLOR=#115511>'--'</FONT> + self.boundary
+                endMarker = self.boundary + <FONT COLOR=#115511>'--'</FONT>
+
+                fLines.seek(lastLineOffset) <FONT COLOR=#1111CC># go one line after content-type</FONT>
+                fLines.readline()
+                <FONT COLOR=#3333CC><B>while</B></FONT> true:
+                    line = fLines.readline()
+                    <FONT COLOR=#3333CC><B>if</B></FONT> line == <FONT COLOR=#115511>''</FONT>:
+                        trace(<FONT COLOR=#115511>'(EOF while seeking after 1st section divider, '</FONT>
+                              <FONT COLOR=#115511>'assume only one part (content sub-type=%s)).'</FONT>
+                               % part.subType)
+                        fLines.seek(lastLineOffset)     <FONT COLOR=#1111CC># go back</FONT>
+                        fLines.readline()
+                        <FONT COLOR=#3333CC><B>break</B></FONT>
+                    <FONT COLOR=#3333CC><B>elif</B></FONT> line[:-1] == sectionDivider: <FONT COLOR=#1111CC># go just after boundary</FONT>
+                        <FONT COLOR=#3333CC><B>break</B></FONT>
+
+                <FONT COLOR=#3333CC><B>import</B></FONT> multifile
+                mf = multifile.MultiFile(fLines)
+                mf.push(self.boundary)
+                <FONT COLOR=#3333CC><B>while</B></FONT> true:
+                    part = Part(cStringIO.StringIO(mf.read()), self)
+                    parts.append(part)
+                    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> mf.next():
+                        <FONT COLOR=#3333CC><B>break</B></FONT>
+                mf.pop()
+            <FONT COLOR=#3333CC><B>else</B></FONT>:   <FONT COLOR=#1111CC># only 1 part:</FONT>
+                parts.append(part)
+                
+            self.parts = parts
+        <FONT COLOR=#3333CC><B>except</B></FONT>:
+            <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'(current message dumped in %s)'</FONT> % dumpMail(self)
+            <FONT COLOR=#3333CC><B>raise</B></FONT>
+            
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__repr__"><FONT COLOR=#CC0000><B> __repr__</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> <FONT COLOR=#115511>'&lt;Mail Message from: %s to: %s, subject: "%s", %d part(s)&gt;'</FONT> % (
+                self.From[1], self.To[1], self.Subject, len(self.parts))
+
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Part"><FONT COLOR=#CC0000><B> Part</B></FONT></A>:
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#115511>''' One content (part) in a (possibly multi-part) mail message.
+    '''</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, fMsg, hostMsg):
+        <FONT COLOR=#115511>''' Constructor.
+
+            @param fMsg: A seekable file-like input object representing the
+                         target mail message part.
+            @param hostMsg: The Message instance containing the part.
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>import</B></FONT> rfc822, mimetools, string, cStringIO, re
+
+        self.msg = hostMsg                  <FONT COLOR=#1111CC># Message containing the part</FONT>
+
+        <FONT COLOR=#1111CC># Parse content-type header:</FONT>
+        mt = mimetools.Message(fMsg, true)
+        self.type = mt.gettype()            <FONT COLOR=#1111CC># 'main type/subtype'</FONT>
+        self.mainType = mt.getmaintype()    <FONT COLOR=#1111CC># 'type'</FONT>
+        self.subType = mt.getsubtype()      <FONT COLOR=#1111CC># 'subtype'</FONT>
+        self.params = {}    <FONT COLOR=#1111CC># parameters for content-type {'name': 'value',...}</FONT>
+        <FONT COLOR=#3333CC><B>for</B></FONT> item <FONT COLOR=#3333CC><B>in</B></FONT> mt.getplist():
+            <FONT COLOR=#1111CC># Value may include a '=', thus everything on the left of the 1st</FONT>
+            <FONT COLOR=#1111CC># '=' is considered as the key, and everything on the right is </FONT>
+            <FONT COLOR=#1111CC># considered as the (string) value :</FONT>
+            l = string.split(item, <FONT COLOR=#115511>'='</FONT>)
+            key = l[0]
+            value = string.join(l[1:], <FONT COLOR=#115511>'='</FONT>)
+            <FONT COLOR=#1111CC>##print 'key = "%s", value = "%s"' % (key, value) ###</FONT>
+            self.params[key] = _strip2Quotes(value)
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            self.name = self.params[<FONT COLOR=#115511>'name'</FONT>] <FONT COLOR=#1111CC># use it as file name for attachment</FONT>
+        <FONT COLOR=#3333CC><B>except</B></FONT> KeyError:
+            self.name = None
+
+        <FONT COLOR=#1111CC># Other headers:</FONT>
+        self.encoding = mt.getencoding()    <FONT COLOR=#1111CC># '7bit', 'base64'...</FONT>
+        fMsg.seek(0)                            <FONT COLOR=#1111CC># restart for rfc822</FONT>
+        self._rfc822 = rfc822.Message(fMsg, true)
+        self.description = self._rfc822.getheader(<FONT COLOR=#115511>'Content-Description'</FONT>) <FONT COLOR=#1111CC># a string or None</FONT>
+
+        self.disposition = self._rfc822.getheader(<FONT COLOR=#115511>'Content-Disposition'</FONT>) <FONT COLOR=#1111CC># a string or none</FONT>
+        self.fileName = None
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.disposition:
+            mo = re.search(<FONT COLOR=#115511>'filename="(.*)"'</FONT>, self.disposition) <FONT COLOR=#1111CC># parse 'filename' field</FONT>
+            <FONT COLOR=#3333CC><B>if</B></FONT> mo <FONT COLOR=#3333CC><B>is</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> None:
+                self.fileName = mo.group(1) <FONT COLOR=#1111CC># use it as file name for attachment</FONT>
+
+        <FONT COLOR=#1111CC># Part's body (decoded if necessary)!</FONT>
+        fBody = cStringIO.StringIO()
+        fMsg.seek(0)            <FONT COLOR=#1111CC># resync after headers (=after 1st empty line)</FONT>
+        <FONT COLOR=#3333CC><B>while</B></FONT> fMsg.readline()[:-1] &lt;&gt; <FONT COLOR=#115511>''</FONT>:
+            <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.mainType != <FONT COLOR=#115511>'multipart'</FONT>:
+            <FONT COLOR=#3333CC><B>if</B></FONT> self.encoding <FONT COLOR=#3333CC><B>in</B></FONT> (<FONT COLOR=#115511>'base64'</FONT>, <FONT COLOR=#115511>'quoted-printable'</FONT>, <FONT COLOR=#115511>'uuencode'</FONT>):
+                mimetools.decode(fMsg, fBody, self.encoding)
+            <FONT COLOR=#3333CC><B>else</B></FONT>:
+                mimetools.copyliteral(fMsg, fBody)
+            self.body = fBody.getvalue()
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            self.body = <FONT COLOR=#115511>'&lt;not significant&gt;'</FONT> <FONT COLOR=#1111CC># multi-part message</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__repr__"><FONT COLOR=#CC0000><B> __repr__</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> <FONT COLOR=#115511>'&lt;part: "%s", %s, encoding=%s&gt;'</FONT> % (self.getName(), self.mainType, self.encoding)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__str__"><FONT COLOR=#CC0000><B> __str__</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>if</B></FONT> len(self.body) &gt; 500:
+            body = self.body[:500] + <FONT COLOR=#115511>'...'</FONT>
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            body = self.body
+        <FONT COLOR=#3333CC><B>return</B></FONT> <FONT COLOR=#115511>'name=%s, type=%s, encoding=%s, description=%s, disposition=%s\nbody = "%s"'</FONT> % (
+            self.getName(), self.type, self.encoding, self.description,
+            self.disposition, body)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getName"><FONT COLOR=#CC0000><B> getName</B></FONT></A>(self):
+        <FONT COLOR=#115511>''' Returns the "name" of the part.
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.name: <FONT COLOR=#3333CC><B>return</B></FONT> self.name
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.fileName: <FONT COLOR=#3333CC><B>return</B></FONT> self.fileName
+        <FONT COLOR=#3333CC><B>else</B></FONT>: <FONT COLOR=#3333CC><B>return</B></FONT> <FONT COLOR=#115511>'&lt;no name&gt;'</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getFileName"><FONT COLOR=#CC0000><B> getFileName</B></FONT></A>(self, computeDefault=true):
+        <FONT COLOR=#115511>''' Gets the base file name to use for saving the part.
+
+            @return: the fileName attribute of the part, or by default its
+                     name. If none is defined (part == message body), either
+                     compute a default name (C{computeDefault} true), or else
+                     return None.
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.fileName:
+            <FONT COLOR=#3333CC><B>return</B></FONT> self.fileName
+        <FONT COLOR=#3333CC><B>elif</B></FONT> self.name:
+            <FONT COLOR=#3333CC><B>return</B></FONT> self.name
+        <FONT COLOR=#3333CC><B>elif</B></FONT> computeDefault:
+            <FONT COLOR=#1111CC># Default name is 'sender_date.txt':</FONT>
+            date = time.strftime(<FONT COLOR=#115511>'%Y%m%d%H%M%S'</FONT>, self.msg.Date)
+            <FONT COLOR=#3333CC><B>return</B></FONT> <FONT COLOR=#115511>'%s_%s.txt'</FONT> % (self.msg.From[1], date)
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#3333CC><B>return</B></FONT> None
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="write"><FONT COLOR=#CC0000><B> write</B></FONT></A>(self, fileDir, fileName=None, overWriteIfExists=true):
+        <FONT COLOR=#115511>''' Writes the part's body into a file.
+
+            @param fileDir: Target file dir path (created if necessary).
+            @param fileName: Target file path (created if necessary).
+                if C{fileName} is not specified, use the attribute filename or 
+                (if undefined) the name attribute. If the latter is undefined, 
+                error!
+
+            @param overWriteIfExists: If true, an existing file with the same
+                    name will be overwritten, otherwise a suffix '_n' is
+                    appended to the file name.
+            @return: actual save (absolute) path.
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>import</B></FONT> os
+        <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> fileName:
+            fileName = self.getFileName(false)
+            <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> fileName:
+                <FONT COLOR=#3333CC><B>raise</B></FONT> Exception(<FONT COLOR=#115511>'No target fileName where to write'</FONT>)
+
+        path = <FONT COLOR=#115511>'%s\\%s'</FONT> % (fileDir, fileName)
+
+        <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> overWriteIfExists:
+            <FONT COLOR=#1111CC># If file already exists, append an indice '_n':</FONT>
+            n = 0
+            <FONT COLOR=#3333CC><B>while</B></FONT> true:
+                <FONT COLOR=#3333CC><B>if</B></FONT> n &gt; 0:       <FONT COLOR=#1111CC># (not 1st time)</FONT>
+                    p = <FONT COLOR=#115511>'%s_%d'</FONT> % (path, n)
+                <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> os.path.exists(p):
+                    <FONT COLOR=#3333CC><B>break</B></FONT>
+                n = n + 1
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            p = path
+
+        <FONT COLOR=#1111CC># If part is unencoded text, write it in text mode (on Windows this adds</FONT>
+        <FONT COLOR=#1111CC># a CR to the LF ):</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.mainType == <FONT COLOR=#115511>'text'</FONT> <FONT COLOR=#3333CC><B>and</B></FONT> self.encoding == <FONT COLOR=#115511>'7bit'</FONT>:
+            mode = <FONT COLOR=#115511>'w'</FONT>
+        <FONT COLOR=#3333CC><B>else</B></FONT>: <FONT COLOR=#1111CC># encoded parts must be considered as binary</FONT>
+            mode = <FONT COLOR=#115511>'wb'</FONT>
+        f = open(p, mode)
+        <FONT COLOR=#3333CC><B>try</B></FONT>: f.write(self.body)
+        <FONT COLOR=#3333CC><B>finally</B></FONT>: f.close()
+        <FONT COLOR=#3333CC><B>return</B></FONT> p
+
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC>#                           U T I L I T I E S</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="dumpMail"><FONT COLOR=#CC0000><B> dumpMail</B></FONT></A>(msg, path=<FONT COLOR=#115511>''</FONT>):
+    <FONT COLOR=#115511>''' Dump mail on file for debug.
+        Return: file path.
+    '''</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> path:
+        <FONT COLOR=#3333CC><B>import</B></FONT> tempfile
+        path =  os.path.join(tempfile.gettempdir(), <FONT COLOR=#115511>'mail_dump.txt'</FONT>)
+    
+    f = open(path, <FONT COLOR=#115511>'w'</FONT>)
+    <FONT COLOR=#3333CC><B>try</B></FONT>:
+        <FONT COLOR=#3333CC><B>for</B></FONT> line <FONT COLOR=#3333CC><B>in</B></FONT> msg.lines:
+            f.write(line + <FONT COLOR=#115511>'\n'</FONT>)
+    <FONT COLOR=#3333CC><B>finally</B></FONT>:
+        f.close()
+    <FONT COLOR=#3333CC><B>return</B></FONT> path
+
+<FONT COLOR=#1111CC># Trace:</FONT>
+<FONT COLOR=#1111CC># -----</FONT>
+_log = None         <FONT COLOR=#1111CC># log file to use</FONT>
+_verbosity = -1     <FONT COLOR=#1111CC># msg with verbosity &gt; _verbosity are not displayed</FONT>
+_logVerbosity = 100 <FONT COLOR=#1111CC># "         "           "       "       "  logged</FONT>
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="setLog"><FONT COLOR=#CC0000><B> setLog</B></FONT></A>(newLog):
+    <FONT COLOR=#3333CC><B>global</B></FONT> _log
+    _log = newLog
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="setVerbosity"><FONT COLOR=#CC0000><B> setVerbosity</B></FONT></A>(value):
+    <FONT COLOR=#3333CC><B>global</B></FONT> _verbosity
+    _verbosity = value
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="setLogVerbosity"><FONT COLOR=#CC0000><B> setLogVerbosity</B></FONT></A>(value):
+    <FONT COLOR=#3333CC><B>global</B></FONT> _logVerbosity
+    _logVerbosity = value
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="trace"><FONT COLOR=#CC0000><B> trace</B></FONT></A>(msg, msgVerbosity=0):
+    <FONT COLOR=#115511>''' Print/log a trace message.
+
+        Msg is printed only if C{msgVerbosity} &lt;= C{_verbosity}.
+        
+        Msg is written (prefixed with date) into log file (if any) only if
+        C{msgVerbosity} &lt;= C{_verbosity}.
+        A LF is appended to the message.
+    '''</FONT>
+    msg = msg + <FONT COLOR=#115511>'\n'</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> msgVerbosity &lt;= _verbosity:
+        <FONT COLOR=#3333CC><B>print</B></FONT> msg,
+    <FONT COLOR=#3333CC><B>if</B></FONT> _log <FONT COLOR=#3333CC><B>and</B></FONT> msgVerbosity &lt;= _logVerbosity:
+        t = time.localtime(time.time())
+        date = time.strftime(<FONT COLOR=#115511>'[%Y/%m/%d %H:%M:%S]'</FONT>, t)
+        _log.write(<FONT COLOR=#115511>'%-6d %s - %s'</FONT> % (msgVerbosity, date, msg))
+        _log.flush()
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_strip2Quotes"><FONT COLOR=#CC0000><B> _strip2Quotes</B></FONT></A>(s):
+    <FONT COLOR=#115511>''' Strip "" around string C{s} if any.
+    '''</FONT>
+    <FONT COLOR=#3333CC><B>try</B></FONT>:
+        <FONT COLOR=#3333CC><B>if</B></FONT> s[0]==s[-1]==<FONT COLOR=#115511>'"'</FONT>:
+            s = s[1:-1]
+    <FONT COLOR=#3333CC><B>except</B></FONT>:
+        <FONT COLOR=#3333CC><B>pass</B></FONT>
+    <FONT COLOR=#3333CC><B>return</B></FONT> s
+
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC>#                               T E S T S</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test"><FONT COLOR=#CC0000><B> test</B></FONT></A>():
+    <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC>#                               M A I N</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__ == <FONT COLOR=#115511>"__main__"</FONT>:
+    test()
+</PRE>
+                  <!--footer-->
+                  </BODY>

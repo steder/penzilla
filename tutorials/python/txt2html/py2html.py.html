@@ -1,0 +1,495 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#!/usr/local/bin/python -u</FONT>
+
+<FONT COLOR=#115511>""" Python Highlighter for HTML                          Version: 0.5
+
+    py2html.py [options] files...
+
+    options:
+     -h             print help
+     -              read from stdin, write to stdout
+     -stdout        read from files, write to stdout
+     -files         read from files, write to filename+'.html' (default)
+     -format:
+       html         output HTML page (default)
+       rawhtml      output pure HTML (without headers, titles, etc.)
+     -mode:
+       color        output in color (default)
+       mono         output b/w (for printing)
+     -title:Title   use 'Title' as title of the generated page
+     -bgcolor:color use color as background-color for page
+     -header:file   use contents of file as header
+     -footer:file   use contents of file as footer
+     -URL           replace all occurances of 'URL: link' with
+                    '&lt;A HREF="link"&gt;link&lt;/A&gt;'; this is always enabled
+                    in CGI mode
+     -v             verbose
+
+    Takes the input, assuming it is Python code and formats it into
+    colored HTML. When called without parameters the script tries to
+    work in CGI mode. It looks for a field 'script=URL' and tries to
+    use that URL as input file. If it can't find this field, the path
+    info (the part of the URL following the CGI script name) is
+    tried. In case no host is given, the host where the CGI script
+    lives and HTTP are used.
+
+    * Uses Just van Rossum's PyFontify version 0.3 to tag Python scripts.
+      You can get it via his homepage on starship:
+        URL: http://starship.skyport.net/crew/just
+"""</FONT>
+__comments__ = <FONT COLOR=#115511>"""
+
+    The following snippet is a small shell script I use for viewing
+    Python scripts per less on Unix:
+#!/bin/sh
+# Browse pretty printed Python code using ANSI codes for highlighting
+py2html -stdout -format:ansi -mode:mono $* | less -r
+
+    History:
+
+    0.5: Added a few suggestions by Kevin Ng to make the CGI version
+         a little more robust.
+
+"""</FONT>
+__copyright__ = <FONT COLOR=#115511>"""
+-----------------------------------------------------------------------------
+(c) Copyright by Marc-Andre Lemburg, 1998 (mailto:mal@lemburg.com)
+
+    Permission to use, copy, modify, and distribute this software and its
+    documentation for any purpose and without fee or royalty is hereby granted,
+    provided that the above copyright notice appear in all copies and that
+    both that copyright notice and this permission notice appear in
+    supporting documentation or portions thereof, including modifications,
+    that you make.
+
+    THE AUTHOR MARC-ANDRE LEMBURG DISCLAIMS ALL WARRANTIES WITH REGARD TO
+    THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+    FITNESS, IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL,
+    INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING
+    FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
+    NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION
+    WITH THE USE OR PERFORMANCE OF THIS SOFTWARE !
+"""</FONT>
+
+__version__ = <FONT COLOR=#115511>'0.5'</FONT>
+
+__cgifooter__ = (<FONT COLOR=#115511>'\n&lt;PRE&gt;# code highlighted using &lt;A HREF='</FONT>
+                 <FONT COLOR=#115511>'"http://starship.skyport.net/~lemburg/"&gt;py2html.py&lt;/A&gt; '</FONT>
+                 <FONT COLOR=#115511>'version %s&lt;/PRE&gt;\n'</FONT> % __version__)
+
+<FONT COLOR=#3333CC><B>import</B></FONT> sys,string,re
+
+<FONT COLOR=#1111CC># Adjust path so that PyFontify is found...</FONT>
+sys.path.append(<FONT COLOR=#115511>'.'</FONT>)
+
+<FONT COLOR=#1111CC>### Constants</FONT>
+
+<FONT COLOR=#1111CC># URL of the input form the user is redirected to in case no script=xxx</FONT>
+<FONT COLOR=#1111CC># form field is given. The URL *must* be absolute. Leave blank to</FONT>
+<FONT COLOR=#1111CC># have the script issue an error instead.</FONT>
+INPUT_FORM = <FONT COLOR=#115511>'http://starship.skyport.net/~lemburg/SoftwareDescriptions.html#py2html.py'</FONT>
+
+<FONT COLOR=#1111CC>### Helpers</FONT>
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="fileio"><FONT COLOR=#CC0000><B> fileio</B></FONT></A>(file, mode=<FONT COLOR=#115511>'rb'</FONT>, data=None, close=0):
+
+    <FONT COLOR=#3333CC><B>if</B></FONT> type(file) == type(<FONT COLOR=#115511>''</FONT>):
+        f = open(file,mode)
+        close = 1
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        f = file
+    <FONT COLOR=#3333CC><B>if</B></FONT> data:
+        f.write(data)
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        data = f.read()
+    <FONT COLOR=#3333CC><B>if</B></FONT> close: f.close()
+    <FONT COLOR=#3333CC><B>return</B></FONT> data
+
+<FONT COLOR=#1111CC>### Converter class</FONT>
+
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="PrettyPrint"><FONT COLOR=#CC0000><B> PrettyPrint</B></FONT></A>:
+
+    <FONT COLOR=#115511>""" generic Pretty Printer class
+
+        * supports tagging Python scripts in the following ways:
+
+          # format/mode |  color  mono
+          # --------------------------
+          # rawhtml     |    x     x   (HTML without headers, etc.)
+          # html        |    x     x   (a HTML page with HEAD&BODY:)
+          # ansi        |          x   (with Ansi-escape sequences)
+
+        * interfaces:
+
+           file_filter -- takes two files: input & output (may be stdin/stdout)
+           filter -- takes a string and returns the highlighted version
+
+        * to create an instance use:
+
+          c = PrettyPrint(tagfct,format,mode)
+
+          where format and mode must be strings according to the
+          above table if you plan to use PyFontify.fontify as
+          tagfct
+
+        * the tagfct has to take one argument, text, and return a taglist
+          (format: [(id,left,right,sublist),...], where id is the
+          "name" given to the slice left:right in text and sublist is a
+          taglist for tags inside the slice or None)
+
+    """</FONT>
+
+    <FONT COLOR=#1111CC># misc settings</FONT>
+    title = <FONT COLOR=#115511>''</FONT>
+    bgcolor = <FONT COLOR=#115511>'#FFFFFF'</FONT>
+    header = <FONT COLOR=#115511>''</FONT>
+    footer = <FONT COLOR=#115511>''</FONT>
+    replace_URLs = 0
+    <FONT COLOR=#1111CC># formats to be used</FONT>
+    formats = {}
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self,tagfct=None,format=<FONT COLOR=#115511>'html'</FONT>,mode=<FONT COLOR=#115511>'color'</FONT>):
+
+        self.tag = tagfct
+        self.set_mode = getattr(self,<FONT COLOR=#115511>'set_mode_'</FONT>+format+<FONT COLOR=#115511>'_'</FONT>+mode)
+        self.filter = getattr(self,<FONT COLOR=#115511>'filter_'</FONT>+format)
+        self.set_mode()
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="file_filter"><FONT COLOR=#CC0000><B> file_filter</B></FONT></A>(self,infile,outfile):
+
+        text = fileio(infile,<FONT COLOR=#115511>'r'</FONT>)
+        <FONT COLOR=#3333CC><B>if</B></FONT> type(infile) == type(<FONT COLOR=#115511>''</FONT>) <FONT COLOR=#3333CC><B>and</B></FONT> self.title == <FONT COLOR=#115511>''</FONT>:
+            self.title = infile
+        fileio(outfile,<FONT COLOR=#115511>'w'</FONT>,self.filter(text))
+
+    <FONT COLOR=#1111CC>### set pre- and postfixes for formats & modes</FONT>
+    <FONT COLOR=#1111CC>#</FONT>
+    <FONT COLOR=#1111CC># These methods must set self.formats to a dictionary having</FONT>
+    <FONT COLOR=#1111CC># an entry for every tag returned by the tagging function.</FONT>
+    <FONT COLOR=#1111CC>#</FONT>
+    <FONT COLOR=#1111CC># The format used is simple:</FONT>
+    <FONT COLOR=#1111CC>#  tag:(prefix,postfix)</FONT>
+    <FONT COLOR=#1111CC># where prefix and postfix are either strings or callable objects,</FONT>
+    <FONT COLOR=#1111CC># that return a string (they are called with the matching tag text</FONT>
+    <FONT COLOR=#1111CC># as only parameter). prefix is inserted in front of the tag, postfix</FONT>
+    <FONT COLOR=#1111CC># is inserted right after the tag.</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="set_mode_html_color"><FONT COLOR=#CC0000><B> set_mode_html_color</B></FONT></A>(self):
+
+        self.formats = {
+            <FONT COLOR=#115511>'all'</FONT>:(<FONT COLOR=#115511>'&lt;PRE&gt;'</FONT>,<FONT COLOR=#115511>'&lt;/PRE&gt;'</FONT>),
+            <FONT COLOR=#115511>'comment'</FONT>:(<FONT COLOR=#115511>'&lt;FONT COLOR=#1111CC&gt;'</FONT>,<FONT COLOR=#115511>'&lt;/FONT&gt;'</FONT>),
+            <FONT COLOR=#115511>'keyword'</FONT>:(<FONT COLOR=#115511>'&lt;FONT COLOR=#3333CC&gt;&lt;B&gt;'</FONT>,<FONT COLOR=#115511>'&lt;/B&gt;&lt;/FONT&gt;'</FONT>),
+            <FONT COLOR=#115511>'parameter'</FONT>:(<FONT COLOR=#115511>'&lt;FONT COLOR=#000066&gt;'</FONT>,<FONT COLOR=#115511>'&lt;/FONT&gt;'</FONT>),
+            <FONT COLOR=#115511>'identifier'</FONT>:( <FONT COLOR=#3333CC><B>lambda</B></FONT> x,strip=string.strip:
+                           <FONT COLOR=#115511>'&lt;A NAME="%s"&gt;&lt;FONT COLOR=#CC0000&gt;&lt;B&gt;'</FONT> % (strip(x)),
+                           <FONT COLOR=#115511>'&lt;/B&gt;&lt;/FONT&gt;&lt;/A&gt;'</FONT>),
+            <FONT COLOR=#115511>'string'</FONT>:(<FONT COLOR=#115511>'&lt;FONT COLOR=#115511&gt;'</FONT>,<FONT COLOR=#115511>'&lt;/FONT&gt;'</FONT>)
+            }
+
+    set_mode_rawhtml_color = set_mode_html_color
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="set_mode_html_mono"><FONT COLOR=#CC0000><B> set_mode_html_mono</B></FONT></A>(self):
+
+        self.formats = {
+            <FONT COLOR=#115511>'all'</FONT>:(<FONT COLOR=#115511>'&lt;PRE&gt;'</FONT>,<FONT COLOR=#115511>'&lt;/PRE&gt;'</FONT>),
+            <FONT COLOR=#115511>'comment'</FONT>:(<FONT COLOR=#115511>''</FONT>,<FONT COLOR=#115511>''</FONT>),
+            <FONT COLOR=#115511>'keyword'</FONT>:( <FONT COLOR=#115511>'&lt;U&gt;'</FONT>,<FONT COLOR=#115511>'&lt;/U&gt;'</FONT>),
+            <FONT COLOR=#115511>'parameter'</FONT>:(<FONT COLOR=#115511>''</FONT>,<FONT COLOR=#115511>''</FONT>),
+            <FONT COLOR=#115511>'identifier'</FONT>:( <FONT COLOR=#3333CC><B>lambda</B></FONT> x,strip=string.strip:
+                           <FONT COLOR=#115511>'&lt;A NAME="%s"&gt;&lt;B&gt;'</FONT> % (strip(x)),
+                           <FONT COLOR=#115511>'&lt;/B&gt;'</FONT>),
+            <FONT COLOR=#115511>'string'</FONT>:(<FONT COLOR=#115511>''</FONT>,<FONT COLOR=#115511>''</FONT>)
+            }
+
+    set_mode_rawhtml_mono = set_mode_html_mono
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="set_mode_ansi_mono"><FONT COLOR=#CC0000><B> set_mode_ansi_mono</B></FONT></A>(self):
+
+        self.formats = {
+            <FONT COLOR=#115511>'all'</FONT>:(<FONT COLOR=#115511>''</FONT>,<FONT COLOR=#115511>''</FONT>),
+            <FONT COLOR=#115511>'comment'</FONT>:(<FONT COLOR=#115511>'\033[2m'</FONT>,<FONT COLOR=#115511>'\033[m'</FONT>),
+            <FONT COLOR=#115511>'keyword'</FONT>:(<FONT COLOR=#115511>'\033[4m'</FONT>,<FONT COLOR=#115511>'\033[m'</FONT>),
+            <FONT COLOR=#115511>'parameter'</FONT>:(<FONT COLOR=#115511>''</FONT>,<FONT COLOR=#115511>''</FONT>),
+            <FONT COLOR=#115511>'identifier'</FONT>:(<FONT COLOR=#115511>'\033[1m'</FONT>,<FONT COLOR=#115511>'\033[m'</FONT>),
+            <FONT COLOR=#115511>'string'</FONT>:(<FONT COLOR=#115511>''</FONT>,<FONT COLOR=#115511>''</FONT>)
+            }
+
+    <FONT COLOR=#1111CC>### filter for Python scripts given as string</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="escape_html"><FONT COLOR=#CC0000><B> escape_html</B></FONT></A>(self,text):
+
+        t = ((<FONT COLOR=#115511>'&lt;'</FONT>,<FONT COLOR=#115511>'&lt;'</FONT>),(<FONT COLOR=#115511>'&gt;'</FONT>,<FONT COLOR=#115511>'&gt;'</FONT>))
+        <FONT COLOR=#3333CC><B>for</B></FONT> x,y <FONT COLOR=#3333CC><B>in</B></FONT> t:
+            text = string.join(string.split(text,x),y)
+        <FONT COLOR=#3333CC><B>return</B></FONT> text
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="filter_html"><FONT COLOR=#CC0000><B> filter_html</B></FONT></A>(self,text):
+
+        output = self.fontify(self.escape_html(text))
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.replace_URLs:
+            output = re.sub(<FONT COLOR=#115511>'URL:([ \t]+)([^ \n\r&lt;]+)'</FONT>,
+                            <FONT COLOR=#115511>'URL:\\1&lt;A HREF="\\2"&gt;\\2&lt;/A&gt;'</FONT>,output)
+        html = <FONT COLOR=#115511>"""&lt;HTML&gt;&lt;HEAD&gt;&lt;TITLE&gt;%s&lt;/TITLE&gt;&lt;/HEAD&gt;
+                  &lt;BODY BGCOLOR=%s&gt;
+                  &lt;!--header--&gt;%s
+                  &lt;!--script--&gt;%s
+                  &lt;!--footer--&gt;%s
+                  &lt;/BODY&gt;\n"""</FONT>%(self.title,self.bgcolor,self.header,output,self.footer)
+        <FONT COLOR=#3333CC><B>return</B></FONT> html
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="filter_rawhtml"><FONT COLOR=#CC0000><B> filter_rawhtml</B></FONT></A>(self,text):
+
+        output = self.fontify(self.escape_html(text))
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.replace_URLs:
+            output = re.sub(<FONT COLOR=#115511>'URL:([ \t]+)([^ \n\r&lt;]+)'</FONT>,
+                            <FONT COLOR=#115511>'URL:\\1&lt;A HREF="\\2"&gt;\\2&lt;/A&gt;'</FONT>,output)
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.header+output+self.footer
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="filter_ansi"><FONT COLOR=#CC0000><B> filter_ansi</B></FONT></A>(self,text):
+
+        output = self.fontify(text)
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.header+output+self.footer
+
+    <FONT COLOR=#1111CC>### fontify engine</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="fontify"><FONT COLOR=#CC0000><B> fontify</B></FONT></A>(self,pytext):
+
+        <FONT COLOR=#1111CC># parse</FONT>
+        taglist = self.tag(pytext)
+
+        <FONT COLOR=#1111CC># prepend special 'all' tag:</FONT>
+        taglist[:0] = [(<FONT COLOR=#115511>'all'</FONT>,0,len(pytext),None)]
+
+        <FONT COLOR=#1111CC># prepare splitting</FONT>
+        splits = []
+        addsplits(splits,pytext,self.formats,taglist)
+
+        <FONT COLOR=#1111CC># do splitting & inserting</FONT>
+        splits.sort()
+        l = []
+        li = 0
+        <FONT COLOR=#3333CC><B>for</B></FONT> ri,dummy,insert <FONT COLOR=#3333CC><B>in</B></FONT> splits:
+            <FONT COLOR=#3333CC><B>if</B></FONT> ri &gt; li: l.append(pytext[li:ri])
+            l.append(insert)
+            li = ri
+        <FONT COLOR=#3333CC><B>if</B></FONT> li &lt; len(pytext): l.append(pytext[li:])
+
+        <FONT COLOR=#3333CC><B>return</B></FONT> string.join(l,<FONT COLOR=#115511>''</FONT>)
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="addsplits"><FONT COLOR=#CC0000><B> addsplits</B></FONT></A>(splits,text,formats,taglist):
+    <FONT COLOR=#1111CC># helper for fontify()</FONT>
+    <FONT COLOR=#3333CC><B>for</B></FONT> id,left,right,sublist <FONT COLOR=#3333CC><B>in</B></FONT> taglist:
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            pre,post = formats[id]
+        <FONT COLOR=#3333CC><B>except</B></FONT> KeyError:
+            <FONT COLOR=#1111CC># sys.stderr.write('Warning: no format for %s specified\n'%repr(id))</FONT>
+            pre,post = <FONT COLOR=#115511>''</FONT>,<FONT COLOR=#115511>''</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> type(pre) != type(<FONT COLOR=#115511>''</FONT>):
+            pre = pre(text[left:right])
+        <FONT COLOR=#3333CC><B>if</B></FONT> type(post) != type(<FONT COLOR=#115511>''</FONT>):
+            post = post(text[left:right])
+        <FONT COLOR=#1111CC># len(splits) is a dummy used to make sorting stable</FONT>
+        splits.append((left,len(splits),pre))
+        <FONT COLOR=#3333CC><B>if</B></FONT> sublist:
+            addsplits(splits,text,formats,sublist)
+        splits.append((right,len(splits),post))
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="write_html_error"><FONT COLOR=#CC0000><B> write_html_error</B></FONT></A>(titel,text):
+
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"""\
+&lt;HTML&gt;&lt;HEADER&gt;&lt;TITLE&gt;%s&lt;/TITLE&gt;&lt;/HEADER&gt;
+&lt;BODY&gt;
+&lt;H2&gt;%s&lt;/H2&gt;
+%s
+&lt;/BODY&gt;&lt;/HTML&gt;
+"""</FONT> % (titel,titel,text)
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="redirect_to"><FONT COLOR=#CC0000><B> redirect_to</B></FONT></A>(url):
+
+    sys.stdout.write(<FONT COLOR=#115511>'Content-Type: text/html\r\n'</FONT>)
+    sys.stdout.write(<FONT COLOR=#115511>'Status: 302\r\n'</FONT>)
+    sys.stdout.write(<FONT COLOR=#115511>'Location: %s\r\n\r\n'</FONT> % url)
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"""
+&lt;HTML&gt;&lt;HEAD&gt;
+&lt;TITLE&gt;302 Moved Temporarily&lt;/TITLE&gt;
+&lt;/HEAD&gt;&lt;BODY&gt;
+&lt;H1&gt;302 Moved Temporarily&lt;/H1&gt;
+The document has moved to &lt;A HREF="%s"&gt;%s&lt;/A&gt;.&lt;P&gt;
+&lt;/BODY&gt;&lt;/HTML&gt;
+"""</FONT> % (url,url)
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="main"><FONT COLOR=#CC0000><B> main</B></FONT></A>(cmdline):
+
+    <FONT COLOR=#115511>""" main(cmdline) -- process cmdline as if it were sys.argv
+    """</FONT>
+    <FONT COLOR=#1111CC># parse options/files</FONT>
+    options = []
+    optvalues = {}
+    <FONT COLOR=#3333CC><B>for</B></FONT> o <FONT COLOR=#3333CC><B>in</B></FONT> cmdline[1:]:
+        <FONT COLOR=#3333CC><B>if</B></FONT> o[0] == <FONT COLOR=#115511>'-'</FONT>:
+            <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#115511>':'</FONT> <FONT COLOR=#3333CC><B>in</B></FONT> o:
+                k,v = tuple(string.split(o,<FONT COLOR=#115511>':'</FONT>))
+                optvalues[k] = v
+                options.append(k)
+            <FONT COLOR=#3333CC><B>else</B></FONT>:
+                options.append(o)
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#3333CC><B>break</B></FONT>
+    files = cmdline[len(options)+1:]
+
+    <FONT COLOR=#1111CC># create converting object</FONT>
+
+    <FONT COLOR=#1111CC># load fontifier</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#115511>'-marcs'</FONT> <FONT COLOR=#3333CC><B>in</B></FONT> options:
+        <FONT COLOR=#1111CC># use mxTextTool's tagging engine</FONT>
+        <FONT COLOR=#3333CC><B>from</B></FONT> mxTextTools <FONT COLOR=#3333CC><B>import</B></FONT> tag
+        <FONT COLOR=#3333CC><B>from</B></FONT> mxTextTools.Examples.Python <FONT COLOR=#3333CC><B>import</B></FONT> python_script
+        tagfct = <FONT COLOR=#3333CC><B>lambda</B></FONT> text,tag=tag,pytable=python_script: \
+                 tag(text,pytable)[1]
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Py2HTML: using Marc's tagging engine"</FONT>
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#1111CC># load Just's</FONT>
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            <FONT COLOR=#3333CC><B>import</B></FONT> PyFontify
+            <FONT COLOR=#3333CC><B>if</B></FONT> PyFontify.__version__ &lt; <FONT COLOR=#115511>'0.3'</FONT>: <FONT COLOR=#3333CC><B>raise</B></FONT> ValueError
+            tagfct = PyFontify.fontify
+        <FONT COLOR=#3333CC><B>except</B></FONT>:
+            <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"""
+    Sorry, but this script needs the PyFontify.py module version 0.3;
+    You can download it from Just's homepage at
+
+       URL: http://starship.skyport.net/crew/just
+"""</FONT>
+            sys.exit()
+
+
+    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#115511>'-format'</FONT> <FONT COLOR=#3333CC><B>in</B></FONT> options:
+        format = optvalues[<FONT COLOR=#115511>'-format'</FONT>]
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#1111CC># use default</FONT>
+        format = <FONT COLOR=#115511>'html'</FONT>
+
+    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#115511>'-mode'</FONT> <FONT COLOR=#3333CC><B>in</B></FONT> options:
+        mode = optvalues[<FONT COLOR=#115511>'-mode'</FONT>]
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#1111CC># use default</FONT>
+        mode = <FONT COLOR=#115511>'color'</FONT>
+
+    c = PrettyPrint(tagfct,format,mode)
+    convert = c.file_filter
+
+    <FONT COLOR=#1111CC># start working</FONT>
+
+    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#115511>'-title'</FONT> <FONT COLOR=#3333CC><B>in</B></FONT> options:
+        c.title = optvalues[<FONT COLOR=#115511>'-title'</FONT>]
+
+    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#115511>'-bgcolor'</FONT> <FONT COLOR=#3333CC><B>in</B></FONT> options:
+        c.bgcolor = optvalues[<FONT COLOR=#115511>'-bgcolor'</FONT>]
+
+    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#115511>'-header'</FONT> <FONT COLOR=#3333CC><B>in</B></FONT> options:
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            f = open(optvalues[<FONT COLOR=#115511>'-header'</FONT>])
+            c.header = f.read()
+            f.close()
+        <FONT COLOR=#3333CC><B>except</B></FONT> IOError:
+            <FONT COLOR=#3333CC><B>if</B></FONT> verbose: <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'IOError: header file not found'</FONT>
+
+    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#115511>'-footer'</FONT> <FONT COLOR=#3333CC><B>in</B></FONT> options:
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            f = open(optvalues[<FONT COLOR=#115511>'-footer'</FONT>])
+            c.footer = f.read()
+            f.close()
+        <FONT COLOR=#3333CC><B>except</B></FONT> IOError:
+            <FONT COLOR=#3333CC><B>if</B></FONT> verbose: <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'IOError: footer file not found'</FONT>
+
+    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#115511>'-URL'</FONT> <FONT COLOR=#3333CC><B>in</B></FONT> options:
+        c.replace_URLs = 1
+
+    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#115511>'-'</FONT> <FONT COLOR=#3333CC><B>in</B></FONT> options:
+        convert(sys.stdin,sys.stdout)
+        sys.exit()
+
+    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#115511>'-h'</FONT> <FONT COLOR=#3333CC><B>in</B></FONT> options:
+        <FONT COLOR=#3333CC><B>print</B></FONT> __doc__
+        sys.exit()
+
+    <FONT COLOR=#3333CC><B>if</B></FONT> len(files) == 0:
+        <FONT COLOR=#1111CC># Turn URL processing on</FONT>
+        c.replace_URLs = 1
+        <FONT COLOR=#1111CC># Try CGI processing...</FONT>
+        <FONT COLOR=#3333CC><B>import</B></FONT> cgi,urllib,urlparse,os
+        form = cgi.FieldStorage()
+        <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> form.has_key(<FONT COLOR=#115511>'script'</FONT>):
+            <FONT COLOR=#1111CC># Ok, then try pathinfo</FONT>
+            <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> os.environ.has_key(<FONT COLOR=#115511>'PATH_INFO'</FONT>):
+                <FONT COLOR=#3333CC><B>if</B></FONT> INPUT_FORM:
+                    redirect_to(INPUT_FORM)
+                <FONT COLOR=#3333CC><B>else</B></FONT>:
+                    sys.stdout.write(<FONT COLOR=#115511>'Content-Type: text/html\r\n\r\n'</FONT>)
+                    write_html_error(<FONT COLOR=#115511>'Missing Parameter'</FONT>,
+                                     <FONT COLOR=#115511>'Missing script=URL field in request'</FONT>)
+                sys.exit(1)
+            url = os.environ[<FONT COLOR=#115511>'PATH_INFO'</FONT>][1:] <FONT COLOR=#1111CC># skip the leading slash</FONT>
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            url = form[<FONT COLOR=#115511>'script'</FONT>].value
+        sys.stdout.write(<FONT COLOR=#115511>'Content-Type: text/html\r\n\r\n'</FONT>)
+        scheme, host, path, params, query, frag = urlparse.urlparse(url)
+        <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> host:
+            scheme = <FONT COLOR=#115511>'http'</FONT>
+            <FONT COLOR=#3333CC><B>if</B></FONT> os.environ.has_key(<FONT COLOR=#115511>'HTTP_HOST'</FONT>):
+                host = os.environ[<FONT COLOR=#115511>'HTTP_HOST'</FONT>]
+            <FONT COLOR=#3333CC><B>else</B></FONT>:
+                host = <FONT COLOR=#115511>'localhost'</FONT>
+            url = urlparse.urlunparse((scheme, host, path, params, query, frag))
+        <FONT COLOR=#1111CC>#print </FONT>url; sys.exit()
+        network = urllib.URLopener()
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            tempfile,headers = network.retrieve(url)
+        <FONT COLOR=#3333CC><B>except</B></FONT> IOError,reason:
+            write_html_error(<FONT COLOR=#115511>'Error opening "%s"'</FONT> % url,
+                             <FONT COLOR=#115511>'The given URL could not be opened. Reason: %s'</FONT> %\
+                             str(reason))
+            sys.exit(1)
+        f = open(tempfile,<FONT COLOR=#115511>'rb'</FONT>)
+        c.title = url
+        c.footer = __cgifooter__
+        convert(f,sys.stdout)
+        f.close()
+        network.close()
+        sys.exit()
+
+    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#115511>'-stdout'</FONT> <FONT COLOR=#3333CC><B>in</B></FONT> options:
+        filebreak = <FONT COLOR=#115511>'-'</FONT>*72
+        <FONT COLOR=#3333CC><B>for</B></FONT> f <FONT COLOR=#3333CC><B>in</B></FONT> files:
+            <FONT COLOR=#3333CC><B>try</B></FONT>:
+                <FONT COLOR=#3333CC><B>if</B></FONT> len(files) &gt; 1:
+                    <FONT COLOR=#3333CC><B>print</B></FONT> filebreak
+                    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'File:'</FONT>,f
+                    <FONT COLOR=#3333CC><B>print</B></FONT> filebreak
+                convert(f,sys.stdout)
+            <FONT COLOR=#3333CC><B>except</B></FONT> IOError:
+                <FONT COLOR=#3333CC><B>pass</B></FONT>
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        verbose = (<FONT COLOR=#115511>'-v'</FONT> <FONT COLOR=#3333CC><B>in</B></FONT> options)
+        <FONT COLOR=#3333CC><B>if</B></FONT> verbose:
+            <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Py2HTML: working on'</FONT>,
+        <FONT COLOR=#3333CC><B>for</B></FONT> f <FONT COLOR=#3333CC><B>in</B></FONT> files:
+            <FONT COLOR=#3333CC><B>try</B></FONT>:
+                <FONT COLOR=#3333CC><B>if</B></FONT> verbose: <FONT COLOR=#3333CC><B>print</B></FONT> f,
+                convert(f,f+<FONT COLOR=#115511>'.html'</FONT>)
+            <FONT COLOR=#3333CC><B>except</B></FONT> IOError:
+                <FONT COLOR=#3333CC><B>if</B></FONT> verbose: <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'(IOError!)'</FONT>,
+        <FONT COLOR=#3333CC><B>if</B></FONT> verbose:
+            <FONT COLOR=#3333CC><B>print</B></FONT>
+            <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Done.'</FONT>
+
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>'__main__'</FONT>:
+    main(sys.argv)
+
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

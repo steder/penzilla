@@ -1,0 +1,34 @@
+<HTML><HEAD><TITLE>../pypar.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#3333CC><B>import</B></FONT> pypar                         <FONT COLOR=#1111CC># The Python-MPI interface </FONT>
+
+numproc = pypar.size()               <FONT COLOR=#1111CC># Number of processes as specified by mpirunmyid =    pypar.rank()               </FONT>
+                                     <FONT COLOR=#1111CC># Id of of this process (myid in [0, numproc-1]) </FONT>
+node =    pypar.get_processor_name() <FONT COLOR=#1111CC># Host name on which current process is running</FONT>
+
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"I am proc %d of %d on node %s"</FONT> %(myid, numproc, node)
+
+<FONT COLOR=#3333CC><B>if</B></FONT> myid == 0: 
+    <FONT COLOR=#1111CC># Actions for process 0 </FONT>
+    
+    msg = <FONT COLOR=#115511>"P0"</FONT>  
+    pypar.send(msg, destination=1)                   <FONT COLOR=#1111CC># Send message to proces 1 (right hand neighbour)</FONT>
+    msg = pypar.receive(source=numproc-1)            <FONT COLOR=#1111CC># Receive message from last process</FONT>
+                
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Processor 0 received message "%s" from processor %d'</FONT> %(msg, numproc-1)
+
+<FONT COLOR=#3333CC><B>else</B></FONT>:         
+    <FONT COLOR=#1111CC># Actions for all other processes</FONT>
+
+    source = myid-1                                  
+    destination = (myid+1)%numproc                   
+                          
+    msg = pypar.receive(source)                      
+    msg = msg + <FONT COLOR=#115511>'P'</FONT> + str(myid)                      <FONT COLOR=#1111CC># Update message     </FONT>
+    pypar.send(msg, destination)                     
+
+pypar.finalize() 
+</PRE>
+                  <!--footer-->
+                  </BODY>

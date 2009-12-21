@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content=
+          "HTML Tidy for Linux/x86 (vers 1st August 2004), see www.w3.org" />
+    <title>Penzilla.net's Python Tutorial: Datatypes</title>
+    <link rel="StyleSheet" href="../style.css" type="text/css" media="screen" />
+  </head>
+  <body>
+    <div id="header">
+      <h1>Penzilla.net's Python Tutorial</h1>
+      <h2>The basic python datatypes</h2>
+      <hr /></div>
+    <div id="sidebar">
+      <div id="menu"><a href="index.shtml">&raquo;Tutorial Home</a> 
+        <!--#include virtual="/tutorials/python/menu.html"--></div>
+      <!--#include virtual="/tutorials/python/skyscraper_ads.html"--></div>
+    <div id="content"><!-- Comments -->
+      <!-- Body -->
+
+      <h3>The "Uncool" Python types</h3>
+      <ul>  
+        <li>
+          <dfn>int</dfn>:  <dd>Integer values (-2^32 , 2^32)</dd>
+        </li>
+        <li>
+          <dfn>long</dfn>:  <dd>Any integer larger then a plain <dfn>int</dfn>.</dd>
+        </li>
+        <li>
+          <dfn>float</dfn>:  <dd>All floating point values.</dd>
+        </li>
+        <li>
+          <dfn>str</dfn>:  <dd>Strings and characters are represented as the same type.</dd>
+        </li>
+      </ul>
+      <h3>The "Cool" Python Types</h3>
+      <ul>
+        <li><dfn>tuple</dfn>:  <dd>Immutable groups of elements.</dd>
+          <div id="indent">
+              Elements can have <em>different</em> types<br/>
+              Coordinates:  p1 = (0, 1)<br/>
+              Used to return more then one value:  return (name, address)<br/>
+          </div>
+        </li>
+        <li>
+          <dfn>list</dfn>:  <dd>Mutable "lists" of elements.</dd>
+          <div id="indent">
+            Elements can have <em>different</em> types<br />
+            Similar to arrays or linked lists, with similar uses<br />
+          </div>
+        </li>
+        <li>
+          <dfn>dict</dfn>:  <dd>Dictionaries are mutable and keyed datastructures.  They store and retrieve elements based on hashed keys (of type <dfn>str</dfn>).</dd>
+          <div id="indent">
+            Elements can be of <em>different</em> types.<br/>
+          </div>
+        </li>
+      </ul>
+      <!--Code Example:  Types-->
+      <div id="code">
+        <!--#include virtual="datatypes.py.html"-->
+      </div>
+      <!--A Note about Typing-->
+      <h3>Typing</h3>
+      <P>Python features a "dynamic" typing model, where types are allocated on the fly and can be changed mid program.  From one line to the next a variable "x" could be an integer, a string, and a list.  Not all at the same time of course, but x could be set to 3 different values, and Python would accept it as completely valid.  This flexible and powerful type system is useful because it is generally very intuitive, and doesn't really intrude when you're writing code.  You rarely have to go back and define variables, nor do you have to define lots of temporary variables for different types of data.  Let's look at a simple example or two.</p>
+      <!--Code Example: Typing-->
+      <div id="code">
+        <!--#include virtual="typing.py.html"-->
+      </div>
+      <!--Introduction of some type functions-->
+      <h3>Type Specific Functions</h3>
+      <P>Here I'd like to illustrate a bunch of type specific operations and functions as a reference.  A lot of these functions you'll need often, so it seems only fair to introduce them early on.  On to the examples:</p>
+      <!--Code Example:  Keywords/Syntax-->
+      
+      <div id="code">
+        <!--#include virtual="type-functions.py.html"-->
+      </div>
+    </div>
+    
+    <div id="footer">
+      <!--#include virtual="/tutorials/python/footer.shtml"-->
+    </div>
+  </body>
+</html>
+    

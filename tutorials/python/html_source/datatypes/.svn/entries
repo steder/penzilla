@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="10"
+   name=""
+   committed-date="2004-01-09T22:55:59.613144Z"
+   url="http://www.ripplefx.net:81/svn/python/html_source/datatypes"
+   last-author="steder"
+   kind="dir"
+   uuid="996777e2-3ecf-0310-aa64-e0ff611b1bef"
+   revision="17"/>
+<entry
+   committed-rev="10"
+   name="type-functions.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="1570bbc558b4b0b11c25f9d09643a545"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+<entry
+   committed-rev="10"
+   name="typing.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="c7c1a7e3f75ea1558afc60455b21fe91"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+<entry
+   committed-rev="10"
+   name="datatypes.py.html"
+   text-time="2004-09-20T02:22:30.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="eb34251155471416abb025c532fec281"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:30.000000Z"/>
+</wc-entries>

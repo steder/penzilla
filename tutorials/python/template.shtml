@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content=
+          "HTML Tidy for Linux/x86 (vers 1st August 2004), see www.w3.org" />
+    <title>New Style for Penzilla.net's Python Tutorial</title>
+    <link rel="StyleSheet" href="style.css" type="text/css" media="screen" />
+  </head>
+  <body>
+    <div id="header">
+      <h1>Penzilla.net's Python Tutorial</h1>
+      <hr /></div>
+    <div id="sidebar">
+      <div id="menu"><a href="index.shtml">&raquo;Tutorial Home</a> 
+        <!--#include virtual="/tutorials/python/menu.html"--></div>
+      <!--#include virtual="/tutorials/python/skyscraper_ads.html"--></div>
+    <div id="content"><!-- Comments -->
+    
+      <!-- Body -->
+      <div id="code">
+        <pre><code>
+# Hello World
+print "hello world!"
+        </code></pre>
+      </div>
+
+    </div>
+    <div id="footer">
+      <!--#include virtual="/tutorials/python/footer.shtml"-->
+    </div>
+  </body>
+</html>

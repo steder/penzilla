@@ -1,0 +1,29 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># Let's create a file and write it to disk.</FONT>
+filename = <FONT COLOR=#115511>"test.dat"</FONT>
+<FONT COLOR=#1111CC># Let's create some data:</FONT>
+done = 0
+namelist = []
+<FONT COLOR=#3333CC><B>while</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> done:
+    name = raw_input(<FONT COLOR=#115511>"Enter a name:"</FONT>)
+    <FONT COLOR=#3333CC><B>if</B></FONT> type(name) == type(<FONT COLOR=#115511>""</FONT>):
+        namelist.append(name)
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#3333CC><B>break</B></FONT>
+    
+    <FONT COLOR=#1111CC># Create a file object:</FONT>
+    <FONT COLOR=#1111CC># in "write" mode</FONT>
+    FILE = open(filename,<FONT COLOR=#115511>"w"</FONT>)
+    FILE.writelines(namelist)
+    
+    <FONT COLOR=#1111CC># Alternatively</FONT>
+    <FONT COLOR=#1111CC># for name in namelist:</FONT>
+    <FONT COLOR=#1111CC>#       FILE.write(name)</FONT>
+    
+    FILE.close() <FONT COLOR=#1111CC># this is icing, you can just exit and this will be</FONT>
+    <FONT COLOR=#1111CC># handled automagically.</FONT>
+</PRE>
+                  <!--footer-->
+                  </BODY>

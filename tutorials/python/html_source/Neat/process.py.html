@@ -1,0 +1,430 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#!/usr/bin/env python</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC># process.py:           Simple process management</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># $Id: //depot/rgutils/rgutils/process.py#1 $</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># See __doc__ string below</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># Requires:</FONT>
+<FONT COLOR=#1111CC>#   Python 1.5.2 or &gt;;</FONT>
+<FONT COLOR=#1111CC>#   Win32 extensions on Windows</FONT>
+<FONT COLOR=#1111CC>#   Threads enabled on POSIX</FONT>
+<FONT COLOR=#1111CC>#   OS: Win32, Posix (Unix)</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># TODO</FONT>
+<FONT COLOR=#1111CC>#   - implement the case 'detached' on Unix.</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#115511>'''
+Simple process management.
+
+Allows to launch, kill and see the status of a process independently
+from the platform (at least on Win32 and Unix).
+
+B{Classes}
+  -  L{Process}         -- Abstract base class for a process.
+  -  L{Win32Process}    -- a WIN32 process.
+  -  L{PosixProcess}    -- a POSIX (Unix) process.
+
+B{Usage}
+    - Execute a cmd in a separate process: p = createProcess(cmd)
+    - "Wrap" an existing process (pid): p = wrapProcess(pid)
+'''</FONT>
+__version__ = <FONT COLOR=#115511>'1.1.'</FONT> + <FONT COLOR=#115511>'$Revision: #1 $'</FONT>[12:-2]
+__author__ = <FONT COLOR=#115511>'Richard Gruet'</FONT>, <FONT COLOR=#115511>'rjgruet@yahoo.com'</FONT>
+__date__    = <FONT COLOR=#115511>'$Date: 2003/05/23 $'</FONT>[7:-2], <FONT COLOR=#115511>'$Author: rgruet $'</FONT>[9:-2]
+__since__ = <FONT COLOR=#115511>'2000/11/28'</FONT>
+__doc__ += <FONT COLOR=#115511>'\n@author: %s (U{%s})\n@version: %s'</FONT> % (__author__[0],
+                                            __author__[1], __version__)
+
+<FONT COLOR=#3333CC><B>import</B></FONT> os, sys, string, re, time
+
+true, false = -1, 0
+
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="ProcessError"><FONT COLOR=#CC0000><B> ProcessError</B></FONT></A>(Exception):
+    <FONT COLOR=#115511>''' Exception raised by the process module.
+    '''</FONT>
+    <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Process"><FONT COLOR=#CC0000><B> Process</B></FONT></A>:
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#115511>''' Abstract base class for a Process.
+        =&gt; Derive specialized classes for each OS.
+    '''</FONT>
+    MIN_LIFE_TIME = 1.0 <FONT COLOR=#1111CC># Minimum lifetime of a process in sec</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, cmd, pid, detached):
+        <FONT COLOR=#115511>''' Runs the program C{cmd} in a new process or wraps the given
+            process.
+
+            NB: this base class constructor MUST be called by derived classes
+            to initialize attributes.
+
+            @param cmd:  The program command line (may be None).
+            @param pid:  The process ID (in case of wrap)
+            @param detached: (if creation) Whether the process will survive its
+                            parent.
+
+        '''</FONT>
+        self.cmd = cmd
+        self.pid = pid
+        self.detached = detached
+        self.exitCode = None
+        self.killed = false
+        self.startedOn = time.time()    <FONT COLOR=#1111CC># N.S. if not launched by us</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__repr__"><FONT COLOR=#CC0000><B> __repr__</B></FONT></A>(self):
+        exitCode = self.getExitCode()
+        <FONT COLOR=#3333CC><B>if</B></FONT> exitCode <FONT COLOR=#3333CC><B>is</B></FONT> None:
+            state = <FONT COLOR=#115511>'alive'</FONT>
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            state = <FONT COLOR=#115511>'ended, exit code=%d'</FONT> % exitCode
+        <FONT COLOR=#3333CC><B>return</B></FONT> <FONT COLOR=#115511>'&lt;%s pid=%d, %s&gt;'</FONT> % (self.__class__.__name__, self.pid, state)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getCmd"><FONT COLOR=#CC0000><B> getCmd</B></FONT></A>(self):
+        <FONT COLOR=#115511>''' Returns the command string executed by the process.
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.cmd
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getPid"><FONT COLOR=#CC0000><B> getPid</B></FONT></A>(self):
+        <FONT COLOR=#115511>''' Returns the PID of the process.
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.pid
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="wait"><FONT COLOR=#CC0000><B> wait</B></FONT></A>(self, timeout=None):
+        <FONT COLOR=#115511>''' Waits until process terminates or a timeout occurs.
+
+            @param timeout: Time out in seconds (None=infinite).
+            @return: the exit code, or None if timeout.
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>raise</B></FONT> NotImplementedError()
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="kill"><FONT COLOR=#CC0000><B> kill</B></FONT></A>(self, hard=true):
+        <FONT COLOR=#115511>''' Kills the process.
+
+            Silent if the process is already terminated.
+            The process will have an exit code = -1
+            @param hard: [Unix] if true use signal SIGKILL, otherwise SIGTERM.
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>raise</B></FONT> NotImplementedError()
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="killed"><FONT COLOR=#CC0000><B> killed</B></FONT></A>(self):
+        <FONT COLOR=#115511>''' Returns true if process was killed (via kill).
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.killed
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getExitCode"><FONT COLOR=#CC0000><B> getExitCode</B></FONT></A>(self):
+        <FONT COLOR=#115511>''' Returns the exit code of the process, or C{None} if still alive.
+
+            On Posix the process must be a child process of the caller; in some
+            circumstances (kill) the exit status cannot be determined and will
+            arbitrarily be returned as -1.
+
+            The returned exit code is also assigned to self.exitCode.
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>raise</B></FONT> NotImplementedError()
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="isAlive"><FONT COLOR=#CC0000><B> isAlive</B></FONT></A>(self):
+        <FONT COLOR=#115511>''' Returns true if process is alive.
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.getExitCode() <FONT COLOR=#3333CC><B>is</B></FONT> None
+
+
+    <FONT COLOR=#1111CC># Private:</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_ensureMinLifeTime"><FONT COLOR=#CC0000><B> _ensureMinLifeTime</B></FONT></A>(self, minTime=None):
+        <FONT COLOR=#115511>''' Sleeps until the process has lived at least C{minTime} sec.
+
+            This is used to avoid killing the process too fast (this leads
+            to strange result codes).
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> minTime <FONT COLOR=#3333CC><B>is</B></FONT> None:
+            minTime = self.MIN_LIFE_TIME
+        delta = time.time() - (self.startedOn + minTime)
+        <FONT COLOR=#3333CC><B>if</B></FONT> delta &lt; 0:
+            time.sleep(-delta)
+
+
+
+<FONT COLOR=#3333CC><B>if</B></FONT> sys.platform == <FONT COLOR=#115511>'win32'</FONT>:
+    <FONT COLOR=#3333CC><B>try</B></FONT>:
+        <FONT COLOR=#3333CC><B>from</B></FONT> win32process <FONT COLOR=#3333CC><B>import</B></FONT> CreateProcess, TerminateProcess, GetExitCodeProcess, STARTUPINFO
+        <FONT COLOR=#3333CC><B>import</B></FONT> win32event, win32api, win32con, pywintypes
+    <FONT COLOR=#3333CC><B>except</B></FONT> ImportError, e:
+        <FONT COLOR=#3333CC><B>raise</B></FONT> ProcessError(<FONT COLOR=#115511>"Import error: %s. Have you installed the "</FONT>
+                    <FONT COLOR=#115511>"Python win32 extensions ?"</FONT> % e)
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Win32Process"><FONT COLOR=#CC0000><B> Win32Process</B></FONT></A>(Process):
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+        <FONT COLOR=#115511>''' A Win32 process.
+        '''</FONT>
+
+        <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, cmd=None, pid=0, detached=false):
+            <FONT COLOR=#115511>''' Runs the program C{cmd} in a new process or wraps a process.
+
+                If C{cmd} is specified (non empty), the command is executed in
+                a new process. C{pid} is non significant.
+                
+                If C{cmd} is empty, wraps the existing process whose pid is
+                given in C{pid}.
+
+                @param cmd: The program command line (may be None).
+                @param pid: The process ID (in case of wrap)
+                @param detached: (if creation) Whether the process will survive
+                        its parent. On Win32 processes are independent, so
+                        so this simply means that parent and child must have
+                        separate consoles to avoid killing the child when the
+                        parent console is closed.
+            '''</FONT>
+            <FONT COLOR=#3333CC><B>if</B></FONT> cmd:
+                <FONT COLOR=#3333CC><B>if</B></FONT> detached:
+                    createFlags =  win32con.CREATE_NEW_CONSOLE
+                <FONT COLOR=#3333CC><B>else</B></FONT>:
+                    createFlags = 0
+                hp, ht, pid, tid = CreateProcess(None, cmd, None, None, 1,
+                                                 createFlags,
+                                                 None, None, STARTUPINFO())
+            <FONT COLOR=#3333CC><B>else</B></FONT>:
+                cmd = None
+                assert pid
+                <FONT COLOR=#3333CC><B>try</B></FONT>:
+                    hp = win32api.OpenProcess(win32con.PROCESS_ALL_ACCESS,
+                                              0, pid)
+                <FONT COLOR=#3333CC><B>except</B></FONT> pywintypes.error, e:
+                    <FONT COLOR=#3333CC><B>raise</B></FONT> ProcessError(<FONT COLOR=#115511>"Can't get handle from pid=%s: %s"</FONT> % (pid, e))
+
+            self.handle = hp    <FONT COLOR=#1111CC># [PyHANDLE] Win32 process handle</FONT>
+            Process.__init__(self, cmd, pid, detached)
+
+        <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="wait"><FONT COLOR=#CC0000><B> wait</B></FONT></A>(self, timeout=None):
+            <FONT COLOR=#115511>''' See class L{Process}.
+            '''</FONT>
+            <FONT COLOR=#3333CC><B>if</B></FONT> timeout <FONT COLOR=#3333CC><B>is</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> None:
+                timeout = int(timeout * 1000)   <FONT COLOR=#1111CC># in ms</FONT>
+            <FONT COLOR=#3333CC><B>else</B></FONT>:
+                timeout = win32event.INFINITE
+            win32event.WaitForSingleObject(self.handle, timeout)
+            <FONT COLOR=#3333CC><B>return</B></FONT> self.getExitCode()
+
+        <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="kill"><FONT COLOR=#CC0000><B> kill</B></FONT></A>(self, hard=true):
+            <FONT COLOR=#115511>''' See class L{Process}.
+                @param hard: Always true in this Win32 version!
+            '''</FONT>
+            <FONT COLOR=#3333CC><B>if</B></FONT> self.isAlive():
+                self._ensureMinLifeTime()
+                TerminateProcess(self.handle, -1)
+                self.wait()     <FONT COLOR=#1111CC># ensure exit code known.</FONT>
+                self.killed = true
+                self.getExitCode() <FONT COLOR=#1111CC># refresh attributes</FONT>
+
+        <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getExitCode"><FONT COLOR=#CC0000><B> getExitCode</B></FONT></A>(self):
+            <FONT COLOR=#115511>''' See class L{Process}.
+            '''</FONT>
+            exitCode = GetExitCodeProcess(self.handle)
+            <FONT COLOR=#3333CC><B>if</B></FONT> exitCode &lt;&gt;  259:    <FONT COLOR=#1111CC># (259 means alive, keep exitCode==None)</FONT>
+                self.exitCode = exitCode
+            <FONT COLOR=#3333CC><B>return</B></FONT> self.exitCode
+
+<FONT COLOR=#3333CC><B>else</B></FONT>: <FONT COLOR=#1111CC># not on Win32</FONT>
+    <FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Win32Process"><FONT COLOR=#CC0000><B> Win32Process</B></FONT></A>: <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+
+<FONT COLOR=#3333CC><B>if</B></FONT>  os.name == <FONT COLOR=#115511>'posix'</FONT>:
+    <FONT COLOR=#3333CC><B>import</B></FONT> threading
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#3333CC><B>class</B></FONT><A NAME="PosixProcess"><FONT COLOR=#CC0000><B> PosixProcess</B></FONT></A>(Process):
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+        <FONT COLOR=#115511>''' A POSIX (Unix) process.
+        '''</FONT>
+
+        SCAN_INTERVAL = 1.0     <FONT COLOR=#1111CC># checking process death interval in sec</FONT>
+
+        <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, cmd=None, pid=0, detached=false):
+            <FONT COLOR=#115511>''' Runs the program &lt;cmd&gt; in a new process or wraps a process.
+
+                If C{cmd} is specified (non empty), the command is executed in
+                a new process. C{pid} is non significant.
+                If C{cmd} is empty, wraps the existing process whose pid is
+                given in C{pid}.
+
+                @param cmd:  The program command line (may be None).
+                @param pid:  The process ID (in case of wrap)
+                @param detached: (if creation) Whether the process will survive
+                        its parent. On Unix, parent and child are tied,
+                        children become "zombies" if parent die (but they
+                        survive). They also must survive the parent logout
+                        by catching the signal NOHUP.
+                        TODO: IMPLEMENT THIS !!!!
+                @exception ProcessError: The program cannot be launched.
+            '''</FONT>
+            <FONT COLOR=#3333CC><B>if</B></FONT> cmd:
+                l = string.split(cmd)
+                progName, args = l[0], l[1:]
+
+                pid = os.fork()
+                <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> pid:     <FONT COLOR=#1111CC># in new process</FONT>
+                    <FONT COLOR=#1111CC>#TODO Use 'nohup progName args' to implement &lt;detached&gt; ????</FONT>
+                    os.execvp(progName, args)
+                <FONT COLOR=#3333CC><B>else</B></FONT>:
+                    childProcess = true
+            <FONT COLOR=#3333CC><B>else</B></FONT>:
+                cmd = None
+                assert pid != 0
+                childProcess = false
+
+            Process.__init__(self, cmd, pid, detached)
+
+            <FONT COLOR=#1111CC># 'wait' for the end of the child process in a separate thread:</FONT>
+            self.waitThread = threading.Thread(target=self._threadMain,
+                                               args = (childProcess,))
+            self.waitThread.start()
+
+        <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="wait"><FONT COLOR=#CC0000><B> wait</B></FONT></A>(self, timeout=None):
+            <FONT COLOR=#115511>''' See class Process.
+            '''</FONT>
+            self.waitThread.join(timeout)
+            <FONT COLOR=#3333CC><B>return</B></FONT> self.exitCode
+
+
+        <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="kill"><FONT COLOR=#CC0000><B> kill</B></FONT></A>(self, hard=true):
+            <FONT COLOR=#115511>''' See class Process.
+            '''</FONT>
+            <FONT COLOR=#3333CC><B>if</B></FONT> self.isAlive():
+                <FONT COLOR=#3333CC><B>import</B></FONT> signal
+                <FONT COLOR=#3333CC><B>if</B></FONT> hard:
+                    sig = 9     <FONT COLOR=#1111CC># SIGKILL</FONT>
+                <FONT COLOR=#3333CC><B>else</B></FONT>:
+                    sig = signal.SIGTERM
+                self._ensureMinLifeTime()
+                os.kill(self.pid, sig)
+                self.waitThread.join()
+                self.killed = true
+
+        <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getExitCode"><FONT COLOR=#CC0000><B> getExitCode</B></FONT></A>(self):
+            <FONT COLOR=#115511>''' See class Process.
+            '''</FONT>
+            <FONT COLOR=#3333CC><B>return</B></FONT> self.exitCode
+
+        <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_threadMain"><FONT COLOR=#CC0000><B> _threadMain</B></FONT></A>(self, childProcess):
+            <FONT COLOR=#115511>''' Waits thread main proc.
+
+                If child process, waits for its end, stores the exit status and
+                exits. Otherwise (not child), just wait for the end and return
+                a *dummy* exit status.
+            '''</FONT>
+            <FONT COLOR=#3333CC><B>if</B></FONT> childProcess:
+                <FONT COLOR=#3333CC><B>try</B></FONT>:
+                    pid, self.exitCode = os.waitpid(self.pid, 0)
+                <FONT COLOR=#3333CC><B>except</B></FONT> OSError, e:
+                    <FONT COLOR=#3333CC><B>if</B></FONT> e.errno == 10:   <FONT COLOR=#1111CC># child process probably killed</FONT>
+                        <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>'CHILD KILLED: %s'</FONT> % e <FONT COLOR=#1111CC>###</FONT>
+                        self.exitCode = -1  <FONT COLOR=#1111CC># not very meaningful !!</FONT>
+            <FONT COLOR=#3333CC><B>else</B></FONT>:
+                <FONT COLOR=#1111CC># Use a ps to detect death of the process. Ideally, we should</FONT>
+                <FONT COLOR=#1111CC># use os.kill(self.pid, 0) which raise OSError with errno==3</FONT>
+                <FONT COLOR=#1111CC># (No such process), but it doesn't work (at least on Linux)</FONT>
+                <FONT COLOR=#1111CC># when the real kill and this kill are performed in separate</FONT>
+                <FONT COLOR=#1111CC># threads (the process still appears alive but "defunct"):</FONT>
+
+                cmd = <FONT COLOR=#115511>'ps -p %d|grep %d'</FONT> % (self.pid, self.pid)
+                <FONT COLOR=#3333CC><B>while</B></FONT> true:
+                    s = os.popen(cmd).read()
+                    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> s :
+                        self.exitCode = 0
+                        <FONT COLOR=#3333CC><B>break</B></FONT>
+                    <FONT COLOR=#3333CC><B>if</B></FONT>  re.search(<FONT COLOR=#115511>'(?i)defunct'</FONT>, s):
+                        self.exitCode = -1  <FONT COLOR=#1111CC># killed</FONT>
+                        <FONT COLOR=#3333CC><B>break</B></FONT>
+                    time.sleep(self.SCAN_INTERVAL)
+
+
+<FONT COLOR=#3333CC><B>else</B></FONT>: <FONT COLOR=#1111CC># not on POSIX</FONT>
+    <FONT COLOR=#3333CC><B>class</B></FONT><A NAME="PosixProcess"><FONT COLOR=#CC0000><B> PosixProcess</B></FONT></A>: <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="createProcess"><FONT COLOR=#CC0000><B> createProcess</B></FONT></A>(cmd, detached=false):
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#115511>''' Runs the program C{cmd} in a new process.
+
+        @param cmd:  The program command line.
+        @param detached: (if creation) Whether the process will survive its
+                        parent.
+        @return: a Process object.
+        @exception ProcessError: The program cannot be launched.
+        @see: L{wrapProcess}
+    '''</FONT>
+    <FONT COLOR=#3333CC><B>import</B></FONT> types
+    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> isinstance(cmd, types.StringType) <FONT COLOR=#3333CC><B>or</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> cmd:
+        <FONT COLOR=#3333CC><B>raise</B></FONT> ProcessError(<FONT COLOR=#115511>'cmd should be a non empty string'</FONT>)
+    <FONT COLOR=#3333CC><B>if</B></FONT> sys.platform == <FONT COLOR=#115511>'win32'</FONT>:
+        f = Win32Process
+    <FONT COLOR=#3333CC><B>elif</B></FONT> os.name == <FONT COLOR=#115511>'posix'</FONT>:
+        f = PosixProcess
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#3333CC><B>raise</B></FONT> ProcessError(<FONT COLOR=#115511>'Only Win32 and Posix (Unix) are supported.'</FONT>)
+
+    <FONT COLOR=#3333CC><B>return</B></FONT> f(cmd, 0, detached)
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="wrapProcess"><FONT COLOR=#CC0000><B> wrapProcess</B></FONT></A>(pid):
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#115511>''' Wraps an existing process.
+
+        @param pid: The ID of the process to wrap.
+        @return: a Process object.
+        @exception ProcessError:
+    '''</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> sys.platform == <FONT COLOR=#115511>'win32'</FONT>:
+        f = Win32Process
+    <FONT COLOR=#3333CC><B>elif</B></FONT> os.name == <FONT COLOR=#115511>'posix'</FONT>:
+        f = PosixProcess
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#3333CC><B>raise</B></FONT> ProcessError(<FONT COLOR=#115511>'Only Win32 and Posix (Unix) are supported.'</FONT>)
+
+    <FONT COLOR=#3333CC><B>return</B></FONT> f(pid=pid)
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC>#                               T E S T S</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test"><FONT COLOR=#CC0000><B> test</B></FONT></A>():
+
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Testing module "process"'</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> sys.platform == <FONT COLOR=#115511>'win32'</FONT>:
+        cmd = <FONT COLOR=#115511>'notepad'</FONT>
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        cmd = <FONT COLOR=#115511>'xterm'</FONT>
+
+    p = createProcess(cmd)
+    <FONT COLOR=#3333CC><B>print</B></FONT> p
+    assert p.isAlive()
+    p.kill(hard=false)
+    <FONT COLOR=#3333CC><B>print</B></FONT> p
+    assert <FONT COLOR=#3333CC><B>not</B></FONT> p.isAlive()
+
+    p1 = createProcess(cmd, detached=true)
+    p2 = wrapProcess(p1.getPid())
+    <FONT COLOR=#3333CC><B>print</B></FONT> p2
+    assert p2.isAlive()
+    p2.kill(hard=true)
+    <FONT COLOR=#3333CC><B>print</B></FONT> p2
+    assert <FONT COLOR=#3333CC><B>not</B></FONT> p2.isAlive()
+    <FONT COLOR=#3333CC><B>print</B></FONT> p1    <FONT COLOR=#1111CC># same as p2</FONT>
+
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'=&gt; Tests passed.'</FONT>
+    <FONT COLOR=#3333CC><B>return</B></FONT> p
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC>#                               M A I N</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__ == <FONT COLOR=#115511>"__main__"</FONT>:
+    p = test()
+</PRE>
+                  <!--footer-->
+                  </BODY>

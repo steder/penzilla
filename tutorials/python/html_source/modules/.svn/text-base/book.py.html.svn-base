@@ -1,0 +1,51 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># Intro To Python:  Modules</FONT>
+<FONT COLOR=#1111CC># book.py</FONT>
+
+<FONT COLOR=#115511>"""
+Class:  Book( title, author, keywords )
+Each book object takes a title, optional author, and optional keywords.
+"""</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Book"><FONT COLOR=#CC0000><B> Book</B></FONT></A>:
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, title, author=<FONT COLOR=#115511>"Unknown"</FONT>, keywords=[]):
+        <FONT COLOR=#115511>"""
+        Books take three arguments to their constructor
+        The first and only required argument is the title,
+        followed by the optional arguments, author, and a list
+        of keywords that can be used to look up a specific book.
+        """</FONT>
+        self.title = title
+        self.author = author
+        self.keywords = keywords
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="setTitle"><FONT COLOR=#CC0000><B> setTitle</B></FONT></A>(self, title):
+        <FONT COLOR=#115511>"""
+        Takes one argument, the title of the book object.
+        """</FONT>
+        self.title = title
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="setAuthor"><FONT COLOR=#CC0000><B> setAuthor</B></FONT></A>(self, author):
+        <FONT COLOR=#115511>"""
+        Takes one argument, the author of the book object.
+        """</FONT>
+        self.author = author
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="setKeywords"><FONT COLOR=#CC0000><B> setKeywords</B></FONT></A>(self, keywords):
+        <FONT COLOR=#115511>"""
+        Takes one argument, the keywords list for this book object.
+        """</FONT>
+        self.keywords = keywords
+
+        <FONT COLOR=#1111CC># Overload print operation, print a specific format for books.</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__str__"><FONT COLOR=#CC0000><B> __str__</B></FONT></A>(self):
+        s  = <FONT COLOR=#115511>"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"</FONT>
+        s += <FONT COLOR=#115511>"+"</FONT> + self.title + <FONT COLOR=#115511>"\n"</FONT>
+        s += <FONT COLOR=#115511>"+"</FONT> + self.author +<FONT COLOR=#115511>"\n"</FONT>
+        s += <FONT COLOR=#115511>"+"</FONT> + str(self.keywords) + <FONT COLOR=#115511>"\n"</FONT>
+        s += <FONT COLOR=#115511>"+++++++++++++++++++++++++++++++++++++++++++++++++++++"</FONT>
+        <FONT COLOR=#3333CC><B>return</B></FONT> s
+</PRE>
+                  <!--footer-->
+                  </BODY>

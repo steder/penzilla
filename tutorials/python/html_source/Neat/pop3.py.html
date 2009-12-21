@@ -1,0 +1,430 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#!/usr/bin/env python</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC># pop3.py:      utilities for reading mail via POP3</FONT>
+<FONT COLOR=#1111CC>#               (using std library poplib.py)</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># See __doc__ string below.</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># Requires:</FONT>
+<FONT COLOR=#1111CC>#   - Python &gt;= 1.5.1</FONT>
+<FONT COLOR=#1111CC>#   - module message</FONT>
+<FONT COLOR=#1111CC>#   OS: portable</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># History:</FONT>
+<FONT COLOR=#1111CC>#   -2 Dec 98: created  by Richard Gruet</FONT>
+<FONT COLOR=#1111CC>#   -11 Mar 99: (RG) - s '' or -s '*' means NO filter - now the default -</FONT>
+<FONT COLOR=#1111CC>#   -4 Jun 99: (RG) MailBoxSession.__init__: several connection attempts in</FONT>
+<FONT COLOR=#1111CC>#               case of socket error</FONT>
+<FONT COLOR=#1111CC>#   -1 Jul 99: (RG) MailScanner._scanThreadProc: log exceptions in scan loop</FONT>
+<FONT COLOR=#1111CC>#   -15 oct 2000: (RG) changed trace + some clean-up.</FONT>
+<FONT COLOR=#1111CC>#   -19 oct 2000: (RG) Moved Message, Part and trace fcts to message.py.</FONT>
+<FONT COLOR=#1111CC># TODO</FONT>
+<FONT COLOR=#1111CC>#   -Put MailScanner in its own module, since it is independent of POP3/IMAP.</FONT>
+<FONT COLOR=#1111CC>#   -Could exist a MailBox base class with derived classes pop3.MailBoxSession</FONT>
+<FONT COLOR=#1111CC>#    and imap.MailBoxSession</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># $Id: //depot/rgutils/rgutils/pop3.py#1 $</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#115511>'''
+Utilities for reading POP3 mail.
+
+B{Classes}
+    - L{MailScanner}      -- A generic class for scanning POP3 mail boxes.
+    - L{MailBoxSession}   -- A connection with a POP3 mailbox.
+'''</FONT>
+__version__ = <FONT COLOR=#115511>'1.1.'</FONT> + <FONT COLOR=#115511>'$Revision: #1 $'</FONT>[12:-2]
+__author__ = <FONT COLOR=#115511>'Richard Gruet'</FONT>, <FONT COLOR=#115511>'rjgruet@yahoo.com'</FONT>
+__date__    = <FONT COLOR=#115511>'$Date: 2003/05/23 $'</FONT>[7:-2], <FONT COLOR=#115511>'$Author: rgruet $'</FONT>[9:-2]
+__since__ = <FONT COLOR=#115511>'1998/12/02'</FONT>
+__doc__ += <FONT COLOR=#115511>'\n@author: %s (U{%s})\n@version: %s'</FONT> % (__author__[0],
+                                            __author__[1], __version__)
+
+<FONT COLOR=#3333CC><B>from</B></FONT> poplib <FONT COLOR=#3333CC><B>import</B></FONT> *
+<FONT COLOR=#3333CC><B>import</B></FONT> time, threading, string, types
+
+<FONT COLOR=#3333CC><B>from</B></FONT> message <FONT COLOR=#3333CC><B>import</B></FONT> Message, Part, trace, setLogVerbosity, setVerbosity, setLog
+
+true, false = -1, 0
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="MailScanner"><FONT COLOR=#CC0000><B> MailScanner</B></FONT></A>:
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#115511>''' Periodic scan of a POP3 mailbox.
+    '''</FONT>
+    <FONT COLOR=#1111CC># Class attributes:</FONT>
+    <FONT COLOR=#1111CC># ----------------</FONT>
+    <FONT COLOR=#1111CC>#   Defaults:</FONT>
+    <FONT COLOR=#1111CC>#   --------</FONT>
+    MAIL_SERVER = <FONT COLOR=#115511>'pop.free.fr'</FONT>
+    USER =  <FONT COLOR=#115511>'rgruet'</FONT>
+    PASSWD = <FONT COLOR=#115511>'xxxx'</FONT>
+    SUBJECT = <FONT COLOR=#115511>''</FONT>    <FONT COLOR=#1111CC># any subject</FONT>
+    SCAN_INTERVAL = 300 <FONT COLOR=#1111CC># seconds (= 5mn)</FONT>
+
+    VALID_OPTIONS = <FONT COLOR=#115511>'''Valid options :
+
+        -h &lt;host&gt;       POP3 server IP address [default: %s]
+        -u &lt;user&gt;       mailbox user name [default: %s]
+        -p &lt;password&gt;   mailbox user password [default: %s]
+        -s &lt;subject&gt;    mail filter on subject content, or '' (or '*') [default: %s]
+        -f &lt;freq&gt;       mailbox scan interval in sec [default: %d]
+        -l &lt;path&gt;       log actions in file &lt;path&gt; [default: no log]
+        -v &lt;level&gt;      screen verbosity level: the higher, the more detailed trace
+                        on screen -1=No trace [default: 0]
+        -w &lt;level&gt;      log verbosity level: the higher, the more detailed trace
+                        on log [default: 100]
+        -?              This help
+        '''</FONT> % (MAIL_SERVER, USER, PASSWD, SUBJECT, SCAN_INTERVAL)
+
+    STOP_TIMEOUT = 10   <FONT COLOR=#1111CC># time out between stop request and actual stop (sec, float)</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, options=<FONT COLOR=#115511>''</FONT>, autoStart=true):
+        <FONT COLOR=#115511>'''Constructor.
+           @param options: [string, or list in sys.argv style] see
+                           L{VALID_OPTIONS}.
+        '''</FONT>
+        <FONT COLOR=#1111CC># Parse options:</FONT>
+        <FONT COLOR=#3333CC><B>import</B></FONT> getopt, sys, types
+        <FONT COLOR=#3333CC><B>if</B></FONT> type(options) == types.StringType:
+            options = parseArgs(options)
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            optList, args = getopt.getopt(options, <FONT COLOR=#115511>'h:u:p:s:f:l:v:w:?'</FONT>)
+        <FONT COLOR=#3333CC><B>except</B></FONT> getopt.error, e:
+            <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'%s\n%s'</FONT> % (e, self.VALID_OPTIONS)
+            <FONT COLOR=#3333CC><B>raise</B></FONT>
+
+        self.host = self.MAIL_SERVER            <FONT COLOR=#1111CC># set defaults</FONT>
+        self.user = self.USER
+        self.subject = self.SUBJECT
+        <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> self.PASSWD:
+            self.PASSWD = raw_input(<FONT COLOR=#115511>'passwd for user "%s" ? '</FONT> % self.USER)
+        self.passwd = self.PASSWD
+        self.scanInterval = self.SCAN_INTERVAL
+        log = None
+        verbosity = 0
+        logVerbosity = 10000
+
+        <FONT COLOR=#3333CC><B>for</B></FONT> opt, value <FONT COLOR=#3333CC><B>in</B></FONT>  optList:
+            <FONT COLOR=#3333CC><B>if</B></FONT> opt == <FONT COLOR=#115511>'-h'</FONT>: self.host = value
+            <FONT COLOR=#3333CC><B>elif</B></FONT> opt == <FONT COLOR=#115511>'-u'</FONT>: self.user = value
+            <FONT COLOR=#3333CC><B>elif</B></FONT> opt == <FONT COLOR=#115511>'-p'</FONT>: self.passwd = value
+            <FONT COLOR=#3333CC><B>elif</B></FONT> opt == <FONT COLOR=#115511>'-s'</FONT>:
+                value = string.strip(value)
+                <FONT COLOR=#3333CC><B>if</B></FONT> value == <FONT COLOR=#115511>'*'</FONT>:
+                    value = <FONT COLOR=#115511>''</FONT>
+                self.subject = value
+            <FONT COLOR=#3333CC><B>elif</B></FONT> opt == <FONT COLOR=#115511>'-f'</FONT>:
+                <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>'option -f !!'</FONT> <FONT COLOR=#1111CC>########"</FONT>
+                value = int(value)
+                <FONT COLOR=#3333CC><B>if</B></FONT> value &lt; 1:
+                    <FONT COLOR=#3333CC><B>raise</B></FONT> ValueError(<FONT COLOR=#115511>'bad scan Frequency (must be &gt;0)'</FONT>)
+                self.scanInterval = value
+            <FONT COLOR=#3333CC><B>elif</B></FONT> opt == <FONT COLOR=#115511>'-l'</FONT>:
+                log = open(value, <FONT COLOR=#115511>'w'</FONT>)
+            <FONT COLOR=#3333CC><B>elif</B></FONT> opt == <FONT COLOR=#115511>'-v'</FONT>:
+                verbosity = int(value)
+            <FONT COLOR=#3333CC><B>elif</B></FONT> opt == <FONT COLOR=#115511>'-w'</FONT>:
+                logVerbosity = int(value)
+            <FONT COLOR=#3333CC><B>elif</B></FONT> opt == <FONT COLOR=#115511>'-?'</FONT>:
+                <FONT COLOR=#3333CC><B>print</B></FONT> self.VALID_OPTIONS
+                <FONT COLOR=#3333CC><B>return</B></FONT>
+
+        setLog(log)
+        setVerbosity(verbosity)
+        setLogVerbosity(logVerbosity)
+        
+        self._scanThread = None
+        trace(<FONT COLOR=#115511>'Created %s, options="%s"'</FONT> % (self,  string.join(options)))
+        <FONT COLOR=#3333CC><B>if</B></FONT> autoStart:
+            self.start()
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__del__"><FONT COLOR=#CC0000><B> __del__</B></FONT></A>(self):
+        self.stop()
+        trace(<FONT COLOR=#115511>'MailScanner deleted '</FONT>)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__repr__"><FONT COLOR=#CC0000><B> __repr__</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>if</B></FONT> self._scanThread <FONT COLOR=#3333CC><B>is</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> None: state = <FONT COLOR=#115511>'started'</FONT>
+        <FONT COLOR=#3333CC><B>else</B></FONT>: state = <FONT COLOR=#115511>'stopped'</FONT>
+        <FONT COLOR=#3333CC><B>return</B></FONT> <FONT COLOR=#115511>'&lt;%s (%s): user "%s" on host "%s", freq=%d sec&gt;'</FONT> % (
+                self.__class__.__name__, state, self.user, self.host,
+                self.scanInterval)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="start"><FONT COLOR=#CC0000><B> start</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>if</B></FONT> self._scanThread <FONT COLOR=#3333CC><B>is</B></FONT> None:
+            <FONT COLOR=#1111CC># launch scan thread</FONT>
+            self._stopRequest = false
+            self._scanThread = threading.Thread(
+                                target=MailScanner._scanThreadProc,
+                                name=<FONT COLOR=#115511>'Pop3 mail scanner'</FONT>,
+                                args=(self,))
+            self._scanThread.start()
+            trace(<FONT COLOR=#115511>'Mail scan started, frequency = %d sec.'</FONT> % self.scanInterval)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="stop"><FONT COLOR=#CC0000><B> stop</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>if</B></FONT> self._scanThread <FONT COLOR=#3333CC><B>is</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> None:
+            <FONT COLOR=#3333CC><B>if</B></FONT> self._scanThread.isAlive():
+                <FONT COLOR=#1111CC># request stop & wait for thread termination:</FONT>
+                self._stopRequest = true
+                self._scanThread.join() <FONT COLOR=#1111CC># can't use a timeout, threading.py bugged!</FONT>
+                <FONT COLOR=#1111CC>#self._scanThread.join(self.STOP_TIMEOUT)</FONT>
+                <FONT COLOR=#3333CC><B>if</B></FONT> self._scanThread.isAlive():
+                    trace(<FONT COLOR=#115511>"Time out - can't stop scan thread!"</FONT>)
+                self._scanThread = None
+                trace(<FONT COLOR=#115511>'Mail scan stopped.'</FONT>)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="handleMsg"><FONT COLOR=#CC0000><B> handleMsg</B></FONT></A>(self, msg):
+        <FONT COLOR=#115511>''' Handles a Message.
+
+            This fct is called by the scan thread for every message found.
+            It must return true (non 0) if the message must be removed from
+            the mailBox, false (0) otherwise.
+            
+            =&gt; Override this fct as necessary to implement the desired behaviour.
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>return</B></FONT> false <FONT COLOR=#1111CC>##TODO should be true!</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_scanThreadProc"><FONT COLOR=#CC0000><B> _scanThreadProc</B></FONT></A>(self):
+        <FONT COLOR=#115511>''' Main procedure for the scan thread.
+
+            Every C{scanInterval} seconds, the target mail box is scanned for mail.
+            
+            For each message present, the function L{handleMsg} is called as
+            follow::
+                handleMsg(msg)
+            where msg is a Message instance (defined in this module)
+            The fct must return true (non 0) if the message is to be deleted,
+            false otherwise.
+
+            The thread may be stopped by calling the method L{stop()}. The
+            thread will stop ASAP.
+        '''</FONT>
+        trace(<FONT COLOR=#115511>'Scan thread started.'</FONT>)
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            <FONT COLOR=#3333CC><B>while</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> self._stopRequest:
+                <FONT COLOR=#3333CC><B>try</B></FONT>:
+                    <FONT COLOR=#1111CC># Open session with POP3 server and check if mail present :</FONT>
+                    mb = MailBoxSession(self.host, self.user, self.passwd)
+
+                    <FONT COLOR=#3333CC><B>for</B></FONT> msgNo <FONT COLOR=#3333CC><B>in</B></FONT> range(1, mb.msgCnt+1):     <FONT COLOR=#1111CC># process messages</FONT>
+                        <FONT COLOR=#3333CC><B>if</B></FONT> self._stopRequest:
+                            <FONT COLOR=#3333CC><B>break</B></FONT>
+                        msg = mb.getMsg(msgNo, removeIt=false)
+                        trace(<FONT COLOR=#115511>'Message read: %s'</FONT> % msg)
+                        <FONT COLOR=#3333CC><B>try</B></FONT>:
+                            removeIt = self.handleMsg(msg)
+                        <FONT COLOR=#3333CC><B>except</B></FONT> Exception, e:
+                            trace(<FONT COLOR=#115511>'*Exception while handling msg: %s'</FONT> % e)
+                        <FONT COLOR=#3333CC><B>else</B></FONT>:   <FONT COLOR=#1111CC># ok:</FONT>
+                            <FONT COLOR=#1111CC>#trace('Message %s handled.' % msg)</FONT>
+                            <FONT COLOR=#3333CC><B>if</B></FONT> removeIt:
+                                mb.removeMsg(msgNo)
+                                trace(<FONT COLOR=#115511>'Message %s deleted.'</FONT> % msg)
+                    mb.quit()   <FONT COLOR=#1111CC># commit changes</FONT>
+                <FONT COLOR=#3333CC><B>except</B></FONT> Exception, e:
+                    trace(<FONT COLOR=#115511>'*Exception in MailScanner._scanThreadProc loop: %s'</FONT> % e)
+
+                <FONT COLOR=#1111CC># Wait for next scan by sleeping, but check for stop request every second:</FONT>
+                <FONT COLOR=#3333CC><B>for</B></FONT> second <FONT COLOR=#3333CC><B>in</B></FONT> range(self.scanInterval):
+                    <FONT COLOR=#3333CC><B>if</B></FONT> self._stopRequest:
+                        <FONT COLOR=#3333CC><B>break</B></FONT>
+                    time.sleep(1)
+        <FONT COLOR=#3333CC><B>finally</B></FONT>:
+            trace(<FONT COLOR=#115511>'Scan thread ended.'</FONT>)
+
+
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="MailBoxSession"><FONT COLOR=#CC0000><B> MailBoxSession</B></FONT></A>:
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#115511>''' A connection with a given POP3 mailbox.
+
+        Access is locked and all changes uncommitted until L{quit()} is called,
+        thus typical usage is only for B{one} scan::
+
+            mb = MailBoxSession(host, user, passwd)
+            mb.scan()   # read messages -&gt; mb.msgCnt
+            for msgNo in range(1, mb.msgCnt+1):
+                msg = mb.getMsg(msgNo, removeIt=true)
+                ## process message as desired (see class: Message)...
+            mb.quit()   # commit changes
+    '''</FONT>
+    MAX_CONNECTION_ATTEMPTS = 3
+
+    <FONT COLOR=#1111CC>#   Defaults:</FONT>
+    <FONT COLOR=#1111CC>#   --------</FONT>
+    MAIL_SERVER = <FONT COLOR=#115511>'pop.free.fr'</FONT>
+    USER =  <FONT COLOR=#115511>'rgruet'</FONT>
+    PASSWD = <FONT COLOR=#115511>''</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, mailServer=MAIL_SERVER, user=USER, passwd=PASSWD):
+        self.server = mailServer
+        self.user = user
+        trace(<FONT COLOR=#115511>'(connecting to %s)...'</FONT> % mailServer, 20)
+
+        <FONT COLOR=#1111CC># (Socket) connection may fail sometimes, so we try several times:</FONT>
+        <FONT COLOR=#3333CC><B>import</B></FONT> socket
+        attempts = 0
+        <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> range(MailBoxSession.MAX_CONNECTION_ATTEMPTS):
+            <FONT COLOR=#3333CC><B>try</B></FONT>:
+                self.pop = POP3(mailServer)     <FONT COLOR=#1111CC># embedded POP3 object</FONT>
+            <FONT COLOR=#3333CC><B>except</B></FONT> socket.error, e:
+                trace(<FONT COLOR=#115511>'Socket error during POP3 connection: %s'</FONT> % e)
+                attempts = attempts + 1
+                <FONT COLOR=#3333CC><B>if</B></FONT> attempts &lt; MailBoxSession.MAX_CONNECTION_ATTEMPTS:
+                    trace(<FONT COLOR=#115511>'-&gt; Retry connection...'</FONT>)
+                <FONT COLOR=#3333CC><B>else</B></FONT>:
+                    trace(<FONT COLOR=#115511>'-&gt; Connection failed after %d attempts'</FONT> % MailBoxSession.MAX_CONNECTION_ATTEMPTS)
+                    <FONT COLOR=#3333CC><B>raise</B></FONT> Exception(<FONT COLOR=#115511>"Can't create MailBoxSession: socket connection failed."</FONT>)
+            <FONT COLOR=#3333CC><B>else</B></FONT>:
+                <FONT COLOR=#3333CC><B>break</B></FONT>
+        trace(self.pop.getwelcome(), 1000)
+
+        <FONT COLOR=#1111CC># open user's mail box:</FONT>
+        self.pop.user(user)
+        <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> passwd:
+            passwd = raw_input(<FONT COLOR=#115511>'passwd for user "%s" ? '</FONT> % user)
+        self.pop.pass_(passwd)  <FONT COLOR=#1111CC># warning: mailbox is locked until pop.quit()</FONT>
+                                <FONT COLOR=#1111CC>#is </FONT>called
+        self.msgCnt = 0     <FONT COLOR=#1111CC># unread pending messages</FONT>
+        self.msgSize = 0    <FONT COLOR=#1111CC># pending messages total size</FONT>
+        self.scan()         <FONT COLOR=#1111CC># initial scan</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__del__"><FONT COLOR=#CC0000><B> __del__</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            self.pop.quit()     <FONT COLOR=#1111CC>#Commit changes, close mail box & connection</FONT>
+        <FONT COLOR=#3333CC><B>except</B></FONT>:
+            <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__repr__"><FONT COLOR=#CC0000><B> __repr__</B></FONT></A>(self):
+        self.scan() <FONT COLOR=#1111CC># ??</FONT>
+        <FONT COLOR=#3333CC><B>return</B></FONT> <FONT COLOR=#115511>'&lt;MailBoxSession for user: %s on server: %s, %d message(s)&gt;'</FONT> % (
+                self.user, self.server, self.msgCnt)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="scan"><FONT COLOR=#CC0000><B> scan</B></FONT></A>(self):
+        <FONT COLOR=#115511>''' Scans mail box for new messages.
+            @return: (message count, message size) [also stored in
+                     self.msgCnt, self.msgSize]
+        '''</FONT>
+        self.msgCnt, self.msgSize = self.pop.stat()
+        <FONT COLOR=#3333CC><B>return</B></FONT> (self.msgCnt, self.msgSize)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getMsg"><FONT COLOR=#CC0000><B> getMsg</B></FONT></A>(self, msgNo=1, removeIt=false):
+        <FONT COLOR=#115511>''' Reads and returns the &lt;msgNo&gt;th pending message.
+
+            "Remove" it from server if C{removeIt} true [see L{removeMsg()}]
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> (0 &lt; msgNo &lt;= self.msgCnt):
+            <FONT COLOR=#3333CC><B>raise</B></FONT> ValueError(<FONT COLOR=#115511>'No such message number (%s)'</FONT> % msgNo)
+        r = self.pop.retr(msgNo) <FONT COLOR=#1111CC># -&gt; (server response, lines list, msg length)</FONT>
+        msg = Message(r[2], r[1])
+
+        <FONT COLOR=#3333CC><B>if</B></FONT> removeIt:
+            self.removeMsg(msgNo)
+            self.scan()
+        <FONT COLOR=#3333CC><B>return</B></FONT> msg
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="removeMsg"><FONT COLOR=#CC0000><B> removeMsg</B></FONT></A>(self, msgNo=1):
+        <FONT COLOR=#115511>''' Removes the C{msgNo}th pending message from the mailBox.
+
+            NB: the msg appears (to scan) as deleted, but deletion is effective
+            only on close [see L{quit()}]
+        '''</FONT>
+        self.pop.dele(msgNo)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="quit"><FONT COLOR=#CC0000><B> quit</B></FONT></A>(self):
+        <FONT COLOR=#115511>'''
+        Commits changes, unlock/close mail box & connection.
+
+        B{Must} be called to commit changes! After this call, the object
+        is no more functional!
+        '''</FONT>
+        self.pop.quit()
+        trace(<FONT COLOR=#115511>'(session closed with %s, changes committed if any)...'</FONT> %
+                                                                self.server)
+
+
+<FONT COLOR=#1111CC># Argument parsing:</FONT>
+<FONT COLOR=#1111CC># ----------------</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="parseArgs"><FONT COLOR=#CC0000><B> parseArgs</B></FONT></A>(argString):
+    <FONT COLOR=#115511>'''
+    Parses a shell command argument string into a sys.argv-style list of 
+    args.
+
+    Handle the case of args enclosed into "" and including spaces (such as
+    file names).
+
+    @param argString: argument string to parse.
+    @return: list of args
+    '''</FONT>
+    <FONT COLOR=#3333CC><B>import</B></FONT> types
+    <FONT COLOR=#3333CC><B>if</B></FONT> type(argString) != types.StringType:
+        <FONT COLOR=#3333CC><B>raise</B></FONT> TypeError(<FONT COLOR=#115511>'arg must be a string'</FONT>)
+
+    argList = []    <FONT COLOR=#1111CC># target argument list</FONT>
+    subArgs = []    <FONT COLOR=#1111CC># args enclosed by "" and including spaces</FONT>
+                    <FONT COLOR=#1111CC># must be concatenated</FONT>
+    <FONT COLOR=#3333CC><B>for</B></FONT> arg <FONT COLOR=#3333CC><B>in</B></FONT> string.split(argString):
+        <FONT COLOR=#3333CC><B>if</B></FONT> arg[0] == <FONT COLOR=#115511>'"'</FONT>:
+            <FONT COLOR=#3333CC><B>if</B></FONT> subArgs: argList.append(string.join(subArgs))
+            subArgs.append(arg[1:])
+        <FONT COLOR=#3333CC><B>elif</B></FONT> arg[-1] == <FONT COLOR=#115511>'"'</FONT>:
+            subArgs.append(arg[:-1])
+            argList.append(string.join(subArgs))
+            subArgs = []
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#3333CC><B>if</B></FONT> subArgs:
+                subArgs.append(arg)
+            <FONT COLOR=#3333CC><B>else</B></FONT>:
+                argList.append(arg)
+    <FONT COLOR=#3333CC><B>if</B></FONT> subArgs:                      <FONT COLOR=#1111CC># missing closing "</FONT>
+        argList.append(string.join(subArgs))
+    <FONT COLOR=#3333CC><B>return</B></FONT> argList
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_strip2Quotes"><FONT COLOR=#CC0000><B> _strip2Quotes</B></FONT></A>(s):
+    <FONT COLOR=#115511>''' Strip "" around string &lt;s&gt; if any.
+    '''</FONT>
+    <FONT COLOR=#3333CC><B>try</B></FONT>:
+        <FONT COLOR=#3333CC><B>if</B></FONT> s[0]==s[-1]==<FONT COLOR=#115511>'"'</FONT>:
+            s = s[1:-1]
+    <FONT COLOR=#3333CC><B>except</B></FONT>:
+        <FONT COLOR=#3333CC><B>pass</B></FONT>
+    <FONT COLOR=#3333CC><B>return</B></FONT> s
+
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC>#                               T E S T S</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="testScan"><FONT COLOR=#CC0000><B> testScan</B></FONT></A>():
+    <FONT COLOR=#3333CC><B>import</B></FONT> os, tempfile
+    log = os.path.join(tempfile.gettempdir(), <FONT COLOR=#115511>'mailscan.log'</FONT>)
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'(log is in file %s)'</FONT> % log
+    s = MailScanner(<FONT COLOR=#115511>'-f 10 -v 0 -l "%s"'</FONT> % log)
+    <FONT COLOR=#3333CC><B>return</B></FONT> s
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="testMailBox"><FONT COLOR=#CC0000><B> testMailBox</B></FONT></A>(user, passwd=<FONT COLOR=#115511>''</FONT>):
+    setVerbosity(100)
+    mb = MailBoxSession(user=user, passwd=passwd)
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'%s message(s) in mailBox "%s":'</FONT> % (mb.msgCnt, mb.user)
+    <FONT COLOR=#3333CC><B>for</B></FONT> msgNo <FONT COLOR=#3333CC><B>in</B></FONT> range(1, min(mb.msgCnt+1, 40)):
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'\n*** Message #%d'</FONT> % msgNo
+        msg = mb.getMsg(msgNo, removeIt=false)
+        <FONT COLOR=#3333CC><B>print</B></FONT> msg
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'message has %d part(s):'</FONT> % len(msg.parts)
+        <FONT COLOR=#3333CC><B>for</B></FONT> part <FONT COLOR=#3333CC><B>in</B></FONT> msg.parts:
+            <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'\n============================================'</FONT>
+            <FONT COLOR=#3333CC><B>print</B></FONT> part
+
+    mb.quit()
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC>#                               M A I N</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__ == <FONT COLOR=#115511>"__main__"</FONT>:
+    testMailBox(<FONT COLOR=#115511>'rgruet'</FONT>)
+    <FONT COLOR=#1111CC>#s = testScan()</FONT>
+</PRE>
+                  <!--footer-->
+                  </BODY>

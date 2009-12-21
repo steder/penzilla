@@ -1,0 +1,41 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#3333CC><B>import</B></FONT> os, glob
+
+<FONT COLOR=#1111CC># Gather up all the files we need.</FONT>
+
+files = glob.glob(<FONT COLOR=#115511>"*.c"</FONT>)
+files += glob.glob(<FONT COLOR=#115511>"*.i"</FONT>) 
+
+<FONT COLOR=#1111CC>## Distutils Script</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#3333CC><B>from</B></FONT> distutils.core <FONT COLOR=#3333CC><B>import</B></FONT> setup, Extension
+
+<FONT COLOR=#1111CC># Some useful directories.  </FONT>
+<FONT COLOR=#3333CC><B>from</B></FONT> distutils.sysconfig <FONT COLOR=#3333CC><B>import</B></FONT> get_python_inc, get_python_lib
+
+python_incdir = os.path.join( get_python_inc(plat_specific=1) )
+python_libdir = os.path.join( get_python_lib(plat_specific=1) )
+
+setup(name=<FONT COLOR=#115511>"NumPtr"</FONT>,
+      version=<FONT COLOR=#115511>"1.0a"</FONT>,
+      description=<FONT COLOR=#115511>"CliMT - CSC Climate Modeling Toolkit"</FONT>,
+      author=<FONT COLOR=#115511>"Rodrigo Caballero"</FONT>,
+      author_email=<FONT COLOR=#115511>"rca@geosci.uchicago.edu"</FONT>,
+      url=<FONT COLOR=#115511>"http://geosci.uchicago.edu/~rca/climt.tar"</FONT>,
+      ext_modules = [Extension(<FONT COLOR=#115511>'_NumPtr'</FONT>,
+                               files,
+                               include_dirs=[python_incdir],
+                               library_dirs=[python_libdir],
+                               ),
+                     ],
+      <FONT COLOR=#1111CC># Install these to their own directory</FONT>
+      <FONT COLOR=#1111CC>#   *I want to be able to remove them if I screw up this script</FONT>
+      <FONT COLOR=#1111CC>#   *"Sandboxing", if you will</FONT>
+      extra_path = <FONT COLOR=#115511>'NumPtr'</FONT>,
+      py_modules=[<FONT COLOR=#115511>"NumPtr"</FONT>,<FONT COLOR=#115511>"test"</FONT>],
+     )
+</PRE>
+                  <!--footer-->
+                  </BODY>

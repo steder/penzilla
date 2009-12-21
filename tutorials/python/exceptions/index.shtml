@@ -1,0 +1,70 @@
+<html>
+<title>Introduction to Python:  Exceptions</title>
+<body>
+<h2>An Introduction to Python:  Exceptions</h2>
+<h3><font color="blue">Exceptions</font></h3>
+<a href="../index.html">Table of Contents</a>
+<hr><!--^Header^-->
+<h4><font color="green">Ooops!</font></h4>
+
+<P>It's easy to think of exceptions as a boring topic.  Indeed, error checking is not terribly 
+interesting, except when you actually want to make sure that your code works when it's supposed to.  
+Anytime you've had a program crash while you were using it you've probably wished there was a way
+to prevent that crash from happening.
+
+<P>That's exactly what extensions do!  
+
+<P>Don't get your hopes up too much just yet.  Exception handling code cannot prevent all crashes 
+for a number of reaons.  For instance, not all problems can be predicted and checked for, and sometimes
+the user does something that you couldn't prepare for, such as kill your program while it is running.
+Sometimes the best you can do with exception handling is just exit <i>gracefully</i>.  And that's what they
+are really there for.  Exceptions aren't the magic bullet that makes all design problems with your program 
+disappear, or prevent your program from ever crashing, but they enable your code to exit cleanly if errors
+occur, and help your code become a nice digital denizen.
+
+<h4><font color="green">Enough!  Show us some code!</font></h4>
+
+<P>Sorry about that.  First off let's write a simple program with some flaws.  This program
+needs input from the user.  And we all know that the <i>"user"</i> is out to get us a crash our
+program, so we'll try to use exceptions to deal with our input.
+
+<P>Here's the program without exceptions:
+
+<!--Include Sourcecode-->
+<ul><!--#include virtual="simplesieve.py.html"--></ul>
+
+<P>Now there are a number of ways that this program could fail.  For instance, the user could enter 
+a string, like there name, or their birthday or something.  A negative number would cause the program to 
+crash when it attempts to allocate a Numeric array of negative size.  There are less obvious but still 
+important problems like what happens if the Numeric library isn't available or isn't working on 
+your users system?
+
+<P>This next version uses exception handling to fix some of these problems.  Notice that we havne't gotten
+into raising our own exceptions yet.  That's something we'll do a little later.
+
+<ul><!--#include virtual="safesieve.py.html"--></ul>
+
+<P>Notice the various ways you can handle errors with exceptions.  You can simply return default values
+if something goes wrong as I do at the beginning of the <font color="blue">sieve</font> method, or 
+you can have a more general error message to the user like I have in <font color="blue">main</font>.
+Notice the exceptions handling code wrapped around the call to <font color="blue">main</font> and
+the <b>import Numeric</b> statement.  These are common and useful techniques to both document and
+check for errors.
+
+<h4><font color="green">Our own exceptions</font></h4>
+
+<P>In serious code it becomes useful to create your own exceptions for all sorts of things.  Sometimes
+exceptions are used simple to transfer control from one place in the code to another, just like branch.
+Sometimes they are used just to deal with specific error conditions within the code itself.
+
+<P>Here's an example showing how to define and raise a simple exception.  More serious use of the exceptions
+will be postponed for later discussion.  Please send me an e-mail if you are curious about using exceptions
+in this way.
+
+<ul><!--#include virtual="myexception.py.html"--></ul>
+
+<!--\/Footer\/-->
+<hr>
+<a href="../index.html">Table of Contents</a>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#3333CC><B>import</B></FONT> Tkinter
+<FONT COLOR=#3333CC><B>import</B></FONT> dmTxt2Html
+<FONT COLOR=#3333CC><B>import</B></FONT> string, os, traceback
+
+Label = Tkinter.Label
+StringVar = Tkinter.StringVar
+dmTxt2Html.promo = string.replace(dmTxt2Html.promo, dmTxt2Html.cgi_home, <FONT COLOR=#115511>''</FONT>)
+
+<FONT COLOR=#1111CC>#-- Create some module scope global variables</FONT>
+root, history_frame, menu_frame, info_line = (None, None, None, None)
+history_list = []
+target, source, proxy_mode, conversion = (None, None, None, None)
+counter = 0
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="file_menu"><FONT COLOR=#CC0000><B> file_menu</B></FONT></A>():
+    file_btn = Tkinter.Menubutton(menu_frame, text=<FONT COLOR=#115511>'File'</FONT>, underline=0)
+    file_btn.pack(side=Tkinter.LEFT, padx=<FONT COLOR=#115511>"2m"</FONT>)
+    file_btn.menu = Tkinter.Menu(file_btn)
+    file_btn.menu.add_command(label=<FONT COLOR=#115511>"Source"</FONT>, underline=0, command=GetSource)
+    file_btn.menu.add_command(label=<FONT COLOR=#115511>"Target"</FONT>, underline=0, command=GetTarget)
+    file_btn.menu.add(<FONT COLOR=#115511>'separator'</FONT>)
+
+    <FONT COLOR=#1111CC>#-- types submenu (radio buttons)</FONT>
+    file_btn.menu.types = Tkinter.Menu(file_btn.menu)
+    file_btn.menu.types.add_radiobutton(label=<FONT COLOR=#115511>'HTML'</FONT>,
+                                        variable=conversion, command=update_specs)
+    file_btn.menu.types.add_radiobutton(label=<FONT COLOR=#115511>'PYTHON'</FONT>,
+                                        variable=conversion, command=update_specs)
+    file_btn.menu.types.add_radiobutton(label=<FONT COLOR=#115511>'FAQ'</FONT>,
+                                        variable=conversion, command=update_specs)
+    file_btn.menu.types.add_radiobutton(label=<FONT COLOR=#115511>'SMART_ASCII'</FONT>,
+                                        variable=conversion, command=update_specs)
+    file_btn.menu.types.add_radiobutton(label=<FONT COLOR=#115511>'RAW'</FONT>,
+                                        variable=conversion, command=update_specs)
+    file_btn.menu.types.add_radiobutton(label=<FONT COLOR=#115511>'INFER'</FONT>,
+                                        variable=conversion, command=update_specs)
+    file_btn.menu.add_cascade(label=<FONT COLOR=#115511>"Type"</FONT>, menu=file_btn.menu.types)
+
+    <FONT COLOR=#1111CC>#-- proxy mode submenu (radio buttons)</FONT>
+    file_btn.menu.proxy = Tkinter.Menu(file_btn.menu)
+    file_btn.menu.proxy.add_radiobutton(label=<FONT COLOR=#115511>'NAVIGATOR'</FONT>,
+                                        variable=proxy_mode, command=update_specs)
+    file_btn.menu.proxy.add_radiobutton(label=<FONT COLOR=#115511>'TRAP_LINKS'</FONT>,
+                                        variable=proxy_mode, command=update_specs)
+    file_btn.menu.proxy.add_radiobutton(label=<FONT COLOR=#115511>'ALL'</FONT>,
+                                        variable=proxy_mode, command=update_specs)
+    file_btn.menu.proxy.add_radiobutton(label=<FONT COLOR=#115511>'NONE'</FONT>,
+                                        variable=proxy_mode, command=update_specs)
+    file_btn.menu.add_cascade(label=<FONT COLOR=#115511>"Proxy Mode"</FONT>, menu=file_btn.menu.proxy)
+
+    file_btn.menu.add(<FONT COLOR=#115511>'separator'</FONT>)
+    file_btn.menu.add_command(label=<FONT COLOR=#115511>'Exit'</FONT>, underline=0, command=file_btn.quit)
+    file_btn[<FONT COLOR=#115511>'menu'</FONT>] = file_btn.menu
+    <FONT COLOR=#3333CC><B>return</B></FONT> file_btn
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="action_menu"><FONT COLOR=#CC0000><B> action_menu</B></FONT></A>():
+    action_btn = Tkinter.Menubutton(menu_frame, text=<FONT COLOR=#115511>'Action'</FONT>, underline=0,)
+    action_btn.pack(side=Tkinter.LEFT, padx=<FONT COLOR=#115511>"2m"</FONT>)
+    action_btn.menu = Tkinter.Menu(action_btn)
+    action_btn.menu.add_command(label=<FONT COLOR=#115511>'Convert!!'</FONT>, underline=0, command=doit_func)
+    action_btn.menu.add(<FONT COLOR=#115511>'separator'</FONT>)
+    action_btn.menu.add_command(label=<FONT COLOR=#115511>"Squeeze History"</FONT>, underline=0, command=clear_history)
+    action_btn[<FONT COLOR=#115511>'menu'</FONT>] = action_btn.menu
+    <FONT COLOR=#3333CC><B>return</B></FONT> action_btn
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="help_menu"><FONT COLOR=#CC0000><B> help_menu</B></FONT></A>():
+    help_btn = Tkinter.Menubutton(menu_frame, text=<FONT COLOR=#115511>'Help'</FONT>, underline=0,)
+    help_btn.pack(side=Tkinter.LEFT, padx=<FONT COLOR=#115511>"2m"</FONT>)
+    help_btn.menu = Tkinter.Menu(help_btn)
+    help_btn.menu.add_command(label=<FONT COLOR=#115511>"How To"</FONT>, underline=0, command=HowTo)
+    help_btn.menu.add_command(label=<FONT COLOR=#115511>"About"</FONT>, underline=0, command=About)
+    help_btn[<FONT COLOR=#115511>'menu'</FONT>] = help_btn.menu
+    <FONT COLOR=#3333CC><B>return</B></FONT> help_btn
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="HowTo"><FONT COLOR=#CC0000><B> HowTo</B></FONT></A>():
+    view_window = Tkinter.Toplevel(root)
+    view_window.title(<FONT COLOR=#115511>'Txt2Html Help'</FONT>)
+    help_text = open(<FONT COLOR=#115511>'txt2html.txt'</FONT>).read()
+    text = Tkinter.Text(view_window, height=40, width=110)
+    scroll = Tkinter.Scrollbar(view_window, command=text.yview)
+    text.configure(yscrollcommand=scroll.set)
+    text.tag_configure(<FONT COLOR=#115511>'fixed'</FONT>, font=(<FONT COLOR=#115511>'Courier'</FONT>, 10))
+    text.insert(Tkinter.END, help_text, <FONT COLOR=#115511>'fixed'</FONT>)
+    text.pack(side=Tkinter.LEFT)
+    scroll.pack(side=Tkinter.RIGHT, fill=Tkinter.Y)
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="About"><FONT COLOR=#CC0000><B> About</B></FONT></A>():
+    view_window = Tkinter.Toplevel(root)
+    about_text = <FONT COLOR=#115511>"TK_Txt2Html version 0.1 \n\nRelease to the Public Domain"</FONT>
+    Tkinter.Message(view_window,
+                    text=about_text,
+                    justify=Tkinter.CENTER,
+                    anchor=Tkinter.CENTER,
+                    relief=Tkinter.GROOVE,
+                    width=250).pack(padx=10, pady=10)
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="GetSource"><FONT COLOR=#CC0000><B> GetSource</B></FONT></A>():
+    get_window = Tkinter.Toplevel(root)
+    get_window.title(<FONT COLOR=#115511>'Source File?'</FONT>)
+    Tkinter.Entry(get_window, width=30,
+                  textvariable=source).pack(side=Tkinter.LEFT, padx=5, pady=5)
+    Tkinter.Button(get_window, text=<FONT COLOR=#115511>"Change"</FONT>,
+                   command=<FONT COLOR=#3333CC><B>lambda</B></FONT>: update_specs()).pack(side=Tkinter.LEFT, padx=5, pady=5)
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="GetTarget"><FONT COLOR=#CC0000><B> GetTarget</B></FONT></A>():
+    get_window = Tkinter.Toplevel(root)
+    get_window.title(<FONT COLOR=#115511>'Target File?'</FONT>)
+    Tkinter.Entry(get_window, width=30,
+                  textvariable=target).pack(side=Tkinter.LEFT, padx=5, pady=5)
+    Tkinter.Button(get_window, text=<FONT COLOR=#115511>"Change"</FONT>,
+                   command=<FONT COLOR=#3333CC><B>lambda</B></FONT>: update_specs()).pack(side=Tkinter.LEFT, padx=5, pady=5)
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="doit_func"><FONT COLOR=#CC0000><B> doit_func</B></FONT></A>():
+    <FONT COLOR=#3333CC><B>global</B></FONT> counter
+    counter = counter+1
+    update_specs()
+    dmTxt2Html.main({<FONT COLOR=#115511>'type'</FONT>: conversion.get(),
+                     <FONT COLOR=#115511>'proxy'</FONT>: proxy_mode.get(),
+                     <FONT COLOR=#115511>'source'</FONT>: source.get(),
+                     <FONT COLOR=#115511>'target'</FONT>: target.get()})
+    show_run()
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="update_specs"><FONT COLOR=#CC0000><B> update_specs</B></FONT></A>():
+    <FONT COLOR=#3333CC><B>global</B></FONT> conversion
+    <FONT COLOR=#3333CC><B>if</B></FONT> conversion.get() <FONT COLOR=#3333CC><B>in</B></FONT> (<FONT COLOR=#115511>'INFER'</FONT>, <FONT COLOR=#115511>''</FONT>):
+        conversion.set(dmTxt2Html.infer_type(source.get()))
+
+    Label(info_line, text=<FONT COLOR=#115511>"Next"</FONT>, width=5,
+          relief=Tkinter.GROOVE, background=<FONT COLOR=#115511>"gray90"</FONT>).grid(row=0, column=0)
+    Label(info_line, text=source.get(), width=20,
+          relief=Tkinter.GROOVE, background=<FONT COLOR=#115511>"gray90"</FONT>).grid(row=0, column=1)
+    Label(info_line, text=target.get(), width=20,
+          relief=Tkinter.GROOVE, background=<FONT COLOR=#115511>"gray90"</FONT>).grid(row=0, column=2)
+    Label(info_line, text=conversion.get(), width=20,
+          relief=Tkinter.GROOVE, background=<FONT COLOR=#115511>"gray90"</FONT>).grid(row=0, column=3)
+    Label(info_line, text=proxy_mode.get(), width=20,
+          relief=Tkinter.GROOVE, background=<FONT COLOR=#115511>"gray90"</FONT>).grid(row=0, column=4)
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="show_run"><FONT COLOR=#CC0000><B> show_run</B></FONT></A>():
+    <FONT COLOR=#3333CC><B>global</B></FONT> history_list
+    hist_line = Tkinter.Frame(history_frame)
+    hist_line.pack(side=Tkinter.TOP, padx=2, pady=2)
+    Label(hist_line, text=str(counter), width=5,
+          relief=Tkinter.SUNKEN).grid(row=0, column=0)
+    Label(hist_line, text=source.get(), width=20,
+          relief=Tkinter.SUNKEN).grid(row=0, column=1)
+    Label(hist_line, text=target.get(), width=20,
+          relief=Tkinter.SUNKEN).grid(row=0, column=2)
+    Label(hist_line, text=conversion.get(), width=20,
+          relief=Tkinter.SUNKEN).grid(row=0, column=3)
+    Label(hist_line, text=proxy_mode.get(), width=20,
+          relief=Tkinter.SUNKEN).grid(row=0, column=4)
+    history_list.append(hist_line)
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="init_vars"><FONT COLOR=#CC0000><B> init_vars</B></FONT></A>():
+    <FONT COLOR=#3333CC><B>global</B></FONT> target, source, proxy_mode, conversion
+    source = Tkinter.StringVar()
+    target = Tkinter.StringVar()
+    proxy_mode = Tkinter.StringVar()
+    conversion = Tkinter.StringVar()
+    target.set(<FONT COLOR=#115511>'default.html'</FONT>)
+    source.set(<FONT COLOR=#115511>'txt2html.txt'</FONT>)
+    proxy_mode.set(<FONT COLOR=#115511>'NONE'</FONT>)
+    conversion.set(<FONT COLOR=#115511>'INFER'</FONT>)
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="clear_history"><FONT COLOR=#CC0000><B> clear_history</B></FONT></A>():
+    <FONT COLOR=#3333CC><B>for</B></FONT> history_line <FONT COLOR=#3333CC><B>in</B></FONT> history_frame.pack_slaves()[:-1]:
+        history_line.destroy()
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="main"><FONT COLOR=#CC0000><B> main</B></FONT></A>():
+    <FONT COLOR=#3333CC><B>global</B></FONT> root, history_frame, info_line, menu_frame
+    root = Tkinter.Tk()
+    root.option_readfile(<FONT COLOR=#115511>'optionDB'</FONT>)
+    root.title(<FONT COLOR=#115511>'Txt2Html TK Shell'</FONT>)
+    init_vars()
+
+
+    <FONT COLOR=#1111CC>#-- Create the menu frame, and add menus to the menu frame</FONT>
+    menu_frame = Tkinter.Frame(root)
+    menu_frame.pack(fill=Tkinter.X, side=Tkinter.TOP)
+    menu_frame.tk_menuBar(file_menu(), action_menu(), help_menu())
+
+    <FONT COLOR=#1111CC>#-- Create the history frame (to be filled in during runtime)</FONT>
+    history_frame = Tkinter.Frame(root)
+    history_frame.pack(fill=Tkinter.X, side=Tkinter.BOTTOM, pady=2)
+
+    <FONT COLOR=#1111CC>#-- Create the info frame and fill with initial contents</FONT>
+    info_frame = Tkinter.Frame(root)
+    info_frame.pack(fill=Tkinter.X, side=Tkinter.BOTTOM)
+
+    <FONT COLOR=#1111CC># first put the column labels in a sub-frame</FONT>
+    label_line = Tkinter.Frame(info_frame, relief=Tkinter.RAISED, borderwidth=1)
+    label_line.pack(side=Tkinter.TOP, padx=2, pady=1)
+    Label(label_line, text=<FONT COLOR=#115511>"Run #"</FONT>, width=5, background=<FONT COLOR=#115511>"lightblue"</FONT>).grid(row=0, column=0)
+    Label(label_line, text=<FONT COLOR=#115511>"Source:"</FONT>, width=20, background=<FONT COLOR=#115511>"lightblue"</FONT>).grid(row=0, column=1)
+    Label(label_line, text=<FONT COLOR=#115511>"Target:"</FONT>, width=20, background=<FONT COLOR=#115511>"lightblue"</FONT>).grid(row=0, column=2)
+    Label(label_line, text=<FONT COLOR=#115511>"Type:"</FONT>, width=20, background=<FONT COLOR=#115511>"lightblue"</FONT>).grid(row=0, column=3)
+    Label(label_line, text=<FONT COLOR=#115511>"Proxy Mode:"</FONT>, width=20, background=<FONT COLOR=#115511>"lightblue"</FONT>).grid(row=0, column=4)
+
+    <FONT COLOR=#1111CC># then put the "next run" information in a sub-frame</FONT>
+    info_line = Tkinter.Frame(info_frame)
+    info_line.pack(side=Tkinter.TOP, padx=2, pady=1)
+    update_specs()
+
+    <FONT COLOR=#1111CC>#-- Finally, let's actually do all that stuff created above</FONT>
+    root.mainloop()
+
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>'__main__'</FONT>:
+    <FONT COLOR=#3333CC><B>try</B></FONT>:
+        main()
+    <FONT COLOR=#3333CC><B>except</B></FONT>:
+        traceback.print_exc()
+
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

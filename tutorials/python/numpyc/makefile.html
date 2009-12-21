@@ -1,0 +1,25 @@
+<html>
+<head>
+  <title>Makefile</title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<pre>
+<font color="2040a0">CC=</font>gcc
+<font color="2040a0">PYTHON_INCLUDE=</font>/usr/include/python2.4
+<font color="2040a0">PYTHON_LIBRARY=</font>/usr/lib/python2.4
+<font color="8b2252">
+<strong>default</strong>:</font> myarray.so
+<font color="8b2252">
+<strong>myarray.so</strong>:</font> mymodule.c
+	<font color="2040a0">$(CC)</font> -fPIC -I<font color="2040a0">$(PYTHON_INCLUDE)</font>  -c mymodule.c -o mymodule.o
+	<font color="2040a0">$(CC)</font> -shared mymodule.o -o _myarray.so -L<font color="2040a0">$(PYTHON_LIBRARY)</font> -lpython2.4
+<font color="8b2252">
+<strong>clean</strong>:</font>
+	rm mymodule.o
+	rm -rf _myarray.so
+
+</pre>
+<hr>
+syntax highlighted by <a href="http://www.palfrader.org/code2html">Code2HTML</a>, v. 0.9.1
+</body>
+</html>

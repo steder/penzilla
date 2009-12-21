@@ -1,0 +1,39 @@
+<html>
+<title>Introduction to Python:  Parallel Python</title>
+<body>
+<h2>An Introduction to Python:  Parallel Python</h2>
+<h3><font color="blue">Python for Supercomputers</font></h3>
+<a href="../index.html">Table of Contents</a>
+<hr><!--^Header^-->
+<h4><font color="green">PyMPI</font></h4>
+
+<P>That's right, Python isn't just for personal computers.  Large computer clusters, with hundreds (maybe even thousands) or processors can make use of python as well.  Thanks to projects like <a href="http://pympi.sourceforge.net/">pyMPI</a>.  
+<P>MPI, the <b>M</b>essage <b>P</b>assing <b>I</b>nterface, is a standard defining how a number of processors can communicate to work together and solve problems.  MPI is extremely general because it relies on the simple concept of sending and receiving messages to keep all the processors synchronized.
+<P><i>Note:  When I refer to processors, I'm not necessarily referring to actual CPU's (<b>Central</b> <b>P</b>rocessing <b>U</b>nits.  MPI is general enough that a 4 "procesor" machine could be a network of 4 computers, a single computer with 4 CPU's, or 2 machines each with 2 CPU's, etc.</i>
+
+<h4><font color="green">An example</font></h4>
+<P>Parallel programming is a difficult topic to cover, and so I'm mostly going to avoid it.  I'd be happy to try to do more to explain, but I think that examples are best.  Hopefully this will allow people who are familiar with parallel programming to wrap their head around doing it in Python.  For those of you who aren't parallel computing junkies this might pique your interest.  Anyway, on to our first example...
+
+<P>The concept is simple, I have a list containing a large number of numbers.  For example purposes we are going to deal with a small set, but in reality this operation would only be worthwhile if we had a large amount of data to process.
+
+<P>Now what I'd like to do is find the maximum of this set of numbers as quickly as possible.  So what I'm going to do is break the set into as many pieces as I have processors, and then I'm going to have each processor compute it's maximum.  Then the main processor with gather these maximums and select the maximum of them.
+
+<ul><!--#include virtual="max.py.html"--></ul>
+
+<P>You'll hopefully notice a number of things about this example that seem a little silly.  For instance, anyone could see the answer is 1000 from looking at the first line.  Also, we are only running this program when the number of available processors evenly divides the size of the problem daomin (in this case only numbers that evenly divide 1000, like 2, 5, 10, etc ).  It's important to note that you can deal with splitting up the domain on unusual numbers of processors however you like, I just didn't bother in this case.
+
+<P>More importantly you will hopefully notice the 3 or 4 mpi calls in this little program.  In this case I only use the mpi.rank, and mpi.size values of the mpi module, and a single function, mpi.gather, which is used to gather data to the main processor(Processor 0, by convention.  Hence the check for if(mpi.rank == 0)).
+
+<h4><font color="green">Monte Carlo Calculation of Pi</font></h4>
+
+<P>Below is a simple implementation of a commono MPI example, the parallel calculation of Pi using the Monte Carlo method.
+
+<!--Include Sourcecode-->
+<ul><!--#include virtual="montecarlo.py.html"--></ul>
+
+<P>That's it for now.  I'll try to post more if I get any e-mail about this page.  I hope it's at least interesting.
+<!--\/Footer\/-->
+<hr>
+<a href="../index.html">Table of Contents</a>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#115511>"""
+Protocol.py
+---
+Defines the BobChat Protocol:
+Message Objects,
+Protocol Constants,
+Commands.
+"""</FONT>
+
+<FONT COLOR=#115511>"""
+Protocol Constants
+"""</FONT>
+
+<FONT COLOR=#115511>"""
+Command List
+"""</FONT>
+COMMANDS = {<FONT COLOR=#115511>"KICK"</FONT>:<FONT COLOR=#115511>"Kick a user out of the Chatroom."</FONT>,
+            <FONT COLOR=#1111CC># &lt;KICK&gt;username&lt;/KICK&gt;</FONT>
+            <FONT COLOR=#115511>"QUIT"</FONT>:<FONT COLOR=#115511>"Kill the server, disconnect everyone, and shutdown."</FONT>,
+            <FONT COLOR=#1111CC># &lt;QUIT&gt;</FONT>
+            <FONT COLOR=#115511>"EXIT"</FONT>:<FONT COLOR=#115511>"Inform all you're quitting the chat, then quit."</FONT>,
+            <FONT COLOR=#1111CC># &lt;EXIT&gt;</FONT>
+            <FONT COLOR=#115511>"PRIVATE"</FONT>:<FONT COLOR=#115511>"Send a private message to the specified user."</FONT>,
+            <FONT COLOR=#1111CC># &lt;PRIVATE&gt;username&lt;/PRIVATE&gt; </FONT>
+            <FONT COLOR=#115511>"_WRITE_"</FONT>:<FONT COLOR=#115511>"Internal Command, setup Write Socket"</FONT>,
+            <FONT COLOR=#1111CC># &lt;_WRITE_&gt;</FONT>
+            <FONT COLOR=#115511>"_READ_"</FONT>:<FONT COLOR=#115511>"Internal Command, setup Read Socket"</FONT>,
+            <FONT COLOR=#1111CC># &lt;_READ_&gt;</FONT>
+            <FONT COLOR=#115511>"JOIN"</FONT>:<FONT COLOR=#115511>"Politely Join the Chat"</FONT>,
+            <FONT COLOR=#1111CC># &lt;JOIN&gt;username&lt;/JOIN&gt;</FONT>
+            <FONT COLOR=#115511>"NICK"</FONT>:<FONT COLOR=#115511>"Change your Nickname/Username"</FONT>,
+            <FONT COLOR=#1111CC># &lt;NICK&gt;newname&lt;/NICK</FONT>
+            <FONT COLOR=#115511>"EMOTE"</FONT>:<FONT COLOR=#115511>"This one is for Rob Jacob"</FONT>}
+            <FONT COLOR=#1111CC># &lt;EMOTE&gt;emote type message&lt;/EMOTE&gt;</FONT>
+COMMANDLIST = COMMANDS.keys()
+MESSAGETYPES=[<FONT COLOR=#115511>'Message'</FONT>,<FONT COLOR=#115511>'Command'</FONT>,<FONT COLOR=#115511>'ServerCommand'</FONT>]
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="splitCommand"><FONT COLOR=#CC0000><B> splitCommand</B></FONT></A>(command):
+    <FONT COLOR=#115511>"""
+    Called by the Server if self.type == 1 or 2
+    Returns a tuple of the Name of the Command,
+    and the argument that command requires, if anything.
+    Kick takes a username,
+    Exit takes a message,
+    Private takes a username, etc.
+    """</FONT>
+    cmd = command.split(<FONT COLOR=#115511>"&lt;"</FONT>)
+    <FONT COLOR=#1111CC># cmd = ["ANY&gt;ANYTHING","/ANY&gt;"]</FONT>
+    cmd = cmd[1].split(<FONT COLOR=#115511>"&gt;"</FONT>) <FONT COLOR=#1111CC># cmd[0]=="ANY&gt;ANYTHING"</FONT>
+    <FONT COLOR=#1111CC># cmd = ["ANY","ANYTHING"]</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> len(cmd) &gt; 1:
+        <FONT COLOR=#3333CC><B>return</B></FONT> (cmd[0],cmd[1]) <FONT COLOR=#1111CC># ( Command Type, Value )</FONT>
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#3333CC><B>return</B></FONT> (cmd[0],)
+
+<FONT COLOR=#115511>"""
+Bob Message Objects
+"""</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Message"><FONT COLOR=#CC0000><B> Message</B></FONT></A>:
+    <FONT COLOR=#115511>"""
+    Message( username, message[, command, password] )
+
+    Examples of Usage:
+    1).  msg = Message('steder', 'Hey Phil, how's it going?')
+      This creates a message in this format and sends it to the
+      server, which timestamps it and returns it to all clients.
+      It is then interpreted by the read client process into:
+      'steder(4:03:21pm):  Hey Phil, how\'s it going?'
+    2).  cmd = Message('steder', 'I'm out of here, bis spater!', '&lt;EXIT&gt;')
+      This creates a message like the above command, the message is
+      simply printed as a comment.  It's really just a placeholder
+      for the executed command.  In this case, &lt;EXIT&gt; is just an example
+      (I'm not settled on a command syntax yet), but intuitively
+      this is the command a client sends when it wishes to disconnect
+      from the chat.
+      So the message object arrives at the server, and the &lt;EXIT&gt;
+      is interpreted, which generates a message in this way:
+      a).  Lookup command('&lt;EXIT&gt;')
+      b).  'User '+username+' has left, saying:'+message
+        'User steder has left, saying: I'm out of here, bis spater!'
+    3).  servercommand = Message('root','Server is going down for maintenance',
+    '&lt;QUIT&gt;','2l33t')
+      OR
+      bootmsg = Message('moderator', 'Die annoying guy!', '&lt;KICK&gt;AnnoyingGuy&lt;/KICK&gt;', 'r0xx0r')
+    """</FONT>
+    MESSAGETYPES=[<FONT COLOR=#115511>'Message'</FONT>,<FONT COLOR=#115511>'Command'</FONT>,<FONT COLOR=#115511>'ServerCommand'</FONT>]
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, username, message, command=None, password=None):
+        self.username = username
+        self.message = message
+        self.command = command
+        self.password = password
+        <FONT COLOR=#3333CC><B>if</B></FONT> command != None <FONT COLOR=#3333CC><B>and</B></FONT> password != None:
+            <FONT COLOR=#1111CC># Server Command</FONT>
+            self.type = 2
+        <FONT COLOR=#3333CC><B>elif</B></FONT> command != None:
+            <FONT COLOR=#1111CC># Client Command</FONT>
+            self.type = 1
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#1111CC># Message</FONT>
+            self.type = 0
+        <FONT COLOR=#1111CC># A timestamp variable.</FONT>
+        <FONT COLOR=#1111CC># All messages are touched by the server,</FONT>
+        <FONT COLOR=#1111CC># which places a timestamp on them.</FONT>
+        self.time = <FONT COLOR=#115511>""</FONT>
+        <FONT COLOR=#3333CC><B>return</B></FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="type"><FONT COLOR=#CC0000><B> type</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> MESSAGETYPES[self.type]
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getCommand"><FONT COLOR=#CC0000><B> getCommand</B></FONT></A>(self):
+        <FONT COLOR=#115511>"""
+        Called by the Server if self.type == 1 or 2
+        Returns a tuple of the Name of the Command,
+        and the argument that command requires, if anything.
+        Kick takes a username,
+        Exit takes a message,
+        Private takes a username, etc.
+        """</FONT>
+        cmd = self.command.split(<FONT COLOR=#115511>"&lt;"</FONT>)
+        <FONT COLOR=#1111CC># cmd = ["ANY&gt;ANYTHING","/ANY&gt;"]</FONT>
+        cmd = cmd[1].split(<FONT COLOR=#115511>"&gt;"</FONT>) <FONT COLOR=#1111CC># cmd[0]=="ANY&gt;ANYTHING"</FONT>
+        <FONT COLOR=#1111CC># cmd = ["ANY","ANYTHING"]</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> len(cmd) &gt; 1:
+            <FONT COLOR=#3333CC><B>return</B></FONT> (cmd[0],cmd[1]) <FONT COLOR=#1111CC># ( Command Type, Value )</FONT>
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#3333CC><B>return</B></FONT> (cmd[0],)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="str"><FONT COLOR=#CC0000><B> str</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.type == 2:
+            string = self.username+<FONT COLOR=#115511>": "</FONT> + self.message + \
+                     <FONT COLOR=#115511>"( "</FONT>+ self.command + <FONT COLOR=#115511>", "</FONT> + self.password + <FONT COLOR=#115511>" )"</FONT>
+        <FONT COLOR=#3333CC><B>elif</B></FONT> self.type == 1:
+            string = self.username+<FONT COLOR=#115511>": "</FONT> + self.message + \
+                     <FONT COLOR=#115511>"( "</FONT>+ self.command + <FONT COLOR=#115511>" )"</FONT>
+        <FONT COLOR=#3333CC><B>elif</B></FONT> self.type == 0:
+            string = self.username+<FONT COLOR=#115511>": "</FONT> + self.message
+        <FONT COLOR=#3333CC><B>return</B></FONT> string
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__repr__"><FONT COLOR=#CC0000><B> __repr__</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.str()
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__str__"><FONT COLOR=#CC0000><B> __str__</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.str()
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="approve"><FONT COLOR=#CC0000><B> approve</B></FONT></A>(self,time):
+        self.time = time
+        <FONT COLOR=#3333CC><B>return</B></FONT>
+    
+        
+                
+</PRE>
+                  <!--footer-->
+                  </BODY>

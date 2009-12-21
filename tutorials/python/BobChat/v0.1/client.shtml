@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content=
+          "HTML Tidy for Linux/x86 (vers 1st August 2004), see www.w3.org" />
+    <title>Penzilla.net: Introduction to Python: BobChat</title>
+    <link rel="StyleSheet" href="../../style.css" type="text/css" media="screen" />
+  </head>
+  <body>
+    <div id="header">
+      <h1>A Python Networking Example</h1>
+      <h2>BobChat: v0.1 Client</h2>
+      <hr /></div>
+    <div id="sidebar">
+      <div id="menu"><a href="../../index.shtml">&raquo;Tutorial Home</a>
+        <!--#include virtual="/tutorials/python/BobChat/menu.html"-->
+        <!--#include virtual="/tutorials/python/menu.html"-->
+      </div>
+      <!--#include virtual="/tutorials/python/skyscraper_ads.html"--></div>
+    <div id="content"><!-- Comments -->
+      <!-- Body -->
+      <h3>v0.1 Client</h3>
+      <p>The client just opens a socket to the server, sends a message, and receives a reply.  
+        Then it disconnects.  The "autobob" method can be used to automate the sending
+        and receiving of a bunch of messages to test communication between the client and server.
+        </P>
+      <h3>Code</h3>
+      <div id="code">
+        <!--#include virtual="BobClient.py.html"-->
+      </div>
+      <!--End Body-->
+    </div>
+    <div id="footer">
+      <!--#include virtual="/tutorials/python/footer.shtml"-->
+    </div>
+  </body>
+</html>

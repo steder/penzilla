@@ -1,0 +1,38 @@
+;-*- mode: emacs-lisp -*-
+;;; Mike Steder <steder@gmail.com>
+;;; Emacs configuration 
+;; Add my local ~/emacs to the load-path
+(add-to-list 'load-path "~/emacs.d")
+(add-to-list 'load-path "~/etc/emacs.d")
+(add-to-list 'load-path "~/etc/emacs.d/color-theme-6.6.0")
+;; Emacs config menus will write customizations
+;; to this file:
+(setq custom-file "~/etc/emacs.d/custom.el")
+
+(load "platform.el")
+(load "custom.el")
+(load "special_files.el")
+(load "look_and_feel.el")
+(load "mouse.el")
+(load "keybindings.el")
+(load "mspython.el")
+;(load "myfotran.el")
+;(load "msphp.el")
+(load "msproject.el")
+(load "mstest.el")
+(load "misc.el")
+;(load "menu.el")
+
+;;; This was installed by package-install.el.
+;;; This provides support for the package system and
+;;; interfacing with ELPA, the package archive.
+;;; Move this code earlier if you want to reference
+;;; packages in your .emacs.
+(when
+    (load
+     (expand-file-name "~/.emacs.d/elpa/package.el"))
+  (package-initialize))
+
+;; Reminders:
+; don't forget you can get an elisp repl: M-x ielm
+

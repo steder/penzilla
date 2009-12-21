@@ -1,0 +1,8 @@
+===================
+ Rope Contributors
+===================
+
+* Alexander Solovyov <piranha@piranha.org.ua>
+* Sebastjan Trepca <trepca@gmail.com>
+* MATSUI Tetsushi <mft@users.sf.net>
+* Kevin Turner <keturn@keturn.net>

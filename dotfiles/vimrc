@@ -1,0 +1,87 @@
+" add the following to .profile or .bashrc
+"export EDITOR=vim
+"export VISUAL=vim
+"export PAGER="col -b | view -c 'set ft=man nomod nolist nonumber' -"
+"export MANPAGER="col -b | view -c 'set ft=man nomod nolist nonumber' -"
+
+set nocompatible " use vim defaults (this should be first in .vimrc)
+filetype plugin on " load ftplugin.vim
+filetype indent on " load indent.vim
+
+set history=1000 " number of commands and search patterns to save
+if version >= 630
+    set viminfo=!,%,'20,/100,:100,s100,n~/.viminfo " options for .viminfo
+else
+    set viminfo=!,%,'20,/100,:100,n~/.viminfo " options for .viminfo
+endif
+"set paste " ignore autoindent and formatoptions while pasting. does not hurt gvim.
+set binary " show control characters (ignore 'fileformat')
+set autoindent "
+set shiftround " align to standard indent when shifting with < and >
+set formatoptions+=r " auto-format comments while typing
+    " t_Co=16 is good on OSX, but not on Linux (leave unset for default)
+"set t_Co=16 " assume we have more colors to work with for highlighting
+"set background=dark " set terminal background (see F11)
+"colorscheme native
+"set guifont=Lucida_Console:h8 " set gvim font on Windows
+"syntax on " use syntax color highlighting
+"colo ps_color " color scheme in ~/.vim/colors
+"set visualbell " flash instead of beep -- this can be annoying
+"set visualbell t_vb= " no beep or flash
+"set mouse=a " enable VIM mouse (see map for F12)
+set ttyfast " smoother display on fast network connections
+set whichwrap=b,s,<,>,[,],~ " allow most motion keys to wrap
+set backspace=indent,eol,start " allow bs over EOL, indent, and start of insert
+set incsearch " incremental search
+set nojoinspaces " use only one space when using join
+set matchpairs+=<:> " add < > to chars that form pairs (see % command)
+set showmatch " show matching brackets by flickering cursor
+set matchtime=1 " show matching brackets quicker than default
+set autoread " automatically read file changed outside of Vim
+set autowrite " automatically save before commands like :next and :make
+set splitbelow " open new split windows below the current one
+set winminheight=0 " This makes more sense than the default of 1
+set noequalalways " do not resize windows on split/close
+"set shortmess="" " long messages -- does not seem to work
+set showcmd " show partial command in status line
+set suffixes+=.class,.pyc " skip bytecode files for filename completion
+set suffixes-=.h " do not skip C header files for filename completion
+set wrap " wrap long lines
+set sidescroll=1 " smooth scroll if set nowrap. for slow terminals set to 0.
+"set showbreak=>>>> " string to print before wrapped lines
+if version >= 700
+    set listchars=eol:$,tab:>-,trail:.,extends:>,precedes:<,nbsp:% " used when set list
+else
+    set listchars=eol:$,tab:>-,trail:.,extends:>,precedes:< " used when set list
+endif
+" set backup " backup files before editing
+" set backupdir=~/tmp,.,/tmp,/var/tmp " backup locations
+set dir=~/tmp,.,/tmp,/var/tmp " swap file locations
+set virtualedit=block " allow Visual block select anywhere
+set laststatus=2 " always show statusline
+set statusline=%n\ %1*%h%f%*\ %=%<[%3lL,%2cC]\ %2p%%\ 0x%02B%r%m
+set ruler " show ruler, but only shown if laststatus is off
+set rulerformat=%h%r%m%=%f " sane value in case laststatus is off
+set nonumber " don't show line numbers
+"set printoptions=number:y " put line numbers on hardcopy
+" this turns on hlsearch, but clears the highlighting when Enter is hit
+set wildmenu " show a menu of matches when doing completion
+set hlsearch " highlight the current search pattern
+set title " shows the current filename and path in the term title.
+nnoremap <silent><CR> :nohlsearch<CR><CR> " in normal mode enter clears search highlight
+if version >= 700
+    "set cusorline " highlight the line with the cursor
+    set numberwidth=4 " width of line numbers
+endif
+
+"
+" tab settings
+"
+set tabstop=4|set shiftwidth=4|set expandtab " default
+autocmd FileType python set tabstop=4|set shiftwidth=4|set expandtab " Python
+autocmd FileType make set tabstop=8|set shiftwidth=8|set noexpandtab " Makefile
+autocmd FileType man set tabstop=8|set shiftwidth=8|set noexpandtab " Man page (also used by psql to edit or view)
+autocmd FileType calendar set tabstop=8|set shiftwidth=8|set noexpandtab
+set softtabstop=4
+set shiftwidth=4
+

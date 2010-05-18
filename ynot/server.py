@@ -2,9 +2,9 @@
 
 import os
 
-from gevent import wsgi
+#from gevent import wsgi
 
-from ynot import pid
+from ynot import daemon
 from ynot import templates
 
 
@@ -39,10 +39,14 @@ def findAndRender(env, start_response):
         return ['Not Found\r\n']
 
 
-def serve():
+def serve(daemonize=False):
     print 'Serving on 8088...'
     try:
-        pid.makePidFile()
+        if daemonize:
+            daemon.daemonize()
+        else:
+            daemon.makePidFile()
+        from gevent import wsgi # import occurs after daemonize to avoid broken file descriptors
         server = wsgi.WSGIServer(('', 8088), findAndRender)
         server.serve_forever()
     except KeyboardInterrupt, e:

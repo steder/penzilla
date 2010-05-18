@@ -1,5 +1,5 @@
 #!/usr/bin/env python
 #-*- mode: python -*-
 
-from ynot import server
-server.serve()
+from ynot import script
+script.main()

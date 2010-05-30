@@ -5,6 +5,7 @@ import os
 #from gevent import wsgi
 
 from ynot import daemon
+from ynot import settings
 from ynot import templates
 
 
@@ -14,12 +15,30 @@ basePath = os.path.dirname(
     )
 )
 
+EXTENSIONS = [".xhtml", ".shtml", ".html"]
+
 
 def find(path):
-    p = os.path.join(basePath, path)
-    if not os.path.exists(p):
-        p = None
-    return p
+    """
+    Attempts to locate a serve the requested
+    file
+
+    - if the file exists it simply serves it.
+    - elif the file does not exist it checks
+       a list of alternate file extensions
+    
+    """
+    result = None
+    fp = os.path.join(basePath, path)
+    if os.path.exists(fp):
+        result = fp
+    else:
+        p, ext = os.path.splitext(fp)
+        for extension in EXTENSIONS:
+            np = p + extension
+            if os.path.exists(np):
+                result = np
+    return result
 
 
 def findAndRender(env, start_response):
@@ -28,8 +47,21 @@ def findAndRender(env, start_response):
     if f:
         content = ""
         try:
-            content = str(templates.render(f))
-            start_response('200 OK', [('Content-Type', 'text/html')])
+            contentType = 'text/plain'
+            p, ext = os.path.splitext(f)
+            if ext in EXTENSIONS:
+                content = str(templates.render(f))
+                contentType = 'text/html'
+            elif ext in [".css"]:
+                inputFile = None
+                contentType = 'text/css'
+                try:
+                    inputFile = open(f, "r")
+                    content = inputFile.read()
+                finally:
+                    if inputFile:
+                        inputFile.close()
+            start_response('200 OK', [('Content-Type', contentType), ('Content-length', str(len(content)))])
         except Exception, e:
             content = str(e)
             start_response('500 Server Error', [('Content-Type', 'text/plain')])
@@ -40,15 +72,18 @@ def findAndRender(env, start_response):
 
 
 def serve(daemonize=False):
-    print 'Serving on 8088...'
     try:
         if daemonize:
             daemon.daemonize()
         else:
             daemon.makePidFile()
+        print 'Serving on %s...'%(settings.PORT,)
         from gevent import wsgi # import occurs after daemonize to avoid broken file descriptors
-        server = wsgi.WSGIServer(('', 8088), findAndRender)
+        server = wsgi.WSGIServer(('', settings.PORT), findAndRender)
         server.serve_forever()
+    except StopIteration, e:
+        print "Caught StopIteration:", e
     except KeyboardInterrupt, e:
+        print "KeyboardInterrupt:", e
+    finally:
         print "Shutting down..."
-        print e

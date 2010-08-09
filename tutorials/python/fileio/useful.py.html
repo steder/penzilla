@@ -1,42 +1,37 @@
-<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
-                  <BODY BGCOLOR=#FFFFFF>
-                  <!--header-->
-                  <!--script--><PRE><FONT COLOR=#3333CC><B>import</B></FONT> os.path
-<FONT COLOR=#1111CC># os.path - The key to File I/O</FONT>
-os.path.exists(<FONT COLOR=#115511>"bob.txt"</FONT>)
-os.path.isfile(<FONT COLOR=#115511>"bob.txt"</FONT>) <FONT COLOR=#1111CC># Does bob.txt exist?  Is it a file, or a directory?</FONT>
-os.path.isdir(<FONT COLOR=#115511>"bob"</FONT>)
-os.path.isabs(<FONT COLOR=#115511>"/home/me/bob.txt"</FONT>) <FONT COLOR=#1111CC># Is it an absolute path to this file?</FONT>
+<div class="syntax"><pre><span class="kn">import</span> <span class="nn">os.path</span>
+<span class="c"># os.path - The key to File I/O</span>
+<span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s">&quot;bob.txt&quot;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s">&quot;bob.txt&quot;</span><span class="p">)</span> <span class="c"># Does bob.txt exist?  Is it a file, or a directory?</span>
+<span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="s">&quot;bob&quot;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="s">&quot;/home/me/bob.txt&quot;</span><span class="p">)</span> <span class="c"># Is it an absolute path to this file?</span>
 
-<FONT COLOR=#1111CC># Creating cross platform paths</FONT>
-<FONT COLOR=#1111CC># This will be slightly different on each platform</FONT>
-currentdir = os.curdir
-imagedir = os.path.join(currentdir, <FONT COLOR=#115511>"images"</FONT>)
+<span class="c"># Creating cross platform paths</span>
+<span class="c"># This will be slightly different on each platform</span>
+<span class="n">currentdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">curdir</span>
+<span class="n">imagedir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">currentdir</span><span class="p">,</span> <span class="s">&quot;images&quot;</span><span class="p">)</span>
 
-<FONT COLOR=#1111CC># Let's say I have a full path, and yet I want to store records based</FONT>
-<FONT COLOR=#1111CC># on the name of the file:</FONT>
-longpath = <FONT COLOR=#115511>"/home/me/python/somefiles/junk/notjunk/blah/bingo.txt"</FONT>
-shortpath = os.path.basename(longpath)
+<span class="c"># Let&#39;s say I have a full path, and yet I want to store records based</span>
+<span class="c"># on the name of the file:</span>
+<span class="n">longpath</span> <span class="o">=</span> <span class="s">&quot;/home/me/python/somefiles/junk/notjunk/blah/bingo.txt&quot;</span>
+<span class="n">shortpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">longpath</span><span class="p">)</span>
 
-<FONT COLOR=#1111CC># Get the type of shortpath:</FONT>
-<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Type of"</FONT>,shortpath,<FONT COLOR=#115511>"is"</FONT>, os.path.splitext(shortpath)[1]
+<span class="c"># Get the type of shortpath:</span>
+<span class="k">print</span> <span class="s">&quot;Type of&quot;</span><span class="p">,</span><span class="n">shortpath</span><span class="p">,</span><span class="s">&quot;is&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">shortpath</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
 
-<FONT COLOR=#1111CC># os.path.walk can be used to traverse directories recursively</FONT>
-<FONT COLOR=#1111CC># to apply changes to a whole tree of files.</FONT>
-<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="callback"><FONT COLOR=#CC0000><B> callback</B></FONT></A>( arg, dirname, fnames ):
-    sum = 0
-    <FONT COLOR=#3333CC><B>for</B></FONT> file <FONT COLOR=#3333CC><B>in</B></FONT> fnames:
-        sum += os.path.getsize(file)
-    arg.append(sum)
+<span class="c"># os.path.walk can be used to traverse directories recursively</span>
+<span class="c"># to apply changes to a whole tree of files.</span>
+<span class="k">def</span> <span class="nf">callback</span><span class="p">(</span> <span class="n">arg</span><span class="p">,</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">fnames</span> <span class="p">):</span>
+    <span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">fnames</span><span class="p">:</span>
+        <span class="nb">sum</span> <span class="o">+=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+    <span class="n">arg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span>
 
-arglist = []
-os.path.walk(<FONT COLOR=#115511>"./"</FONT>,callback,arglist)
+<span class="n">arglist</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="s">&quot;./&quot;</span><span class="p">,</span><span class="n">callback</span><span class="p">,</span><span class="n">arglist</span><span class="p">)</span>
 
-sum = 0
-<FONT COLOR=#3333CC><B>for</B></FONT> value <FONT COLOR=#3333CC><B>in</B></FONT> arglist:
-    sum += value
+<span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">arglist</span><span class="p">:</span>
+    <span class="nb">sum</span> <span class="o">+=</span> <span class="n">value</span>
 
-<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Size of directory:"</FONT>,sum
-</PRE>
-                  <!--footer-->
-                  </BODY>
+<span class="k">print</span> <span class="s">&quot;Size of directory:&quot;</span><span class="p">,</span><span class="nb">sum</span>
+</pre></div>

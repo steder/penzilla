@@ -10,14 +10,15 @@ while not done:
     else:
         break
     
-    # Create a file object:
-    # in "write" mode
-    FILE = open(filename,"w")
-    FILE.writelines(namelist)
+# Create a file object:
+# in "write" mode
+FILE = open(filename,"w")
+
+# Write all the lines at once:
+FILE.writelines(namelist)
     
-    # Alternatively
-    # for name in namelist:
-    #       FILE.write(name)
+# Alternatively write them one by one:
+for name in namelist:
+    FILE.write(name)
     
-    FILE.close() # this is icing, you can just exit and this will be
-    # handled automagically.
+FILE.close()

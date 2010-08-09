@@ -1,58 +1,53 @@
-<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
-                  <BODY BGCOLOR=#FFFFFF>
-                  <!--header-->
-                  <!--script--><PRE><FONT COLOR=#1111CC># Let's define a class quick:</FONT>
-<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Student"><FONT COLOR=#CC0000><B> Student</B></FONT></A>:
-    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, name=<FONT COLOR=#115511>""</FONT>, school=<FONT COLOR=#115511>""</FONT>, major=<FONT COLOR=#115511>""</FONT>, year=<FONT COLOR=#115511>""</FONT>, gpa=-1):
-        self.name = name
-        self.school = school
-        self.major = major
-        self.year = year
-        self.gpa = gpa
+<div class="syntax"><pre><span class="c"># Let&#39;s define a class quick:</span>
+<span class="k">class</span> <span class="nc">Student</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">school</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">major</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">gpa</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">school</span> <span class="o">=</span> <span class="n">school</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">major</span> <span class="o">=</span> <span class="n">major</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">year</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gpa</span> <span class="o">=</span> <span class="n">gpa</span>
 
-    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_Print"><FONT COLOR=#CC0000><B> _Print</B></FONT></A>(self):
-        string = <FONT COLOR=#115511>"++++++++++++++++++++++"</FONT> + \
-                 <FONT COLOR=#115511>"+"</FONT>+name \
-                 <FONT COLOR=#115511>"+"</FONT>+school \
-                 <FONT COLOR=#115511>"+"</FONT>+major \
-                 <FONT COLOR=#115511>"+"</FONT>+year \
-                 <FONT COLOR=#115511>"+"</FONT>+gpa \
-                 <FONT COLOR=#115511>"++++++++++++++++++++++"</FONT>
-        <FONT COLOR=#3333CC><B>return</B></FONT> string
+    <span class="k">def</span> <span class="nf">_Print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="s">&quot;++++++++++++++++++++++&quot;</span> <span class="o">+</span> \
+                 <span class="s">&quot;+&quot;</span><span class="o">+</span><span class="n">name</span> \
+                 <span class="s">&quot;+&quot;</span><span class="o">+</span><span class="n">school</span> \
+                 <span class="s">&quot;+&quot;</span><span class="o">+</span><span class="n">major</span> \
+                 <span class="s">&quot;+&quot;</span><span class="o">+</span><span class="n">year</span> \
+                 <span class="s">&quot;+&quot;</span><span class="o">+</span><span class="n">gpa</span> \
+                 <span class="s">&quot;++++++++++++++++++++++&quot;</span>
+        <span class="k">return</span> <span class="n">string</span>
 
-    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="Print"><FONT COLOR=#CC0000><B> Print</B></FONT></A>(self):
-        <FONT COLOR=#3333CC><B>print</B></FONT> self._Print()
+    <span class="k">def</span> <span class="nf">Print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Print</span><span class="p">()</span>
 
-    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__str__"><FONT COLOR=#CC0000><B> __str__</B></FONT></A>(self):
-        <FONT COLOR=#3333CC><B>return</B></FONT> self._Print()
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Print</span><span class="p">()</span>
     
-<FONT COLOR=#1111CC># Now I'll create a student:</FONT>
-Mike = Student(<FONT COLOR=#115511>"Mike"</FONT>,<FONT COLOR=#115511>"UIUC"</FONT>,<FONT COLOR=#115511>"CS"</FONT>,<FONT COLOR=#115511>"Senior"</FONT>,0.6)
-<FONT COLOR=#1111CC># Now, let's Pickle Mike</FONT>
-mike_the_pickle = pickle.dumps(Mike)
-<FONT COLOR=#3333CC><B>print</B></FONT> mike_the_pickle
-<FONT COLOR=#1111CC># Now let's clone mike!</FONT>
-Mike2 = pickle.loads(mike_the_pickle)
-<FONT COLOR=#3333CC><B>if</B></FONT> type(Mike) == type(Mike2):
-    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Mike and Mike2 are of type:"</FONT>,(str(type(Mike)))
+<span class="c"># Now I&#39;ll create a student:</span>
+<span class="n">Mike</span> <span class="o">=</span> <span class="n">Student</span><span class="p">(</span><span class="s">&quot;Mike&quot;</span><span class="p">,</span><span class="s">&quot;UIUC&quot;</span><span class="p">,</span><span class="s">&quot;CS&quot;</span><span class="p">,</span><span class="s">&quot;Senior&quot;</span><span class="p">,</span><span class="mf">0.6</span><span class="p">)</span>
+<span class="c"># Now, let&#39;s Pickle Mike</span>
+<span class="n">mike_the_pickle</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">Mike</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">mike_the_pickle</span>
+<span class="c"># Now let&#39;s clone mike!</span>
+<span class="n">Mike2</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">mike_the_pickle</span><span class="p">)</span>
+<span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">Mike</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="n">Mike2</span><span class="p">):</span>
+    <span class="k">print</span> <span class="s">&quot;Mike and Mike2 are of type:&quot;</span><span class="p">,(</span><span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">Mike</span><span class="p">)))</span>
 
-<FONT COLOR=#1111CC># Create A Pickler</FONT>
-P.pickle.Pickler(<FONT COLOR=#115511>"pickle.dat"</FONT>)
-<FONT COLOR=#1111CC># Write to your Pickler</FONT>
-P.dump(Mike)
-<FONT COLOR=#1111CC># OR, combine the last 2 lines</FONT>
-pickle.dump(Mike, <FONT COLOR=#115511>"pickle.dat"</FONT>)
+<span class="c"># Create A Pickler</span>
+<span class="n">P</span><span class="o">.</span><span class="n">pickle</span><span class="o">.</span><span class="n">Pickler</span><span class="p">(</span><span class="s">&quot;pickle.dat&quot;</span><span class="p">)</span>
+<span class="c"># Write to your Pickler</span>
+<span class="n">P</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">Mike</span><span class="p">)</span>
+<span class="c"># OR, combine the last 2 lines</span>
+<span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">Mike</span><span class="p">,</span> <span class="s">&quot;pickle.dat&quot;</span><span class="p">)</span>
 
-<FONT COLOR=#1111CC># Now, Create an Unpickler, and get Mike back</FONT>
-U = pickle.Unpickler(<FONT COLOR=#115511>"pickle.dat"</FONT>)
-<FONT COLOR=#1111CC># Read from the pickler</FONT>
-Mike = U.load()
-<FONT COLOR=#1111CC># Do it in one line</FONT>
-Mike2 = pickle.load(<FONT COLOR=#115511>"pickle.dat"</FONT>)
+<span class="c"># Now, Create an Unpickler, and get Mike back</span>
+<span class="n">U</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">Unpickler</span><span class="p">(</span><span class="s">&quot;pickle.dat&quot;</span><span class="p">)</span>
+<span class="c"># Read from the pickler</span>
+<span class="n">Mike</span> <span class="o">=</span> <span class="n">U</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="c"># Do it in one line</span>
+<span class="n">Mike2</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">&quot;pickle.dat&quot;</span><span class="p">)</span>
 
-<FONT COLOR=#1111CC># Just something to keep in mind:</FONT>
-<FONT COLOR=#1111CC># For more sophisticated usage, you may want to use the Shelve module,</FONT>
-<FONT COLOR=#1111CC># or other Database modules.</FONT>
-</PRE>
-                  <!--footer-->
-                  </BODY>
+<span class="c"># Just something to keep in mind:</span>
+<span class="c"># For more sophisticated usage, you may want to use the Shelve module,</span>
+<span class="c"># or other Database modules.</span>
+</pre></div>

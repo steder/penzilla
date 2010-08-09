@@ -1,29 +1,25 @@
-<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
-                  <BODY BGCOLOR=#FFFFFF>
-                  <!--header-->
-                  <!--script--><PRE><FONT COLOR=#1111CC># Let's create a file and write it to disk.</FONT>
-filename = <FONT COLOR=#115511>"test.dat"</FONT>
-<FONT COLOR=#1111CC># Let's create some data:</FONT>
-done = 0
-namelist = []
-<FONT COLOR=#3333CC><B>while</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> done:
-    name = raw_input(<FONT COLOR=#115511>"Enter a name:"</FONT>)
-    <FONT COLOR=#3333CC><B>if</B></FONT> type(name) == type(<FONT COLOR=#115511>""</FONT>):
-        namelist.append(name)
-    <FONT COLOR=#3333CC><B>else</B></FONT>:
-        <FONT COLOR=#3333CC><B>break</B></FONT>
+<div class="highlight"><pre><span class="c"># Let&#39;s create a file and write it to disk.</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="s">&quot;test.dat&quot;</span>
+<span class="c"># Let&#39;s create some data:</span>
+<span class="n">done</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">namelist</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&quot;Enter a name:&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+        <span class="n">namelist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">break</span>
     
-    <FONT COLOR=#1111CC># Create a file object:</FONT>
-    <FONT COLOR=#1111CC># in "write" mode</FONT>
-    FILE = open(filename,<FONT COLOR=#115511>"w"</FONT>)
-    FILE.writelines(namelist)
+<span class="c"># Create a file object:</span>
+<span class="c"># in &quot;write&quot; mode</span>
+<span class="n">FILE</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s">&quot;w&quot;</span><span class="p">)</span>
+
+<span class="c"># Write all the lines at once:</span>
+<span class="n">FILE</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">namelist</span><span class="p">)</span>
     
-    <FONT COLOR=#1111CC># Alternatively</FONT>
-    <FONT COLOR=#1111CC># for name in namelist:</FONT>
-    <FONT COLOR=#1111CC>#       FILE.write(name)</FONT>
+<span class="c"># Alternatively write them one by one:</span>
+<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">namelist</span><span class="p">:</span>
+    <span class="n">FILE</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
     
-    FILE.close() <FONT COLOR=#1111CC># this is icing, you can just exit and this will be</FONT>
-    <FONT COLOR=#1111CC># handled automagically.</FONT>
-</PRE>
-                  <!--footer-->
-                  </BODY>
+<span class="n">FILE</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>

@@ -195,6 +195,14 @@ Functions:
         <a href="#top">Return to the top</a>
       </p>
       -->
+      <div id="translations">
+        <p>This page has been translated into the following languages:
+          <ul>
+            <li><a href="http://ucallweconn.net/be/pyt-numeric-be">Belarusian (Martha Ruszkowski)</a></li>
+          </ul>
+        </p>
+        
+      </div>
       <!--End of Body-->
     </div>
     <div id="footer">

@@ -39,11 +39,14 @@ x.append(y) == [ 1, 2, 3, 4, 5, [1, 2.0, (3,4), [5], {"Hello":"World!"}] ]
 [1,2,3] + [4,5] == [1,2,3,4,5]
 # Multiply/Repeat - Again, strings are similar
 [1,2] * 3 == [1,2,1,2,1,2]
+
 # Delete
-del y[2] == [1, 2.0, [5], {"Hello":"World!"}]
+del y[2]
+y2 == [1, 2.0, [5], {"Hello":"World!"}]
 # Or
 y[2] = None
 y == [1, 2.0, {"Hello":"World!"}]
+
 # Pop - Remove and delete the last element of a list
 x.pop() == 5
 x == [1,2,3,4]

@@ -2,12 +2,13 @@
 #
 # Int and Long int(Range?)
 inta = 100
-fact = def factorial (n):
+def factorial (n):
     if n == 0:
         return 1
     else:
         return n * factorial(n-1)
-intb = fact(100) # 100! is pretty damned big, notice python doesn't choke.
+    
+intb = factorial(100) # 100! is pretty damned big, notice python doesn't overflow.
 
 # Float/Double(Precision?)
 floata = 1.2
@@ -20,6 +21,7 @@ c1 = s1[1]
 # Tuples(What are they, simple examples)
 t1 = (1, 2) # coordinates on a grid
 t2 = ("username", "passcode") # Not a very useful "use" of a tuple
+
 # Tuples are mostly going to be used for things like encapsulating a
 # bunch of function arguments, especially things like coordinates
 # that are very tightly coupled.

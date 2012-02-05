@@ -9,7 +9,7 @@ for i in xrange(0,100):
 # How many heads can we flip in a row?
 heads = 0
 while 1:
-    if x = 0:
+    if x == 0:
         break
     else:
         x = random.rand(0,1)
@@ -21,7 +21,7 @@ x = 0
 while 1:
     if x <= 100:
         pass
-    elif x = 101:
+    elif x == 101:
         print "Just enough Dalmations!"
     else:
         print "Argh!  Too many Dalmations!"

@@ -3,11 +3,11 @@ while i < 100:
     i + 1
 
 # More generally:
-while condition == true:
-    """do the following"""
-    ...
-    ...
-    condition = false.
+while thing is True:
+    """do the following
+
+    """
+    thing = False or None
 
 # Infinite Loop:
 while 1:

@@ -7,31 +7,43 @@ class Student:
         self.year = year
         self.gpa = gpa
 
-    def _Print(self):
-        string = "++++++++++++++++++++++" + \
-                 "+"+name \
-                 "+"+school \
-                 "+"+major \
-                 "+"+year \
-                 "+"+gpa \
-                 "++++++++++++++++++++++"
-        return string
+    def __repr__(self):
+        """
+        Return official string representation of object
 
-    def Print(self):
-        print self._Print()
+        Called by repr() builtin function and
+        by print if __str__ is not defined.
+        """
+        string = ["++++++++++++++++++++++", 
+                 "+" + name,
+                 "+" + school,
+                 "+" + major,
+                 "+" + year,
+                 "+" + gpa,
+                 "++++++++++++++++++++++"]
+                 
+        return "\n".join(string)
 
     def __str__(self):
-        return self._Print()
+        """
+        Return unofficial string representation of an object.
+
+        Called by print
+        """
+        return self.__repr__()
+
     
 # Now I'll create a student:
-Mike = Student("Mike","UIUC","CS","Senior",0.6)
+Mike = Student("Mike", "UIUC", "CS", "Senior", 0.6)
+
 # Now, let's Pickle Mike
 mike_the_pickle = pickle.dumps(Mike)
 print mike_the_pickle
+
 # Now let's clone mike!
 Mike2 = pickle.loads(mike_the_pickle)
 if type(Mike) == type(Mike2):
-    print "Mike and Mike2 are of type:",(str(type(Mike)))
+    print "Mike and Mike2 are of type:", (str(type(Mike)))
 
 # Create A Pickler
 P.pickle.Pickler("pickle.dat")

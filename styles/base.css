@@ -1,0 +1,14 @@
+body {
+    color: #efefef;
+    background: #010101;
+    text-align: center;
+}
+a {
+    color: #efefef;
+}
+#navlist li
+{
+    display: inline;
+    list-style-type: none;
+    padding-right: 20px;
+}

@@ -1,0 +1,73 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#3333CC><B>import</B></FONT> cgi, sys, string
+<FONT COLOR=#3333CC><B>import</B></FONT> gradelib
+form = cgi.FieldStorage() <FONT COLOR=#1111CC># parse form data</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Cotent-type: text/html"</FONT>
+
+html = <FONT COLOR=#115511>"""
+&lt;html&gt;
+&lt;title&gt;CS373: Unofficial Grade info for: %(alias)&lt;/title&gt;
+&lt;body&gt;
+&lt;h1&gt;CS373: Unofficial Grade info for: %(alias)&lt;/h1&gt;
+&lt;table&gt;
+&lt;tbody&gt;
+%(classdata)
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;P&gt;
+%(scale)
+&lt;h4&gt;
+%(tentative)
+&lt;/h4&gt;
+&lt;/body&gt;
+&lt;/html&gt;"""</FONT>
+
+data = {}
+classdata = gradelib.parse(<FONT COLOR=#115511>"grades.txt"</FONT>)
+htmldata = gradelib.htmlize(classdata)
+<FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> form.has_key(<FONT COLOR=#115511>"alias"</FONT>):
+    data[<FONT COLOR=#115511>"alias"</FONT>] = <FONT COLOR=#115511>"(unknown)"</FONT>
+<FONT COLOR=#3333CC><B>else</B></FONT>:
+    data[<FONT COLOR=#115511>"alias"</FONT>] = form[<FONT COLOR=#115511>"alias"</FONT>].value
+    
+temp = gradelib.tentative(classdata[0],classdata[1],form[<FONT COLOR=#115511>"alias"</FONT>].value)
+
+
+<FONT COLOR=#115511>""" 
+[78,100]  --&gt;  A       
+[60,78)   --&gt;  B
+       (42,60)   --&gt;  C
+       (25,42]   --&gt;  D
+       [0,25]    --&gt;  F
+"""</FONT>
+data[<FONT COLOR=#115511>"scale"</FONT>] =<FONT COLOR=#115511>"""
+&lt;ul&gt; 
+[78,100]  --&gt;  A       
+[60,78)   --&gt;  B       
+(42,60)   --&gt;  C
+(25,42]   --&gt;  D
+[0,25]    --&gt;  F
+&lt;/ul&gt;"""</FONT> 
+
+<FONT COLOR=#3333CC><B>if</B></FONT> temp &gt;= 78:
+    data[<FONT COLOR=#115511>"tentative"</FONT>]=<FONT COLOR=#115511>"You have"</FONT>,temp,<FONT COLOR=#115511>"percent"</FONT>+\
+                       <FONT COLOR=#115511>"so you are currently getting an A"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> 60 &lt; temp &lt; 78:
+    data[<FONT COLOR=#115511>"tentative"</FONT>]=<FONT COLOR=#115511>"You have"</FONT>,temp,<FONT COLOR=#115511>"percent"</FONT>+\
+                       <FONT COLOR=#115511>"so you are currently getting an A"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> 42 &lt; temp &lt; 60:
+    data[<FONT COLOR=#115511>"tentative"</FONT>]=<FONT COLOR=#115511>"You have"</FONT>,temp,<FONT COLOR=#115511>"percent"</FONT>+\
+                       <FONT COLOR=#115511>"so you are currently getting an A"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> 25 &lt; temp &lt;= 42:
+    data[<FONT COLOR=#115511>"tentative"</FONT>]=<FONT COLOR=#115511>"You have"</FONT>,temp,<FONT COLOR=#115511>"percent"</FONT>+\
+                       <FONT COLOR=#115511>"so you are currently getting an A"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> 0 &lt;= temp &lt;= 25:
+    data[<FONT COLOR=#115511>"tentative"</FONT>]=<FONT COLOR=#115511>"You have"</FONT>,temp,<FONT COLOR=#115511>"percent"</FONT>+\
+                       <FONT COLOR=#115511>"so you are currently getting an A"</FONT>
+    
+<FONT COLOR=#3333CC><B>print</B></FONT> html % data
+</PRE>
+                  <!--footer-->
+                  </BODY>

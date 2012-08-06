@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content=
+          "HTML Tidy for Linux/x86 (vers 1st August 2004), see www.w3.org" />
+    <title>Penzilla.net: Introduction to Python: BobChat</title>
+    <link rel="StyleSheet" href="../style.css" type="text/css" media="screen" />
+  </head>
+  <body>
+    <div id="header">
+      <h1>A Python Networking Example</h1>
+      <h2>BobChat</h2>
+      <hr /></div>
+    <div id="sidebar">
+      <div id="menu"><a href="../index.shtml">&raquo;Tutorial Home</a>
+        <!--#include virtual="/tutorials/python/BobChat/menu.html"-->
+        <!--#include virtual="/tutorials/python/menu.html"-->
+      </div>
+      <!--#include virtual="/tutorials/python/skyscraper_ads.html"--></div>
+    <div id="content"><!-- Comments -->
+      <!-- Body -->
+      <h3>BobChat</h3>
+      <p>BobChat is a simple "IRC Chat"-like program.  As this is several degrees more
+        complicated then other examples I've done on this site so I'm going to do it a bit differently.
+      </p>  
+      <p>Below and on the side you'll find links to individual pieces of each version of BobChat.
+        I originally attempted to build BobChat using the techniques in v0.1 and iteratively
+        made changes until I ended up with v0.3.
+      </p>
+      <P>The simplest example is v0.1.  I recommend
+        that you start with that as it has the lowest signal to noise ratio...  By which I mean, the
+        focus of v0.1 is the mechanics of Sockets and Threading.  The later versions are trying to 
+        wrap up those basic concepts in a pretty and more functional package.  So if you're really
+        just interested in seeing some sockets / threading code v0.1 will probably be the most
+        enlightening example.
+      </p>
+      <h3>BobChat Index</h3>
+      <ul>
+        <li><a href="v0.1">Version 0.1</a>
+          <ul>
+            <li><a href="v0.1/server.shtml">Asynchronus Server (select-based)</a></li>
+            <li><a href="v0.1/client.shtml">Threaded Client (One thread reads, one thread writes)</a></li>
+            <li>Totally Function Based (No Objects or Components)</li>
+          </ul>
+        </li>
+        <li><a href="v0.2">Version 0.2</a>
+          <ul>
+            <li>Object Oriented examples of BobChat</li>
+            <li>Commands and Administration</li>
+          </ul>
+        </li>
+        <li><a href="v0.3">Version 0.3</a>
+          <ul>
+          <li>Continued Object Orientation</li>
+            <li>Introduction of the Protocol Module</li>
+            <li>Concept of a Message Object</li>
+          </ul>
+        </li>
+      </ul>
+      <!--End Body-->
+    </div>
+    <div id="footer">
+      <!--#include virtual="/tutorials/python/footer.shtml"-->
+    </div>
+  </body>
+</html>

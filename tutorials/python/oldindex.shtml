@@ -1,0 +1,240 @@
+<html>
+  <head>
+    <title>Penzilla.net: Introduction to Python(v0.4)</title>
+  </head>
+  <body link="blue" alink="blue" vlink="green">
+    <table>
+      <tr>
+        <td colspan="2">
+          <h2>An Introduction to Python(v0.4) -- January 5th, 2006</h2>
+        
+          <!-- Creative Commons License -->
+          <p>This website and all code examples are &#169; 
+            <a href="mailto:steder@gmail.com">Mike Steder</a><br>and is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/1.0/">Creative Commons License</a>.<br/>
+            <!-- /Creative Commons License -->
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <hr>
+        </td>
+      </tr>
+      <!--Comment Row-->
+      <tr>
+        <td colspan="2"><!--Comments-->
+        <h4><font color="blue">1/2/06:</font></h4>
+        <P>Fixed a problem related to my server move that prevented a number of code examples from showing up.  Also added some more Numeric content, including some information about the NumPtr package which can be used to simplify passing Numeric Arrays to and from SWIG'ed code.</P>
+        <h4><Font color="blue">11/29/05:</font></h4>
+        <P>After an extremely long period of ignoring this page I'm finally
+          back at it.  I've already made some updates and will be continuing to do
+          so over the next few weeks as time permits.
+        <P>Thanks to the people who have sent me e-mails over the last few months!</P>
+        <hr>
+        </td>
+      </tr>
+      <tr valign="top"><!--Body Row-->
+        <!--Menu
+            <td width="15%"></td>-->
+        <td colspan="2"><!--Body-->
+        <h3>Table of Contents</h3>
+        <ul>
+          <li><font color="green">Doc-u-licious!</font></li>
+          <ul>
+            <li><a href="changelog.html">CHANGELOG</a></li>
+            <li><a href="readme.html">README</a></li>
+            <!--<li><a href="html_source">Browseable Source</a></li>-->
+          </ul>	
+          <li><font color="green">Who uses Python?:</font>
+            <ul>
+              <li>Google</li>
+              <li>Industrial Light and Magic</li>
+              <li>The National Labs(Argonne and Lawrence Livermore for Example)</li>
+              <li>Gentoo Linux <font color="purple">&&</font> Redhat Linux</li>
+              <li>Bittorrent </li>
+              <li><a href="http://www.python-in-business.org/success/">... And many more </a></li>
+            </ul>
+          </li>
+          <ul><P></ul><!--Insert a space-->
+          <li><font color="green">Why Use Python?</font></li>
+          <ul><P></ul><!--Insert a space-->
+          <li><font color="green">Getting/Running Python</font>
+            <ul>
+              <li>What(<a href="http://www.python.org/download/">version</a>), Where, How?</li>
+              <li>Running the Interpreter
+                <ul>
+	              <li>Useful Interpreter Commands</li>
+	              <li>Quitting</li>
+	            </ul>
+              </li>
+              <li><font color="blue">I</font><font color="green">P</font><font color="yellow">y</font><font color="orange">t</font><font color="red">h</font><font color="purple">o</font><font color="brown">n</font>.  <a href="http://ipython.scipy.org/">Check it out</a>
+              </li>
+              <li><a href="ide/index.html">Python Integrated Development Environments</a>
+                <ul>
+	              <li>Windows</li>
+	              <li>Linux</li>
+	              <li>Mac OS X</li>
+	            </ul>
+              </li>
+            </ul>
+            <ul><P></ul>
+          <li><a href="PyQuickRef.pdf">Python Quick Reference:</a>  Still valid, but written for Python 1.5.2.  Look for an updated version(to 2.3) later.</a></li>
+<ul><P></ul>
+<li><font color="green">Basic Python:</font>
+  <ul>
+    <li>Syntax and Datatypes
+      <ul>
+	    <li><a href="intro/index.shtml">Hello World!</a></li>
+        <li><a href="datatypes/index.shtml">Basic Types</a> And a Note about <a href="datatypes">Typing</a></li>
+	    <ul>
+	      <li>Tuples</li>
+	      <li>Lists</li>
+	      <li>Dictionaries</li>
+	    </ul>
+	    <li><a href="control/index.shtml">Python Control Statements</a></li>
+	    <li><b><font color="red">*UPDATED*</font></B> <a href="numeric/index.shtml">Numeric Arrays</a> Or <i>How to avoid the built-in Array Package</i> 
+          <ul>
+            <li><B><font color="red">*NEW*</font></B> <a href="numpyc/index.shtml">Numeric Arrays and C Extensions</a> 
+            <li><B><font color="red">*NEW*</font></B> <a href="numptr/index.shtml">NumPtr Module</a> for interfacing SWIG'ed C code with Numeric (Python) Arrays.</li>
+          </ul>
+        </li>
+	  </ul>
+    </li>
+    <li><a href="functions/index.shtml">Functions</a>
+	  <ul>
+	    <li>Optional Arguments</li>
+	    <li>Named Argument Lists</li>
+	    <li>Functions as Arguments OR <i>Python as a Functional Language</i></li>
+	    <li>Lambda(anonymous functions)</li>
+        <li><a href="generators/index.shtml">Generator Functions(Coming Soon)</a></li>
+	  </ul>
+    </li>
+    <li><a href="modules/index.shtml">Modules</a></li>
+    <li>Module Packages</li>
+    <li><a href="classes/index.shtml">Classes</a>
+      <ul>
+	    <li>Inheritance</li>
+	    <li>Overloading Operators</li>
+	</ul>
+    </li>
+    <li>I/O
+      <ul>
+	  <li><a href="io_song.shtml">The I/O Song</a></li>
+	  <li><a href="consoleio/index.html">Console I/O</a></li>
+      <li><a href="cmdlineargs/index.shtml">Command Line Arguments</a></li>
+	  <li><a href="fileio/index.shtml">File I/O</a></li>
+	  </ul>
+    </li>
+    <li><a href="scripting/index.shtml">Python Scripting</a>
+      <ul>
+	  <li>The Pound-Bang Hack (#!)</li>
+	  <li>Defining a __main__ method</li>
+	  <li>OS / System Specific Calls</li>
+	  <li>Executing System Commands</li>
+	  </ul>
+    </li>
+    <li><a href="exceptions/index.shtml">Exceptions</a></li>
+</li>
+</ul>
+</li>
+<ul><P></ul><!--Insert a space-->
+<li><font color="green">Advanced Python: Graphics, Sound, Etc:</font>
+  <ul>
+    <li><a href="tkinter/index.shtml">Tkinter(Coming Soon)</a>
+      <ul>
+	    <li>Hello Gui World!</li>
+	    <li>Dialogs</li>
+	    <li>Simple Text Editor</li>
+	  </ul>
+    </li>
+    <li><a href="pygame/index.shtml">Pygame(Coming Soon)</a>
+      <ul>
+	    <li>Initialization</li>
+	    <li>Loading Images/Sounds/Movies/CD's</li>
+	    <li>Handling Events</li>
+	    <li>Sprites - Animation</li>
+	  </ul>
+    </li>
+    <li><a href="pyopengl/index.shtml">PyOpenGL(Coming Soon)</a>
+      <ul>
+	    <li>NEHE OpenGL Examples in Python Code</li>
+	    <li>Walking through creating a Diamond</li>
+	    <ul>
+	      <li>Initializing PyGame & PyOpenGL<li>
+	      <li>PyOpenGL Syntax</li>
+	      <li>Defining the Diamond Graphic Primitives</li>
+	    <li>Drawing and moving diamonds</li>
+	    </ul>
+	    <li>Loading a prebuilt Model</li>
+	  </ul>
+    </li>
+    <li><a href="threading/index.shtml">Threading(Coming Soon)</a>
+      <ul>
+	        <li>Parallelism, Concurrency</li>
+	        <li>Spawning Threads</li>
+	        <li>Synchronization Primatives</li>
+	  </ul>
+    </li>
+    <li><a href="pympi/index.shtml">Parallel Python</a>
+      <ul>
+        <li>Parallel Programming for Clusters with Python(<a href="http://pympi.sourceforge.net">PyMPI2.0</a>)</li>
+        </ul>
+    </li>
+    <li><a href="networking/index.shtml">Networking(Example is up)</a>
+      <ul>
+	    <li>Basics (Sockets, TCP/IP, IP Addresses)</li>
+	    <li>Basic Sockets Example</li>
+	    <li>Threaded Server</li>
+	  <li>Asynchronus Server</li>
+        <li>An example using threads, sockets, and an asynchronus server
+          to create a simple client/server chat program.
+          <a href="BobChat">BobChat</a>
+        </li>
+	  </ul>
+      </li>
+    <li><a href="cgi/index.shtml">CGI Scripting</a>
+      <ul>
+	    <li><a href="http://www.penzilla.net/cgi-bin/wittime.py">What is the time?</a></li>
+	    <li><a href="http://www.penzilla.net/tutorials/python/cgi/rpssl.html">Rock Paper Scissors Spock Lizard</a></li>
+	  </ul>
+    </li>
+    </ul>
+  <ul><P></ul>
+<li><font color="green">Language Interoperability:</font>
+  <ul>
+    <li><a href="swig/index.html">SWIG</a></li>
+  </ul>
+    </li>
+</li> 
+<ul><p></ul>
+<li><font color="green">Stuff Python can do that we will talk about upon request.</font>
+  <ul>
+    <li>Jython, Python embedded in a browser through Java</li>
+    <li>Interfacing Python and Fortran (Although it can be done!)</li>
+    <li>Distutils - Crossplatform installer for python applications</li>
+  </ul>
+  
+</li>
+</ul>
+<!---You can download the entire tutorial include both html pages and Python code in a couple convenient forms:<br>
+    <a href="python_tutorial.tar.gz">Python Tutorial as  Gzipped Tarball (*.tar.gz)</a><br>
+    <a href="python_tutorial.tar.bzip2">NEW!  Save a "nibble" with bzip :~)</a><br>:
+    <a href="python_tutorial.zip">... As a zip archive (*.zip)</a>
+   
+    <br>--->
+</td>
+</tr>
+<!--footer-->
+<tr>
+  <td colspan="2">
+    <HR>
+    <a href="http://www.python.org" style="color:white"><img src="images/PythonPoweredAnim.gif"></a>
+    <a href="http://www.pygame.org" style="color:white"><img src="images/pygame_tiny.gif"></a>
+    <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/1.0/"><img alt="Creative Commons License" border="0" src="http://creativecommons.org/images/public/somerights.gif" /></a><BR>
+    <!--#include virtual="ads.html"-->
+  </td>
+</tr>
+</table>
+</body>
+</html>
+
+

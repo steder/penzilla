@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="1"
+   name=""
+   committed-date="2003-12-24T19:34:15.663229Z"
+   url="http://www.ripplefx.net:81/svn/python/fileio/CS373_Grades"
+   last-author="steder"
+   kind="dir"
+   uuid="996777e2-3ecf-0310-aa64-e0ff611b1bef"
+   revision="17"/>
+<entry
+   committed-rev="1"
+   name="hw0grades.txt"
+   text-time="2004-09-20T02:22:56.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="8796a42692c9f97f2e92997709de079d"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:56.000000Z"/>
+<entry
+   committed-rev="1"
+   name="grades.py"
+   text-time="2004-09-20T02:22:56.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="21561affb41b55825370748e6212cb68"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:56.000000Z"/>
+</wc-entries>

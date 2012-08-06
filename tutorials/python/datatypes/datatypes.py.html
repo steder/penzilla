@@ -1,0 +1,34 @@
+<div class="syntax"><pre><span class="c"># Introduction to Python&#39;s Data Structures</span>
+<span class="c">#</span>
+<span class="c"># Int and Long int(Range?)</span>
+<span class="n">inta</span> <span class="o">=</span> <span class="mf">100</span>
+<span class="k">def</span> <span class="nf">factorial</span> <span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mf">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">n</span> <span class="o">*</span> <span class="n">factorial</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mf">1</span><span class="p">)</span>
+    
+<span class="n">intb</span> <span class="o">=</span> <span class="n">factorial</span><span class="p">(</span><span class="mf">100</span><span class="p">)</span> <span class="c"># 100! is pretty damned big, notice python doesn&#39;t overflow.</span>
+
+<span class="c"># Float/Double(Precision?)</span>
+<span class="n">floata</span> <span class="o">=</span> <span class="mf">1.2</span>
+<span class="n">floatb</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="c"># isn&#39;t this peculiar?</span>
+
+<span class="c"># Strings(Indexing, Concatination, Searching, Matching)</span>
+<span class="n">s1</span> <span class="o">=</span> <span class="s">&quot;I am a string!</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="n">c1</span> <span class="o">=</span> <span class="n">s1</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span>
+
+<span class="c"># Tuples(What are they, simple examples)</span>
+<span class="n">t1</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span> <span class="c"># coordinates on a grid</span>
+<span class="n">t2</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;username&quot;</span><span class="p">,</span> <span class="s">&quot;passcode&quot;</span><span class="p">)</span> <span class="c"># Not a very useful &quot;use&quot; of a tuple</span>
+
+<span class="c"># Tuples are mostly going to be used for things like encapsulating a</span>
+<span class="c"># bunch of function arguments, especially things like coordinates</span>
+<span class="c"># that are very tightly coupled.</span>
+
+<span class="c"># Lists(What they are, append, concatenate, add, remove(del), searching, map, SLICES!)</span>
+
+<span class="c"># Now connect strings (w/slicing) to lists :~)</span>
+
+<span class="c"># Dictionaries(What they are, some neat uses, NOTES on SPEED?)</span>
+</pre></div>

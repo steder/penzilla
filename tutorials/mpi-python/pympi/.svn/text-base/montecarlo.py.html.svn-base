@@ -1,0 +1,44 @@
+<HTML><HEAD><TITLE>/home/steder/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#115511>"""
+This example computes PI to certain precision using 
+4 processors and a monte carlo simulation.
+"""</FONT>
+
+<FONT COLOR=#3333CC><B>import</B></FONT> random
+<FONT COLOR=#3333CC><B>import</B></FONT> mpi
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="computePi"><FONT COLOR=#CC0000><B> computePi</B></FONT></A>(nsamples):
+	rank, size = mpi.rank, mpi.size
+	oldpi, pi, mypi = 0.0,0.0,0.0
+	
+	done = False
+	<FONT COLOR=#3333CC><B>while</B></FONT>(<FONT COLOR=#3333CC><B>not</B></FONT> done):
+		inside = 0
+		<FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> xrange(nsamples):
+			x = random.random()
+			y = random.random()
+			<FONT COLOR=#3333CC><B>if</B></FONT> ((x*x)+(y*y)&lt;1):
+				inside+=1
+		
+		oldpi = pi
+		mypi = (inside * 1.0)/nsamples
+		pi =  (4.0 / mpi.size) * mpi.allreduce(mypi, mpi.SUM) 
+		
+		delta = abs(pi - oldpi)
+		<FONT COLOR=#3333CC><B>if</B></FONT>(mpi.rank==0):
+			<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"pi:"</FONT>,pi,<FONT COLOR=#115511>" - delta:"</FONT>,delta
+		<FONT COLOR=#3333CC><B>if</B></FONT>(delta &lt; 0.00001):
+			done = True
+	<FONT COLOR=#3333CC><B>return</B></FONT> pi
+
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
+	pi = computePi(10000)
+	<FONT COLOR=#3333CC><B>if</B></FONT>(mpi.rank==0):
+		<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Computed value of pi on"</FONT>,mpi.size,<FONT COLOR=#115511>"processors is"</FONT>,pi
+	
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

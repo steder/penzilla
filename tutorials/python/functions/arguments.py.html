@@ -1,0 +1,52 @@
+<div class="syntax"><pre><span class="c"># Simplest Arguments</span>
+<span class="k">def</span> <span class="nf">multiprint</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">txt</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mf">0</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">txt</span>
+
+<span class="c"># This throws an error</span>
+<span class="n">multiprint</span><span class="p">()</span>
+
+<span class="c"># Default Values</span>
+<span class="k">def</span> <span class="nf">multiprint</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mf">5</span><span class="p">,</span> <span class="n">txt</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mf">0</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">txt</span>
+        
+<span class="c"># This works just fine</span>
+<span class="n">multiprint</span><span class="p">()</span>
+
+<span class="c"># Labels</span>
+<span class="k">def</span> <span class="nf">multiprint</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mf">5</span><span class="p">,</span> <span class="n">txt</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mf">0</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">txt</span>
+
+<span class="c"># I want to call multiprint, but I&#39;m happy with</span>
+<span class="c"># n = 5, so I don&#39;t want to reassign it.</span>
+<span class="c"># I can use the labels to set &quot;txt&quot; without having to set n.</span>
+<span class="n">multiprint</span><span class="p">(</span><span class="n">txt</span><span class="o">=</span><span class="s">&quot;Hello World!&quot;</span><span class="p">)</span>
+
+<span class="c"># You can mix default and required variables</span>
+<span class="c"># Notice there is a default on list, but since it is</span>
+<span class="c"># defined in the middle of the list, you can&#39;t do this:</span>
+<span class="c"># fold_right( lambda x y: x + y, 0 )</span>
+
+<span class="c"># No, you need to specify lst as well, even though you</span>
+<span class="c"># may be happy with the default value.</span>
+<span class="c"># fold_right( lambda x y: x + y, [], 0 )</span>
+<span class="k">def</span> <span class="nf">fold_right</span><span class="p">(</span><span class="n">fun</span><span class="p">,</span> <span class="n">lst</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">base</span><span class="p">):</span>
+    <span class="n">lst</span> <span class="o">=</span> <span class="n">lst</span> <span class="k">if</span> <span class="n">lst</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">lst</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">base</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fun</span><span class="p">(</span><span class="n">lst</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="n">fold_right</span><span class="p">(</span><span class="n">fun</span><span class="p">,</span> <span class="n">lst</span><span class="p">[</span><span class="mf">1</span><span class="p">:],</span> <span class="n">base</span><span class="p">))</span>
+
+<span class="c"># Now, let&#39;s say I want to just define fun and base, and not list.</span>
+<span class="c"># I could do this:</span>
+<span class="n">fold_right</span><span class="p">(</span><span class="n">fun</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mf">0</span><span class="p">)</span> <span class="c">#Look &#39;ma, no list!</span>
+
+<span class="c"># This makes sense if you have a large argument list (5, 10, + variables),</span>
+<span class="c"># some default and some required.  You can easily specify just the</span>
+<span class="c"># variables necessary to run the function and leave the defaults alone.</span>
+</pre></div>

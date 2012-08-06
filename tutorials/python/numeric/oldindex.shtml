@@ -1,0 +1,121 @@
+<html>
+<title>Introduction to Python:  Numeric Python Arrays</title>
+<body>
+<h2>An Introduction to Python:  Numeric Python Arrays</h2>
+<h3>The Numeric Python Array Package</h3>
+<a href="../index.html">Table of Contents</a>
+<hr>
+<h3><font color="green">Python and Arrays</font></h3>
+<!--^Header^-->
+<P>There is a built in Python array type, but it is generally considered slow, difficult to use, and "non-sexy".  Numeric is a module developed by a group primarily interested in high performance array computations in scientific applications.  Numeric Arrays have quite a few built in operations and some of the numerical tricks of Linpack and other number crunching libraries.</P>
+<P><i>If you are interested in working with compiled code and Numeric arrays (i.e.: passing Numeric(Python) arrays to C / passing C arrays to Numeric(Python) ) you should take a look at my <a href="../numpyc/">new page</a> that deals with that topic.  It shows a simple example of code that can take  Numeric array from Python and access it in C.</i></P>  
+<P>Numeric arrays are not terribly difficult to use, so I'm not going to spend a lot of time on them, but they are worth getting ahold of and using, especially in graphics or numerical programs.  There is a significant difference(some might say a HUGE difference) in performance between Numeric Arrays and the built in Python lists.  If you ever find yourself tempted to write multidimensional Python Lists I strongly encourage you to pick up and use Numeric instead.</P>
+<P>I'm going to do some brief examples.  They are very similar to Python lists, and it probably helps to think of them as just special cases of lists.  They support many of the same operations, especially slicing, and are extensible like Python lists, not static like C/C++ arrays.</P>
+
+<ul><!--#include virtual="array.py.html"--></ul>
+
+<P>
+So you can create an Numeric array from a list using the "Numeric.array" constructor.  This is kind of an unrealistic usage.  It is faster and more efficient to just create an array using the following methods.</P>
+
+<ul><!--#include virtual="zeros.py.html"--></ul>
+
+<h4><font color="blue">Using Numeric Arrays</font></h4>
+<P>
+You can access Numeric arrays just like standard Python lists (using [] brackets), but looping over these arrays using <font color="blue">for</font> is not going to be the most efficient.  Like many math/array packages Numeric includes quite a few specialized routines to help you take full advantage of Numeric arrays.  Depending on what you want to do Numeric may have a specialized method that works quickly and efficently over arrays.
+</P><P>
+Some simple examples are the Numeric.sum and Numeric.average functions.  There is a large selection of Numeric operations that can be quickly accessed by typing "help(Numeric)" at the Python prompt.  Here is a brief summary of those functions(shamelessly stolen from Numeric's documentation):
+</P>
+<P>
+<ul>
+<pre><code>
+Functions:
+
+    -   array                      - NumPy Array construction
+    -   zeros                      - Return an array of all zeros
+    -   shape                      - Return shape of sequence or array
+    -   rank                       - Return number of dimensions
+    -   size                       - Return number of elements in entire array or a
+                                     certain dimension
+    -   fromstring                 - Construct array from (byte) string
+    -   take                       - Select sub-arrays using sequence of indices
+    -   put                        - Set sub-arrays using sequence of 1-D indices
+    -   putmask                    - Set portion of arrays using a mask
+    -   reshape                    - Return array with new shape
+    -   repeat                     - Repeat elements of array
+    -   choose                     - Construct new array from indexed array tuple
+    -   cross_correlate            - Correlate two 1-d arrays
+    -   searchsorted               - Search for element in 1-d array
+    -   sum                        - Total sum over a specified dimension
+    -   average                    - Average, possibly weighted, over axis or array.
+    -   cumsum                     - Cumulative sum over a specified dimension
+    -   product                    - Total product over a specified dimension
+    -   cumproduct                 - Cumulative product over a specified dimension
+    -   alltrue                    - Logical and over an entire axis
+    -   sometrue                   - Logical or over an entire axis
+    -   allclose                   - Tests if sequences are essentially equal
+
+    -   arrayrange (arange)        - Return regularly spaced array
+    -   asarray                    - Guarantee NumPy array
+    -   sarray                     - Guarantee a NumPy array that keeps precision
+    -   convolve                   - Convolve two 1-d arrays
+    -   swapaxes                   - Exchange axes
+    -   concatenate                - Join arrays together
+    -   transpose                  - Permute axes
+    -   sort                       - Sort elements of array
+    -   argsort                    - Indices of sorted array
+    -   argmax                     - Index of largest value
+    -   argmin                     - Index of smallest value
+    -   innerproduct               - Innerproduct of two arrays
+    -   dot                        - Dot product (matrix multiplication)
+    -   outerproduct               - Outerproduct of two arrays
+    -   resize                     - Return array with arbitrary new shape
+    -   indices                    - Tuple of indices
+    -   fromfunction               - Construct array from universal function
+    -   diagonal                   - Return diagonal array
+    -   trace                      - Trace of array
+    -   dump                       - Dump array to file object (pickle)
+    -   dumps                      - Return pickled string representing data
+    -   load                       - Return array stored in file object
+    -   loads                      - Return array from pickled string
+    -   ravel                      - Return array as 1-D
+    -   nonzero                    - Indices of nonzero elements for 1-D array
+    -   shape                      - Shape of array
+    -   where                      - Construct array from binary result
+    -   compress                   - Elements of array where condition is true
+    -   clip                       - Clip array between two values
+    -   zeros                      - Array of all zeros
+    -   ones                       - Array of all ones
+    -   identity                   - 2-D identity array (matrix)
+
+(Universal) Math Functions
+
+           add                    logical_or             exp
+           subtract               logical_xor            log
+           multiply               logical_not            log10
+           divide                 maximum                sin
+           divide_safe            minimum                sinh
+           conjugate              bitwise_and            sqrt
+           power                  bitwise_or             tan
+           absolute               bitwise_xor            tanh
+           negative               invert                 ceil
+           greater                left_shift             fabs
+           greater_equal          right_shift            floor
+           less                   arccos                 arctan2
+           less_equal             arcsin                 fmod
+           equal                  arctan                 hypot
+           not_equal              cos                    around
+           logical_and            cosh                   sign
+           arccosh                arcsinh                arctanh
+</pre></code>
+</ul>
+
+<h4><font color="blue">Numeric Arrays and C Extensions</font></h4>
+
+Please see <a href="../numpyc/index.html">this page</a> for information
+on using Numeric Arrays with your C extensions.
+
+<!--\/Footer\/-->
+<hr>
+<a href="../index.html">Table of Contents</a>
+</body>
+</html>

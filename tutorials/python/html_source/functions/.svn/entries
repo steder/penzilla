@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="10"
+   name=""
+   committed-date="2004-01-09T22:55:59.613144Z"
+   url="http://www.ripplefx.net:81/svn/python/html_source/functions"
+   last-author="steder"
+   kind="dir"
+   uuid="996777e2-3ecf-0310-aa64-e0ff611b1bef"
+   revision="17"/>
+<entry
+   committed-rev="10"
+   name="arguments.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="e2fdf089b1841c1a3f56b792cc77e544"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+<entry
+   committed-rev="10"
+   name="multiple-returns.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="5d360b42e72325033d35a72b382d017f"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+<entry
+   committed-rev="10"
+   name="map.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="aeaa1ce466b5182ced4f10906895d825"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+<entry
+   committed-rev="10"
+   name="lambda.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="df9e89c2a9371e9bb20ecf1b6fd2cd21"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+<entry
+   committed-rev="10"
+   name="hello.py.html"
+   text-time="2004-09-20T02:22:33.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="8cfd781156643ccf507c10c139dedac2"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:33.000000Z"/>
+</wc-entries>

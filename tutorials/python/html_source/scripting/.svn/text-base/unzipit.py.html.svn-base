@@ -1,0 +1,38 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># Simple script to Unzip archives created by</FONT>
+<FONT COLOR=#1111CC># our Zip Scripts.</FONT>
+
+<FONT COLOR=#3333CC><B>import</B></FONT> sys
+<FONT COLOR=#3333CC><B>import</B></FONT> os
+<FONT COLOR=#3333CC><B>from</B></FONT> zipfile <FONT COLOR=#3333CC><B>import</B></FONT> ZipFile, ZIP_DEFLATED
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="unzip"><FONT COLOR=#CC0000><B> unzip</B></FONT></A>( path ):
+    <FONT COLOR=#1111CC># Create a ZipFile Object Instance</FONT>
+    archive = ZipFile(path, <FONT COLOR=#115511>"r"</FONT>, ZIP_DEFLATED)
+    names = archive.namelist()
+    <FONT COLOR=#3333CC><B>for</B></FONT> name <FONT COLOR=#3333CC><B>in</B></FONT> names:
+        <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> os.path.exists(os.path.dirname(name)):
+            <FONT COLOR=#1111CC># Create that directory</FONT>
+            os.mkdir(os.path.dirname(name))
+        <FONT COLOR=#1111CC># Write files to disk</FONT>
+        temp = open(name, <FONT COLOR=#115511>"wb"</FONT>) <FONT COLOR=#1111CC># create the file</FONT>
+        data = archive.read(name) <FONT COLOR=#1111CC>#read the binary data</FONT>
+        temp.write(data)
+        temp.close()
+    archive.close()
+    <FONT COLOR=#3333CC><B>return</B></FONT> <FONT COLOR=#115511>"\""</FONT>+path+<FONT COLOR=#115511>"\" was unzipped successfully."</FONT>
+    
+instructions = <FONT COLOR=#115511>"This script unzips plain jane zipfiles:"</FONT>+\
+               <FONT COLOR=#115511>"e.g.:  python unzipit.py myfiles.zip"</FONT>
+
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
+    <FONT COLOR=#3333CC><B>if</B></FONT> len(sys.argv) == 2:
+        msg = unzip(sys.argv[1])
+        <FONT COLOR=#3333CC><B>print</B></FONT> msg
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#3333CC><B>print</B></FONT> instructions
+</PRE>
+                  <!--footer-->
+                  </BODY>

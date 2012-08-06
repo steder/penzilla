@@ -1,0 +1,23 @@
+<div class="syntax"><pre><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Let&#39;s create a file and write it to disk.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c"># Let&#39;s create a file containing a list of names:</span>
+<span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c"># prompt for names, stop on the first blank line:</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&quot;Enter a name: &quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+        <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">break</span>
+    
+<span class="c"># write the names to your file:</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="s">&quot;test.dat&quot;</span>
+<span class="k">print</span> <span class="s">&quot;Writing names to </span><span class="si">%s</span><span class="s">...&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">filename</span><span class="p">,)</span>
+<span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s">&quot;w&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">name</span><span class="p">,))</span>
+<span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>

@@ -1,0 +1,160 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#115511>"""
+BobClient.py
+---
+Simple Chat Client that runs the Bob Protocol.  Bob stands for ...   Um....
+Nevermind.
+
+BobClient is threaded to allow one thread to wait on user input, while another
+thread processes the network connection.
+BobClient's goal is to send an arbitrarily long message to the server and
+recieve that message back.  In fact, messages sent by other clients to the
+Server will also get echoed back onto All BobClients.  This is how we create
+our little chat program.
+"""</FONT>
+
+
+
+<FONT COLOR=#3333CC><B>import</B></FONT> thread, time, sys
+<FONT COLOR=#3333CC><B>from</B></FONT> socket <FONT COLOR=#3333CC><B>import</B></FONT> socket, AF_INET, SOCK_STREAM
+
+<FONT COLOR=#1111CC># Bob Protocol</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> Protocol
+<FONT COLOR=#1111CC># We need to pickle these messages for transmission</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> pickle
+
+<FONT COLOR=#1111CC># Build a Client Object:</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Client"><FONT COLOR=#CC0000><B> Client</B></FONT></A>:
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, HOSTNAME,  username):
+        self.HOSTNAME = HOSTNAME
+        self.PORTS = [7777,7778]
+        self.username = username
+        self.DONE = 0
+    <FONT COLOR=#1111CC>#------------ Threaded Stuff ----------------#</FONT>
+    <FONT COLOR=#1111CC># I'm using PORTS 7777 and 7778</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="Chat"><FONT COLOR=#CC0000><B> Chat</B></FONT></A>(self):
+        <FONT COLOR=#1111CC># Start two threads, one reading, one writing</FONT>
+        thread.start_new(self.ChatRead, (self.PORTS[0],self.username,))
+        thread.start_new(self.ChatWrite, (self.PORTS[1],self.username,))
+        <FONT COLOR=#1111CC># We need a loop here, if this</FONT>
+        <FONT COLOR=#1111CC># function exists it kills the</FONT>
+        <FONT COLOR=#1111CC># threads.</FONT>
+        <FONT COLOR=#3333CC><B>while</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> self.DONE:
+            time.sleep(0.1) 
+        <FONT COLOR=#3333CC><B>return</B></FONT>
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="ChatRead"><FONT COLOR=#CC0000><B> ChatRead</B></FONT></A>(self, PORT,username):
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Client Initializing READS"</FONT>
+        <FONT COLOR=#1111CC># Create Connect _READ_ Message</FONT>
+        connect = Protocol.Message(username,<FONT COLOR=#115511>"Connecting Client Read Thread"</FONT>,
+                               <FONT COLOR=#115511>"&lt;_READ_&gt;"</FONT>,None)
+        <FONT COLOR=#1111CC># Initialize Network Connection</FONT>
+        readsock = socket(AF_INET, SOCK_STREAM)
+        readsock.connect((self.HOSTNAME, PORT))
+        <FONT COLOR=#1111CC># PIckle and send the connect message as a string</FONT>
+        readsock.send(pickle.dumps(connect))
+        <FONT COLOR=#3333CC><B>while</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> self.DONE:
+            data = readsock.recv(1024)
+            <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> data:
+                <FONT COLOR=#3333CC><B>continue</B></FONT>
+            data = pickle.loads(data)
+            <FONT COLOR=#3333CC><B>print</B></FONT> data.username+<FONT COLOR=#115511>"( "</FONT>+data.time+<FONT COLOR=#115511>" ): "</FONT>+data.message
+        readsock.close()
+        <FONT COLOR=#3333CC><B>return</B></FONT>
+        
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="ChatWrite"><FONT COLOR=#CC0000><B> ChatWrite</B></FONT></A>(self, PORT, username):
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Client Initializing WRITES"</FONT>
+        <FONT COLOR=#1111CC># Create Connect _WRITE_ Message</FONT>
+        connect = Protocol.Message(username,<FONT COLOR=#115511>"Connecting Client Write Thread"</FONT>,
+                                   <FONT COLOR=#115511>"&lt;_WRITE_&gt;"</FONT>,None)
+        <FONT COLOR=#1111CC># Initialize Network Connection    </FONT>
+        writesock = socket(AF_INET, SOCK_STREAM)
+        writesock.connect((self.HOSTNAME, PORT))
+        writesock.send(pickle.dumps(connect))
+        <FONT COLOR=#3333CC><B>while</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> self.DONE:
+            data = raw_input(<FONT COLOR=#115511>"&gt;"</FONT>)
+            <FONT COLOR=#3333CC><B>if</B></FONT> data == <FONT COLOR=#115511>""</FONT>:
+                <FONT COLOR=#3333CC><B>continue</B></FONT>
+            <FONT COLOR=#3333CC><B>else</B></FONT>: <FONT COLOR=#1111CC># Just a normal message</FONT>
+                message = Protocol.Message(username,data)
+                writesock.send(pickle.dumps(message))
+                time.sleep(0.2)
+        writesock.close()
+        <FONT COLOR=#3333CC><B>return</B></FONT>
+
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
+    <FONT COLOR=#3333CC><B>if</B></FONT> len(sys.argv) == 2:
+        Bob = Client(<FONT COLOR=#115511>""</FONT>,sys.argv[1])
+        Bob.Chat()
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        name = raw_input(<FONT COLOR=#115511>"Please enter a name to chat:"</FONT>)
+        Bob = Client(<FONT COLOR=#115511>""</FONT>,name)
+        Bob.Chat()
+        
+
+<FONT COLOR=#1111CC>#------------ Testing Functions --------------#</FONT>
+<FONT COLOR=#1111CC># These may be useful if you rewrite them</FONT>
+<FONT COLOR=#1111CC># to use the new message objects.</FONT>
+
+<FONT COLOR=#1111CC>## message = ["Ping!"]</FONT>
+<FONT COLOR=#1111CC>## def pingBob():</FONT>
+<FONT COLOR=#1111CC>##     sockobj = socket(AF_INET, SOCK_STREAM)</FONT>
+<FONT COLOR=#1111CC>##     sockobj.connect((HOSTNAME, PORT))</FONT>
+<FONT COLOR=#1111CC>##     for line in message:</FONT>
+<FONT COLOR=#1111CC>##         sockobj.send(line)</FONT>
+<FONT COLOR=#1111CC>##         data = sockobj.recv(1024)</FONT>
+<FONT COLOR=#1111CC>##         print 'Client received:', `data`</FONT>
+<FONT COLOR=#1111CC>##     sockobj.close()</FONT>
+<FONT COLOR=#1111CC>##     return</FONT>
+
+<FONT COLOR=#1111CC>## def autoBob(message):</FONT>
+<FONT COLOR=#1111CC>##     sockobj = socket(AF_INET, SOCK_STREAM)</FONT>
+<FONT COLOR=#1111CC>##     sockobj.connect((HOSTNAME, PORT))</FONT>
+<FONT COLOR=#1111CC>##     done = 0</FONT>
+<FONT COLOR=#1111CC>##     for i in range(6):</FONT>
+<FONT COLOR=#1111CC>##         time.sleep(1)</FONT>
+<FONT COLOR=#1111CC>##         sockobj.send(message)</FONT>
+<FONT COLOR=#1111CC>##         data = sockobj.recv(1024)</FONT>
+<FONT COLOR=#1111CC>##         print 'Client received:', `data`</FONT>
+<FONT COLOR=#1111CC>##     sockobj.close()</FONT>
+<FONT COLOR=#1111CC>##     return</FONT>
+
+
+
+<FONT COLOR=#1111CC># I'm not going to bother implementing these until</FONT>
+<FONT COLOR=#1111CC># They are supported on the server</FONT>
+<FONT COLOR=#1111CC># and the Client is Object Oriented.</FONT>
+
+<FONT COLOR=#1111CC>##         if data.find("&lt;QUIT&gt;")&gt;0 and data.find("&lt;/QUIT&gt;")&gt;0:</FONT>
+<FONT COLOR=#1111CC>##             cmd = Protocol.splitCommand(data)</FONT>
+<FONT COLOR=#1111CC>##             password = cmd[1].split(":")[1]</FONT>
+<FONT COLOR=#1111CC>##             message = Protocol.Message(username,</FONT>
+<FONT COLOR=#1111CC>##                                        "Server Is Exiting!", data, password)</FONT>
+<FONT COLOR=#1111CC>##         elif data == "&lt;EXIT&gt;":</FONT>
+<FONT COLOR=#1111CC>##             message = Protocol.Message(username,"left the building.","&lt;EXIT&gt;")</FONT>
+<FONT COLOR=#1111CC>##             print "Client Exiting..."</FONT>
+<FONT COLOR=#1111CC>##             time.sleep(1.0)</FONT>
+<FONT COLOR=#1111CC>##             break</FONT>
+<FONT COLOR=#1111CC>## # Not sure how to implement Nick at the moment</FONT>
+<FONT COLOR=#1111CC>## # Let's not worry about it for now.</FONT>
+<FONT COLOR=#1111CC>## ##         elif data.find("&lt;NICK&gt;")&gt;0 and data.find("&lt;/NICK&gt;")&gt;0:</FONT>
+<FONT COLOR=#1111CC>## ##             cmd = Protocol.splitCommand(data)</FONT>
+<FONT COLOR=#1111CC>## ##             newname = cmd[1]</FONT>
+<FONT COLOR=#1111CC>## ##             message = Protocol.Message(newname, " &lt;=&gt; "+username, data)</FONT>
+<FONT COLOR=#1111CC>##         elif data.find("&lt;KICK&gt;")&gt;0 and data.find("&lt;/KICK&gt;")&gt;0:</FONT>
+<FONT COLOR=#1111CC>##             cmd = Protocol.splitCommand(data)</FONT>
+<FONT COLOR=#1111CC>##             password = cmd[1].split(":")[1]</FONT>
+<FONT COLOR=#1111CC>##             message = Protocol.Message(username, data, data, password)</FONT>
+<FONT COLOR=#1111CC>##         elif data.find("&lt;EMOTE&gt;")&gt;0:</FONT>
+<FONT COLOR=#1111CC>##             cmd = Protocol.splitCommand(data)</FONT>
+<FONT COLOR=#1111CC>##             emotion = cmd[1]</FONT>
+<FONT COLOR=#1111CC>##             message = Protocol.Message(username, emotion, data)</FONT>
+
+
+
+    
+</PRE>
+                  <!--footer-->
+                  </BODY>

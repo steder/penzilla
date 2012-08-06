@@ -1,0 +1,22 @@
+<hr />
+<p>
+  <a href="http://www.python.org">
+    <img alt="http://www.python.org" src="/tutorials/python/images/PythonPoweredAnim.gif" />
+  </a> 
+  <a href="http://www.pygame.org">
+    <img alt="http://www.pygame.org" src="/tutorials/python/images/pygame_tiny.gif" />
+  </a> 
+  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/1.0/">
+    <img alt="Creative Commons License" src="http://creativecommons.org/images/public/somerights.gif" />
+  </a>
+</p>
+<!-- Creative Commons License -->
+<p>This website and all code examples are &copy; 
+  <!--#config timefmt="%Y"-->
+  <a href="mailto:steder@gmail.com">Mike Steder</a>(
+  <!--#echo var="LAST_MODIFIED"-->)<br />
+  and is licensed under a <a rel="license" href=
+                             "http://creativecommons.org/licenses/by-nc-sa/1.0/">Creative
+    Commons License</a>.<br />
+  <!-- /Creative Commons License -->
+</p>

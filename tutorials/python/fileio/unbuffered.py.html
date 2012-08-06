@@ -1,0 +1,26 @@
+<div class="syntax"><pre><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd"> 0 means buffer size of 0</span>
+<span class="sd"> or unbuffered:</span>
+
+<span class="sd"> 1 means line buffered</span>
+
+<span class="sd"> Some other number &gt;1 means use</span>
+<span class="sd"> a buffer that size (4096 would mean use a buffer</span>
+<span class="sd"> of 4096 bytes)</span>
+
+<span class="sd"> Defaults to -1, which indicates the platform</span>
+<span class="sd"> default</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> 
+
+<span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">namelist</span><span class="p">)</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Now when your program exits without</span>
+<span class="sd">calling FILE.close() your data will</span>
+<span class="sd">still be written to disk.</span>
+
+<span class="sd">Yeah...  It kind of an ugly way to do things.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>

@@ -1,0 +1,34 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># multiple-returns.py</FONT>
+a, b, c = 0, 0, 0
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getabc"><FONT COLOR=#CC0000><B> getabc</B></FONT></A>():
+    a = <FONT COLOR=#115511>"Hello"</FONT>
+    b = <FONT COLOR=#115511>"World"</FONT>
+    c = <FONT COLOR=#115511>"!"</FONT>
+    <FONT COLOR=#3333CC><B>return</B></FONT> a,b,c <FONT COLOR=#1111CC>#defines a tuple on the fly</FONT>
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="gettuple"><FONT COLOR=#CC0000><B> gettuple</B></FONT></A>():
+    a,b,c = 1,2,3 <FONT COLOR=#1111CC># Notice the similarities between this and getabc?</FONT>
+    <FONT COLOR=#3333CC><B>return</B></FONT> (a,b,c)
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getlist"><FONT COLOR=#CC0000><B> getlist</B></FONT></A>():
+    a,b,c = (3,4),(4,5),(5,6)
+    <FONT COLOR=#3333CC><B>return</B></FONT> [a,b,c]
+
+<FONT COLOR=#1111CC># These all work, as amazing as it seems.</FONT>
+<FONT COLOR=#1111CC># So multiple assignment is actually quite easy.</FONT>
+a,b,c = getabc()
+d,e,f = gettuple()
+g,h,i = getlist()
+
+<FONT COLOR=#1111CC># It's fun too...  Depending on how you design your code,</FONT>
+<FONT COLOR=#1111CC># chances are you'll never ever use it.</FONT>
+<FONT COLOR=#1111CC># But it's neat.</FONT>
+
+
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

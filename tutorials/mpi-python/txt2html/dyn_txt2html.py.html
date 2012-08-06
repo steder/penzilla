@@ -1,0 +1,34 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/mpi-python/pympi/max.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#3333CC><B>from</B></FONT> dmTxt2Html <FONT COLOR=#3333CC><B>import</B></FONT> *     <FONT COLOR=#1111CC># Import the body of 'Txt2Html' code</FONT>
+<FONT COLOR=#3333CC><B>from</B></FONT> urllib <FONT COLOR=#3333CC><B>import</B></FONT> urlopen
+<FONT COLOR=#3333CC><B>import</B></FONT> sys
+
+<FONT COLOR=#1111CC># Check for updated functions (fail gracefully if not fetchable)</FONT>
+<FONT COLOR=#3333CC><B>try</B></FONT>:
+    updates = urlopen(<FONT COLOR=#115511>'http://gnosis.cx/download/t2h_textfuncs.py'</FONT>).read()
+    fh = open(<FONT COLOR=#115511>'t2h_textfuncs.py'</FONT>, <FONT COLOR=#115511>'w'</FONT>)
+    fh.write(updates)
+    fh.close()
+<FONT COLOR=#3333CC><B>except</B></FONT>:
+    sys.stderr.write(<FONT COLOR=#115511>'Cannot currently download Txt2Html updates'</FONT>)
+
+<FONT COLOR=#1111CC># Import the updated functions (if available)</FONT>
+<FONT COLOR=#3333CC><B>try</B></FONT>:
+    <FONT COLOR=#3333CC><B>from</B></FONT> t2h_textfuncs <FONT COLOR=#3333CC><B>import</B></FONT> *
+<FONT COLOR=#3333CC><B>except</B></FONT>:
+    sys.stderr.write(<FONT COLOR=#115511>'Cannot import the updated Txt2Html functions'</FONT>)
+
+<FONT COLOR=#1111CC># Set options based on runmode (shell vs. CGI)</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> len(sys.argv) &gt;= 2:
+    cfg_dict = ParseArgs(sys.argv[1:])
+    main(cfg_dict)
+<FONT COLOR=#3333CC><B>else</B></FONT>:
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Please specify URL (and options) for Txt2Html conversion"</FONT>
+
+
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

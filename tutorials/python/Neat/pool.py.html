@@ -1,0 +1,191 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#!/usr/bin/env python</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC># pool.py:          Resource Pool management</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># See __doc__ string below.</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># Requires:</FONT>
+<FONT COLOR=#1111CC>#   Python 1.5.2 or &gt;</FONT>
+<FONT COLOR=#1111CC>#   OS: portable</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># TODO</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># $Id: //depot/rgutils/rgutils/pool.py#1 $</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#115511>'''
+Resource pool management.
+
+B{Classes}
+   - L{Pool}  -- a pool of resources.
+'''</FONT>
+__version__ = <FONT COLOR=#115511>'1.1.'</FONT> + <FONT COLOR=#115511>'$Revision: #1 $'</FONT>[12:-2]
+__author__ = <FONT COLOR=#115511>'Richard Gruet'</FONT>, <FONT COLOR=#115511>'rjgruet@yahoo.com'</FONT>
+__date__    = <FONT COLOR=#115511>'$Date: 2003/05/23 $'</FONT>[7:-2], <FONT COLOR=#115511>'$Author: rgruet $'</FONT>[9:-2]
+__since__ = <FONT COLOR=#115511>'2000/11/10'</FONT>
+__doc__ += <FONT COLOR=#115511>'\n@author: %s (U{%s})\n@version: %s'</FONT> % (__author__[0],
+                                            __author__[1], __version__)
+
+
+<FONT COLOR=#3333CC><B>import</B></FONT> threading, types
+
+true, false = -1, 0
+
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="PoolError"><FONT COLOR=#CC0000><B> PoolError</B></FONT></A>(Exception):
+    <FONT COLOR=#115511>''' Exception raised by the pool module.
+    '''</FONT>
+    <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Pool"><FONT COLOR=#CC0000><B> Pool</B></FONT></A>:
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#115511>''' A pool of resources to be shared by threads of a (same) process.
+
+        All resources are supposed of the same kind. They are created
+        externally and passed on creation.
+
+        The class defines 2 methods:
+
+          - L{acquire}(timeout)    -- acquire a resource
+          - L{release}(resource)   -- release a resource
+
+    '''</FONT>
+    FREE = 0        <FONT COLOR=#1111CC># resource is available.</FONT>
+    ALLOCATED = 1   <FONT COLOR=#1111CC># resource is allocated</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, resources):
+        <FONT COLOR=#115511>''' Creates a pool containing the given resources.
+
+            @param resources: A sequence of arbitrary objects that must be of
+                              the same kind (not checked).
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> (<FONT COLOR=#3333CC><B>not</B></FONT> isinstance(resources, types.TupleType) <FONT COLOR=#3333CC><B>and</B></FONT>
+            <FONT COLOR=#3333CC><B>not</B></FONT> isinstance(resources, types.ListType)):
+            <FONT COLOR=#3333CC><B>raise</B></FONT> TypeError(<FONT COLOR=#115511>'Arg resources must be a list or a tuple.'</FONT>)
+        <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> resources:
+            <FONT COLOR=#3333CC><B>raise</B></FONT> ValueError(<FONT COLOR=#115511>'Resource list is empty.'</FONT>)
+
+        self.resDict = {}   <FONT COLOR=#1111CC># { id resource: (resource, state FREE/ALLOCATED,</FONT>
+                            <FONT COLOR=#1111CC>#                 None/owner),...}</FONT>
+        <FONT COLOR=#3333CC><B>for</B></FONT> res <FONT COLOR=#3333CC><B>in</B></FONT> resources:
+            key = id(res)
+            assert <FONT COLOR=#3333CC><B>not</B></FONT> self.resDict.has_key(key), <FONT COLOR=#115511>'Duplicate resource key'</FONT>
+            self.resDict[key] = (res, self.FREE, None)
+
+        self.resAvailable = threading.Condition(threading.Lock())
+        self.freeCnt = len(self.resDict)     <FONT COLOR=#1111CC># nb of avail. resources</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__del__"><FONT COLOR=#CC0000><B> __del__</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__repr__"><FONT COLOR=#CC0000><B> __repr__</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> <FONT COLOR=#115511>'&lt;Pool, %d resources, %d free&gt;'</FONT> % (len(self.resDict),
+                                                  self.freeCnt)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="acquire"><FONT COLOR=#CC0000><B> acquire</B></FONT></A>(self, blocking=true):
+        <FONT COLOR=#115511>'''Requests the allocation of a resource.
+
+           @param blocking: if true, waits until a resource is available.
+           @return: The allocated resource, or None if C{blocking} false
+                   and no available resource.
+        '''</FONT>
+        self.resAvailable.acquire()
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            <FONT COLOR=#3333CC><B>while</B></FONT> self.freeCnt == 0:
+                <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> blocking:
+                    <FONT COLOR=#3333CC><B>return</B></FONT> None
+                self.resAvailable.wait()
+            <FONT COLOR=#3333CC><B>else</B></FONT>: <FONT COLOR=#1111CC># locate avail resource:</FONT>
+                <FONT COLOR=#3333CC><B>for</B></FONT> res, state, owner <FONT COLOR=#3333CC><B>in</B></FONT> self.resDict.values():
+                    <FONT COLOR=#3333CC><B>if</B></FONT> state == self.FREE:
+                        <FONT COLOR=#1111CC># Allocate the resource to caller:</FONT>
+                        callerId = threading.currentThread()
+                        self.resDict[id(res)] = (res, self.ALLOCATED, callerId)
+                        self.freeCnt = self.freeCnt - 1
+                        <FONT COLOR=#3333CC><B>return</B></FONT> res
+                <FONT COLOR=#3333CC><B>raise</B></FONT> PoolError(<FONT COLOR=#115511>'BUG! freeCnt&gt;0 but no free resource found'</FONT>)
+        <FONT COLOR=#3333CC><B>finally</B></FONT>:
+            self.resAvailable.release()
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="release"><FONT COLOR=#CC0000><B> release</B></FONT></A>(self, resource):
+        <FONT COLOR=#115511>'''Releases a resource.
+
+           @param resource: The resource to release.
+           @exception PoolError: The resource doesn't belong to the pool,
+                        is not allocated or the caller is not the owner.
+         '''</FONT>
+        self.resAvailable.acquire()
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            key = id(resource)
+            <FONT COLOR=#3333CC><B>try</B></FONT>:
+                res, state, owner = self.resDict[key]
+            <FONT COLOR=#3333CC><B>except</B></FONT> KeyError:
+                <FONT COLOR=#3333CC><B>raise</B></FONT> PoolError(<FONT COLOR=#115511>"Can't release unknown resource."</FONT>)
+            <FONT COLOR=#3333CC><B>if</B></FONT> state != self.ALLOCATED:
+                <FONT COLOR=#3333CC><B>raise</B></FONT> PoolError(<FONT COLOR=#115511>'Resource not allocated.'</FONT>)
+            <FONT COLOR=#3333CC><B>if</B></FONT> owner != threading.currentThread():
+                <FONT COLOR=#3333CC><B>raise</B></FONT> PoolError(<FONT COLOR=#115511>'Not owner (owner ID is %d).'</FONT> % owner)
+            self.resDict[key] = (resource, self.FREE, None)
+            self.freeCnt = self.freeCnt + 1
+            self.resAvailable.notify()
+        <FONT COLOR=#3333CC><B>finally</B></FONT>:
+            self.resAvailable.release()
+
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC>#                               T E S T S</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test"><FONT COLOR=#CC0000><B> test</B></FONT></A>():
+
+    resCnt = 3          <FONT COLOR=#1111CC># Nb of resources in pool.</FONT>
+    clientCnt = 10      <FONT COLOR=#1111CC># Nb of concurrent clients.</FONT>
+    acquireCnt = 10     <FONT COLOR=#1111CC># Nb of resource acquires for each client</FONT>
+
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Testing Pool (%d resources, %d consumers)...'</FONT> % (resCnt, clientCnt)
+
+    resources = []
+    <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> range(resCnt):
+        resources.append(<FONT COLOR=#115511>'res%d'</FONT> % i)
+    pool = Pool(resources)
+    <FONT COLOR=#1111CC>#print </FONT>pool
+
+    <FONT COLOR=#1111CC># Create &lt;clientCnt&gt; x threads to represent consumers</FONT>
+    threads = []
+    <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> range(clientCnt):
+        name = <FONT COLOR=#115511>'client#%d'</FONT> % (i+1)
+        threads.append(threading.Thread(target=_threadMain,
+                                          args=(name, pool, acquireCnt)))
+    <FONT COLOR=#3333CC><B>for</B></FONT> thread <FONT COLOR=#3333CC><B>in</B></FONT> threads:
+        thread.start()
+
+    <FONT COLOR=#1111CC># Wait for termination of all clients:</FONT>
+    <FONT COLOR=#3333CC><B>import</B></FONT> time
+    <FONT COLOR=#3333CC><B>while</B></FONT> threads:
+        threads = filter(<FONT COLOR=#3333CC><B>lambda</B></FONT> t: t.isAlive(), threads)
+        <FONT COLOR=#3333CC><B>if</B></FONT> threads:
+            time.sleep(0.5)
+
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'=&gt; Tests passed.'</FONT>
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_threadMain"><FONT COLOR=#CC0000><B> _threadMain</B></FONT></A>(name, pool, acquireCnt):
+    <FONT COLOR=#3333CC><B>import</B></FONT> time, random
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'%s started.'</FONT> % name
+    <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> range(acquireCnt):
+        res = pool.acquire()
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'%s acquired by %s'</FONT> % (res, name)
+        time.sleep(random.random()/2 + 0.01)
+        pool.release(res)
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'%s released by %s'</FONT> % (res, name)
+        time.sleep(0.01)
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'%s ended.'</FONT> % name
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC>#                               M A I N</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__ == <FONT COLOR=#115511>"__main__"</FONT>:
+    test()
+</PRE>
+                  <!--footer-->
+                  </BODY>

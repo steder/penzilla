@@ -1,0 +1,30 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#3333CC><B>class</B></FONT><A NAME="BaseClass"><FONT COLOR=#CC0000><B> BaseClass</B></FONT></A>:
+    <FONT COLOR=#1111CC># This data will exist in all</FONT>
+    <FONT COLOR=#1111CC># BaseClasses (even uninstantiated ones)</FONT>
+    Name = <FONT COLOR=#115511>"BaseClass"</FONT>
+    <FONT COLOR=#1111CC># __init__ is a class constructor</FONT>
+    <FONT COLOR=#1111CC># __****__ is usually a special class method.</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, arg1, arg2):
+        <FONT COLOR=#1111CC># These values are created</FONT>
+        <FONT COLOR=#1111CC># when the class is instantiated.</FONT>
+        self.value1 = arg1
+        self.value2 = arg2
+
+    <FONT COLOR=#1111CC># Self is used as an argument to</FONT>
+    <FONT COLOR=#1111CC># pretty much all class functions.</FONT>
+    <FONT COLOR=#1111CC># However, you do NOT need to pass</FONT>
+    <FONT COLOR=#1111CC># the argument self if you call this method</FONT>
+    <FONT COLOR=#1111CC># from a Class, because the class provides</FONT>
+    <FONT COLOR=#1111CC># the value of itself.</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="display"><FONT COLOR=#CC0000><B> display</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>print</B></FONT> self.Name
+        <FONT COLOR=#3333CC><B>print</B></FONT> self.value1
+        <FONT COLOR=#3333CC><B>print</B></FONT> self.value2
+
+        
+</PRE>
+                  <!--footer-->
+                  </BODY>

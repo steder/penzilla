@@ -1,0 +1,254 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#115511>"""
+BobClient.py
+---
+Simple Chat Client that runs the Bob Protocol.  Bob stands for ...   Um....
+Nevermind.
+
+BobClient is threaded to allow one thread to wait on user input, while another
+thread processes the network connection.
+BobClient's goal is to send an arbitrarily long message to the server and
+recieve that message back.  In fact, messages sent by other clients to the
+Server will also get echoed back onto All BobClients.  This is how we create
+our little chat program.
+"""</FONT>
+
+
+
+<FONT COLOR=#3333CC><B>import</B></FONT> thread, time, sys,string
+<FONT COLOR=#3333CC><B>from</B></FONT> socket <FONT COLOR=#3333CC><B>import</B></FONT> socket, AF_INET, SOCK_STREAM
+
+<FONT COLOR=#1111CC># Bob Protocol</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> Protocol
+<FONT COLOR=#1111CC># We need to pickle these messages for transmission</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> pickle
+
+<FONT COLOR=#1111CC># I used to Define the Text Gui Class Here, now let's just import it:</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> BobClient
+
+<FONT COLOR=#1111CC># Create  A GUI Client:</FONT>
+<FONT COLOR=#1111CC>#   +First Define Some GUI Widgets!</FONT>
+<FONT COLOR=#3333CC><B>from</B></FONT> Tkinter <FONT COLOR=#3333CC><B>import</B></FONT> *
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="ScrolledText"><FONT COLOR=#CC0000><B> ScrolledText</B></FONT></A>(Frame):
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, parent=None, event=None, text=<FONT COLOR=#115511>''</FONT>,
+                 height=10, width=10):
+        Frame.__init__(self, parent, event=None)
+        self.event = event
+        self.makewidgets(height, width)
+        self.settext(text)
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="makewidgets"><FONT COLOR=#CC0000><B> makewidgets</B></FONT></A>(self, height, width):
+        sbar = Scrollbar(self)
+        text = Text(self, relief=SUNKEN)
+        sbar.config(command=text.yview)       <FONT COLOR=#1111CC># xlink sbar and text</FONT>
+        text.config(yscrollcommand=sbar.set,   <FONT COLOR=#1111CC># move one moves other</FONT>
+                    height=height,
+                    width=width)
+        sbar.pack(side=RIGHT, fill=Y, expand=Y)         <FONT COLOR=#1111CC># pack first=clip last</FONT>
+        text.pack(side=LEFT, fill=BOTH, expand=Y)  <FONT COLOR=#1111CC>#text clipped first</FONT>
+        self.text = text
+        self.buffer = []
+        <FONT COLOR=#1111CC># Bind Some event to this widget.</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.event != None:
+            <FONT COLOR=#1111CC># If this is an imput widget, bind return</FONT>
+            <FONT COLOR=#3333CC><B>if</B></FONT> self.event == <FONT COLOR=#115511>"input"</FONT>:
+                self.text.bind(<FONT COLOR=#115511>"&lt;Return&gt;"</FONT>,self.cSetText,<FONT COLOR=#115511>""</FONT>)
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="settext"><FONT COLOR=#CC0000><B> settext</B></FONT></A>(self, text=<FONT COLOR=#115511>''</FONT>):
+        self.text.delete(<FONT COLOR=#115511>'1.0'</FONT>, END)
+        self.text.insert(<FONT COLOR=#115511>'1.0'</FONT>, text)
+        self.text.mark_set(INSERT,<FONT COLOR=#115511>'1.0'</FONT>)
+        self.text.focus()
+    <FONT COLOR=#1111CC># For Input Handling Text Boxes</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="cSetText"><FONT COLOR=#CC0000><B> cSetText</B></FONT></A>(self, event):
+        txt = self.gettext()
+        self.settext(<FONT COLOR=#115511>""</FONT>)
+        <FONT COLOR=#3333CC><B>if</B></FONT> txt.strip(<FONT COLOR=#115511>"\n"</FONT>) == <FONT COLOR=#115511>""</FONT>:
+            <FONT COLOR=#115511>"""Empty String, Don't Bother"""</FONT>
+            <FONT COLOR=#3333CC><B>return</B></FONT>
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#1111CC># Process txt to remove newlines</FONT>
+            <FONT COLOR=#1111CC># at the beginning of the string</FONT>
+            txt = txt.strip(<FONT COLOR=#115511>"\n"</FONT>)    
+            self.buffer.append(txt)
+            <FONT COLOR=#3333CC><B>print</B></FONT> self.buffer
+            
+    <FONT COLOR=#1111CC># What I'll probably use in BobChat</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="inserttext"><FONT COLOR=#CC0000><B> inserttext</B></FONT></A>(self, text):
+        self.text.insert(END, text)
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="gettext"><FONT COLOR=#CC0000><B> gettext</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.text.get(<FONT COLOR=#115511>'0.0'</FONT>,END)
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getReference"><FONT COLOR=#CC0000><B> getReference</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> self
+
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="GClient"><FONT COLOR=#CC0000><B> GClient</B></FONT></A>(BobClient.Client):
+    <FONT COLOR=#1111CC># I'm using PORTS 7777 and 7778</FONT>
+    <FONT COLOR=#115511>"""
+    GClient is essentially BobClient.Client.  The __init__ method of
+    the two functions is exactly the same.  The real difference is
+    the addition of all the gui calls in GClient.
+    """</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="Chat"><FONT COLOR=#CC0000><B> Chat</B></FONT></A>(self):
+        <FONT COLOR=#1111CC># Create a GUI consisting of the above widgets</FONT>
+        <FONT COLOR=#1111CC># Create main window</FONT>
+        win = Tk()
+        win.title(<FONT COLOR=#115511>"BobChat: "</FONT>+self.username)
+        win.focus_set()
+        win.protocol(<FONT COLOR=#115511>'WM_DELETE_WINDOW'</FONT>, win.quit)
+        frame = Frame(win).pack()
+        <FONT COLOR=#1111CC># Create 2 Gui Widgets:  Text Window (Scrollable)</FONT>
+        message_window = ScrolledText(win, <FONT COLOR=#115511>""</FONT>,<FONT COLOR=#115511>""</FONT>, height=30, width=100)
+        <FONT COLOR=#1111CC>#message_window.config(width=80,height=25)</FONT>
+        message_window.pack(side=TOP, expand=Y, fill=BOTH)
+        <FONT COLOR=#1111CC># Text Input (Non-Scrollable)</FONT>
+        input_window = ScrolledText(win,<FONT COLOR=#115511>"input"</FONT>,<FONT COLOR=#115511>""</FONT>, height=5, width=100)
+        <FONT COLOR=#1111CC>#input_window.config(width=80,height=5)</FONT>
+        input_window.pack(side=BOTTOM, expand=Y, fill=BOTH)
+        input_window.config(height=10)
+        <FONT COLOR=#1111CC># Start two threads, one reading, one writing</FONT>
+        <FONT COLOR=#3333CC><B>print</B></FONT> input_window
+
+        <FONT COLOR=#1111CC># Comment These Out to Debug the Gui \/</FONT>
+        thread.start_new(self.GChatRead,
+                         (self.PORTS[0],self.username,
+                          message_window,))
+        thread.start_new(self.GChatWrite,
+                         (self.PORTS[1],self.username,
+                          input_window,))
+        <FONT COLOR=#1111CC># Comment These Out to Debug the Gui ^</FONT>
+        
+        <FONT COLOR=#1111CC># We need a loop here, if this</FONT>
+        <FONT COLOR=#1111CC># function exits it kills the</FONT>
+        <FONT COLOR=#1111CC># threads.</FONT>
+        win.mainloop()
+        win.destroy()
+        <FONT COLOR=#3333CC><B>return</B></FONT>
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="GChatRead"><FONT COLOR=#CC0000><B> GChatRead</B></FONT></A>(self, PORT,username, msgbox):
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Client Initializing READS"</FONT>
+        <FONT COLOR=#1111CC># Initialize Network Connection</FONT>
+        readsock = socket(AF_INET, SOCK_STREAM)
+        readsock.connect((self.HOSTNAME, PORT))
+        self.Read(PORT,username, readsock)
+        <FONT COLOR=#1111CC># Enter Read Loop until program exit</FONT>
+        <FONT COLOR=#3333CC><B>while</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> self.DONE:
+            data = readsock.recv(1024)
+            <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> data:
+                <FONT COLOR=#3333CC><B>continue</B></FONT>
+            data = pickle.loads(data)
+            msg = data.str() <FONT COLOR=#1111CC># Get string representation of data</FONT>
+            <FONT COLOR=#1111CC># Add a newline to the beginning of the message</FONT>
+            <FONT COLOR=#1111CC># if necessary.</FONT>
+            temp = len(msg)
+            <FONT COLOR=#3333CC><B>if</B></FONT> msg[temp-1] == <FONT COLOR=#115511>"\n"</FONT>:
+                msgbox.inserttext(msg)
+            <FONT COLOR=#3333CC><B>else</B></FONT>:
+                msgbox.inserttext(msg+<FONT COLOR=#115511>"\n"</FONT>)
+        readsock.close()
+        <FONT COLOR=#3333CC><B>return</B></FONT>
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="GChatWrite"><FONT COLOR=#CC0000><B> GChatWrite</B></FONT></A>(self, PORT, username, msgbox):
+        <FONT COLOR=#1111CC># Open The Network Connection:</FONT>
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Client Initializing WRITES"</FONT>
+        <FONT COLOR=#1111CC># Initialize Network Connection</FONT>
+        writesock = socket(AF_INET, SOCK_STREAM)
+        writesock.connect((self.HOSTNAME, PORT))
+        self.Write(PORT,username, writesock)
+        join = Protocol.Message(username, <FONT COLOR=#115511>"\\join"</FONT>)
+        join.isCommand()
+        writesock.send(pickle.dumps(join))
+        <FONT COLOR=#1111CC># widget is the input widget</FONT>
+        <FONT COLOR=#1111CC># Input TO THE NETWORK!</FONT>
+        done = 0
+        <FONT COLOR=#1111CC># Enter Write Loop until program exit.</FONT>
+        <FONT COLOR=#3333CC><B>while</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> done:
+            <FONT COLOR=#3333CC><B>if</B></FONT> len(msgbox.buffer)&gt;0:
+                <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>"msgbox has "</FONT>,len(msgbox.buffer),<FONT COLOR=#115511>"messages!"</FONT>
+                <FONT COLOR=#1111CC># Get data from the buffer</FONT>
+                data = msgbox.buffer[0]
+                <FONT COLOR=#1111CC># Send message</FONT>
+                message = Protocol.Message(username, data)
+                message.isCommand()
+                writesock.send(pickle.dumps(message))
+                <FONT COLOR=#1111CC># print message</FONT>
+                <FONT COLOR=#1111CC># Now Delete from the buffer</FONT>
+                msgbox.buffer.remove(data)
+            time.sleep(0.2)
+        writesock.close()
+        <FONT COLOR=#3333CC><B>return</B></FONT>
+    
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
+    <FONT COLOR=#3333CC><B>if</B></FONT> len(sys.argv) == 2:
+        Bob = GClient(<FONT COLOR=#115511>""</FONT>,sys.argv[1])
+        Bob.Chat()
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        name = raw_input(<FONT COLOR=#115511>"Please enter a name to chat:"</FONT>)
+        host = raw_input(<FONT COLOR=#115511>"Enter Host to Connect to(Enter for Default):"</FONT>)
+        Bob = GClient(host,name)
+        Bob.Chat()
+        
+
+<FONT COLOR=#1111CC>#------------ Testing Functions --------------#</FONT>
+<FONT COLOR=#1111CC># These may be useful if you rewrite them</FONT>
+<FONT COLOR=#1111CC># to use the new message objects.</FONT>
+
+<FONT COLOR=#1111CC>## message = ["Ping!"]</FONT>
+<FONT COLOR=#1111CC>## def pingBob():</FONT>
+<FONT COLOR=#1111CC>##     sockobj = socket(AF_INET, SOCK_STREAM)</FONT>
+<FONT COLOR=#1111CC>##     sockobj.connect((HOSTNAME, PORT))</FONT>
+<FONT COLOR=#1111CC>##     for line in message:</FONT>
+<FONT COLOR=#1111CC>##         sockobj.send(line)</FONT>
+<FONT COLOR=#1111CC>##         data = sockobj.recv(1024)</FONT>
+<FONT COLOR=#1111CC>##         print 'Client received:', `data`</FONT>
+<FONT COLOR=#1111CC>##     sockobj.close()</FONT>
+<FONT COLOR=#1111CC>##     return</FONT>
+
+<FONT COLOR=#1111CC>## def autoBob(message):</FONT>
+<FONT COLOR=#1111CC>##     sockobj = socket(AF_INET, SOCK_STREAM)</FONT>
+<FONT COLOR=#1111CC>##     sockobj.connect((HOSTNAME, PORT))</FONT>
+<FONT COLOR=#1111CC>##     done = 0</FONT>
+<FONT COLOR=#1111CC>##     for i in range(6):</FONT>
+<FONT COLOR=#1111CC>##         time.sleep(1)</FONT>
+<FONT COLOR=#1111CC>##         sockobj.send(message)</FONT>
+<FONT COLOR=#1111CC>##         data = sockobj.recv(1024)</FONT>
+<FONT COLOR=#1111CC>##         print 'Client received:', `data`</FONT>
+<FONT COLOR=#1111CC>##     sockobj.close()</FONT>
+<FONT COLOR=#1111CC>##     return</FONT>
+
+
+
+<FONT COLOR=#1111CC># I'm not going to bother implementing these until</FONT>
+<FONT COLOR=#1111CC># They are supported on the server</FONT>
+<FONT COLOR=#1111CC># and the Client is Object Oriented.</FONT>
+
+<FONT COLOR=#1111CC>##         if data.find("&lt;QUIT&gt;")&gt;0 and data.find("&lt;/QUIT&gt;")&gt;0:</FONT>
+<FONT COLOR=#1111CC>##             cmd = Protocol.splitCommand(data)</FONT>
+<FONT COLOR=#1111CC>##             password = cmd[1].split(":")[1]</FONT>
+<FONT COLOR=#1111CC>##             message = Protocol.Message(username,</FONT>
+<FONT COLOR=#1111CC>##                                        "Server Is Exiting!", data, password)</FONT>
+<FONT COLOR=#1111CC>##         elif data == "&lt;EXIT&gt;":</FONT>
+<FONT COLOR=#1111CC>##             message = Protocol.Message(username,"left the building.","&lt;EXIT&gt;")</FONT>
+<FONT COLOR=#1111CC>##             print "Client Exiting..."</FONT>
+<FONT COLOR=#1111CC>##             time.sleep(1.0)</FONT>
+<FONT COLOR=#1111CC>##             break</FONT>
+<FONT COLOR=#1111CC>## # Not sure how to implement Nick at the moment</FONT>
+<FONT COLOR=#1111CC>## # Let's not worry about it for now.</FONT>
+<FONT COLOR=#1111CC>## ##         elif data.find("&lt;NICK&gt;")&gt;0 and data.find("&lt;/NICK&gt;")&gt;0:</FONT>
+<FONT COLOR=#1111CC>## ##             cmd = Protocol.splitCommand(data)</FONT>
+<FONT COLOR=#1111CC>## ##             newname = cmd[1]</FONT>
+<FONT COLOR=#1111CC>## ##             message = Protocol.Message(newname, " &lt;=&gt; "+username, data)</FONT>
+<FONT COLOR=#1111CC>##         elif data.find("&lt;KICK&gt;")&gt;0 and data.find("&lt;/KICK&gt;")&gt;0:</FONT>
+<FONT COLOR=#1111CC>##             cmd = Protocol.splitCommand(data)</FONT>
+<FONT COLOR=#1111CC>##             password = cmd[1].split(":")[1]</FONT>
+<FONT COLOR=#1111CC>##             message = Protocol.Message(username, data, data, password)</FONT>
+<FONT COLOR=#1111CC>##         elif data.find("&lt;EMOTE&gt;")&gt;0:</FONT>
+<FONT COLOR=#1111CC>##             cmd = Protocol.splitCommand(data)</FONT>
+<FONT COLOR=#1111CC>##             emotion = cmd[1]</FONT>
+<FONT COLOR=#1111CC>##             message = Protocol.Message(username, emotion, data)</FONT>
+
+
+
+    
+</PRE>
+                  <!--footer-->
+                  </BODY>

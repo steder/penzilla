@@ -1,0 +1,33 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># Modules.py</FONT>
+<FONT COLOR=#1111CC># Let's import some modules:</FONT>
+<FONT COLOR=#3333CC><B>from</B></FONT> book <FONT COLOR=#3333CC><B>import</B></FONT> * <FONT COLOR=#1111CC># Notice we omit the suffix ".py" from "book.py"</FONT>
+
+<FONT COLOR=#3333CC><B>import</B></FONT> map <FONT COLOR=#1111CC># this has the map function and a few other neat things.</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> map
+
+<FONT COLOR=#1111CC># Now I can Create  Book Object:</FONT>
+abook = Book(<FONT COLOR=#115511>"Robert A. Heinlein"</FONT>, <FONT COLOR=#115511>"Stranger In a Strange Land"</FONT>, [<FONT COLOR=#115511>"Mars"</FONT>,<FONT COLOR=#115511>"Martians"</FONT>])
+<FONT COLOR=#3333CC><B>print</B></FONT> abook
+
+<FONT COLOR=#1111CC># What if I didn't remember that definition for the Book object?</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> book
+<FONT COLOR=#1111CC>#List's everything in the "book.py" module</FONT>
+dir(book) 
+<FONT COLOR=#1111CC># Enter the help system and read about the book object. This will remind you of</FONT>
+<FONT COLOR=#1111CC># all the definitions and everything.  Very convenient when you're working at</FONT>
+<FONT COLOR=#1111CC># the command prompt.</FONT>
+
+<FONT COLOR=#1111CC>#help(book) # Uncomment to got help on the Book Object</FONT>
+
+<FONT COLOR=#1111CC># Let's call some functions in map to quickly increment this list :~)</FONT>
+<FONT COLOR=#1111CC># &lt;sarcasm&gt;( Real exciting ! )&lt;/sarcasm&gt;</FONT>
+l = range(12, 76)
+<FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> range(0,64):
+    l = map.map( map.increment, l )
+<FONT COLOR=#3333CC><B>print</B></FONT> l
+</PRE>
+                  <!--footer-->
+                  </BODY>

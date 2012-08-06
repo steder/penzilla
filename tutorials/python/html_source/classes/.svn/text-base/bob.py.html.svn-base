@@ -1,0 +1,58 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#115511>"""
+Bob.py
+Defines the Bob class and methods.  Bob is a simple model of a creature.
+Bob might be a good basis for a Sprite class in a simple game, or
+it might make a decent AI entity.
+"""</FONT>
+
+<FONT COLOR=#115511>"""
+class Blob
+Blobs are the basic lifeform on this planet.  They don't do much.
+"""</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Blob"><FONT COLOR=#CC0000><B> Blob</B></FONT></A>:
+    <FONT COLOR=#115511>"""
+    """</FONT>
+    <FONT COLOR=#1111CC># Variables that are shared between all Blob objects</FONT>
+    POP = 0 <FONT COLOR=#1111CC># Population of the Blob Species</FONT>
+    TINY = 1
+    MEDIUM = 2
+    LARGE = 3
+    <FONT COLOR=#115511>"""
+    __init__(self):
+    Create a new Bob object.  Initialize various data variables.
+    """</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self):
+        self.AGE = 0
+        self.SIZE = TINY
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="tick"><FONT COLOR=#CC0000><B> tick</B></FONT></A>(self):
+        self.AGE += 1
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.AGE % 3 == 0:
+            self.SIZE += 1
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.SIZE == 3:
+            <FONT COLOR=#3333CC><B>return</B></FONT> self.divide()
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#3333CC><B>return</B></FONT> None
+
+<FONT COLOR=#115511>"""
+Bob's hunt and eat blobs.  Using Bob's and Blob's we can create a simple ecosytem.  The Bob class can hunt, eat, die, multiply, and drink Eggnog.
+"""</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Bob"><FONT COLOR=#CC0000><B> Bob</B></FONT></A>(Blob):
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self):
+        self.TASK = <FONT COLOR=#115511>"Nothing"</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="tick"><FONT COLOR=#CC0000><B> tick</B></FONT></A>(self):
+        self.AGE += 1
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.AGE % 10 == 0:
+            self.SIZE +=1
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.SIZE == 3:
+            self.die()
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#3333CC><B>return</B></FONT> None
+        
+</PRE>
+                  <!--footer-->
+                  </BODY>

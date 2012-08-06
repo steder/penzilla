@@ -1,0 +1,177 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#!/usr/bin/python</FONT>
+<FONT COLOR=#1111CC># For CGI support</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> cgi
+<FONT COLOR=#1111CC># For debugging support</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> cgitb; cgitb.enable()
+
+<FONT COLOR=#1111CC># import needed libraries:</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> sys,random
+
+<FONT COLOR=#1111CC># This needs to be here first.</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Content-Type: text/html"</FONT>     <FONT COLOR=#1111CC># Just set the standard html content type.</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT>                               <FONT COLOR=#1111CC># Blank line signifies the end of the header info.</FONT>
+
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;title&gt;Rock Paper Scissors Spock Lizard:  The Challenge&lt;/title&gt;"</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;body&gt;"</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;h1&gt;Rock Paper Scissors Spock Lizard&lt;/h1&gt;"</FONT>
+
+form = cgi.FieldStorage()
+
+<FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> form.has_key(<FONT COLOR=#115511>"choice"</FONT>):
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;P&gt;&lt;b&gt;"</FONT>
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Please go back and choose a throw so we can play a game."</FONT>
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;/b&gt;&lt;/p&gt;"</FONT>
+    sys.exit(1)
+
+<FONT COLOR=#1111CC>## A list of image links:</FONT>
+images = [<FONT COLOR=#115511>'&lt;img src="http://www.penzilla.net/tutorials/python/cgi/rock.jpeg"&gt;'</FONT>,
+          <FONT COLOR=#115511>'&lt;img src="http://www.penzilla.net/tutorials/python/cgi/paper.jpeg"&gt;'</FONT>,
+          <FONT COLOR=#115511>'&lt;img src="http://www.penzilla.net/tutorials/python/cgi/scissors.jpeg"&gt;'</FONT>,
+          <FONT COLOR=#115511>'&lt;img src="http://www.penzilla.net/tutorials/python/cgi/spock.jpeg"&gt;'</FONT>,
+          <FONT COLOR=#115511>'&lt;img src="http://www.penzilla.net/tutorials/python/cgi/lizard.jpeg"&gt;'</FONT>]
+
+<FONT COLOR=#1111CC>## Now, generate my choice:</FONT>
+<FONT COLOR=#1111CC># 0 = Rock</FONT>
+<FONT COLOR=#1111CC># 1 = Paper</FONT>
+<FONT COLOR=#1111CC># 2 = Scissors</FONT>
+<FONT COLOR=#1111CC># 3 = Spock</FONT>
+<FONT COLOR=#1111CC># 4 = Lizard</FONT>
+comp = (random.randint(0,255)) % 5
+user = int(form.getvalue(<FONT COLOR=#115511>"choice"</FONT>,<FONT COLOR=#115511>""</FONT>)) % 5
+
+<FONT COLOR=#1111CC>## Compute a winner:</FONT>
+<FONT COLOR=#1111CC>#Scissors cuts Paper covers Rock crushes Lizard poisons Spock smashes</FONT>
+<FONT COLOR=#1111CC>#Scissors decapitates Lizard eats Paper disproves Spock vaporizes Rock</FONT>
+<FONT COLOR=#1111CC>#crushes Scissors.</FONT>
+
+winner = -1 <FONT COLOR=#1111CC># Computer = 0, Player = 1</FONT>
+message = <FONT COLOR=#115511>""</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> comp == user: <FONT COLOR=#1111CC># TIE</FONT>
+    message = <FONT COLOR=#115511>"Tie!"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> comp == 0:  <FONT COLOR=#1111CC># Comp = Rock</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 1: 
+        winner = 1
+        message = <FONT COLOR=#115511>"Paper covers Rock"</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 2:
+        winner = 0
+        message = <FONT COLOR=#115511>"Rock crushes Scissors"</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 3:
+        winner = 1
+        message = <FONT COLOR=#115511>"Spock vaporizes Rock"</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 4:
+        winner = 0
+        message = <FONT COLOR=#115511>"Rock crushes Lizard"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> comp == 1:  <FONT COLOR=#1111CC># Comp = Paper</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 0: 
+        winner = 0
+        message = <FONT COLOR=#115511>"Paper covers Rock"</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 2:
+        winner = 1
+        message = <FONT COLOR=#115511>"Scissors cuts Paper"</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 3:
+        winner = 0
+        message = <FONT COLOR=#115511>"Paper disproves Spock"</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 4:
+        winner = 1
+        message = <FONT COLOR=#115511>"Lizard eats Paper"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> comp == 2:  <FONT COLOR=#1111CC># Comp = Scissors</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 0: 
+        winner = 1
+        message = <FONT COLOR=#115511>"Rock crushes Scissors"</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 1:
+        winner = 0
+        message = <FONT COLOR=#115511>"Scissors cuts Paper"</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 3:
+        winner = 1
+        message = <FONT COLOR=#115511>"Spock smashes Scissors"</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 4:
+        winner = 0
+        message = <FONT COLOR=#115511>"Scissors decapitates Lizard"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> comp == 3:  <FONT COLOR=#1111CC># Comp = Spock</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 0: 
+        winner = 0
+        message = <FONT COLOR=#115511>"Spock vaporizes Rock"</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 1:
+        winner = 1
+        message = <FONT COLOR=#115511>"Paper disproves Spock"</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 2:
+        winner = 0
+        message = <FONT COLOR=#115511>"Spock smashes Scissors"</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 4:
+        winner = 1
+        message = <FONT COLOR=#115511>"Lizard poisons Spock"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> comp == 4:  <FONT COLOR=#1111CC># Comp = Lizard</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 0: 
+        winner = 1
+        message = <FONT COLOR=#115511>"Rock crushes Lizard"</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 1:
+        winner = 0
+        message = <FONT COLOR=#115511>"Lizard eats Paper"</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 2:
+        winner = 1
+        message = <FONT COLOR=#115511>"Scissors decapitate Lizard"</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> user == 3:
+        winner = 0
+        message = <FONT COLOR=#115511>"Lizard poisons Spock"</FONT>
+
+<FONT COLOR=#1111CC>## Time to Lay out the HTML Results Page</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> user == 0:
+    userstr = <FONT COLOR=#115511>"Rock"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> user == 1:
+    userstr = <FONT COLOR=#115511>"Paper"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> user == 2:
+    userstr = <FONT COLOR=#115511>"Scissors"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> user == 3:
+    userstr = <FONT COLOR=#115511>"Spock"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> user == 4:
+    userstr = <FONT COLOR=#115511>"Lizard"</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> comp == 0:
+    compstr = <FONT COLOR=#115511>"Rock"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> comp == 1:
+    compstr = <FONT COLOR=#115511>"Paper"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> comp == 2:
+    compstr = <FONT COLOR=#115511>"Scissors"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> comp == 3:
+    compstr = <FONT COLOR=#115511>"Spock"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> comp == 4:
+    compstr = <FONT COLOR=#115511>"Lizard"</FONT>
+
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;H2&gt;"</FONT>,userstr, <FONT COLOR=#115511>"&lt;font color='red'&gt;versus&lt;/font&gt;"</FONT>, compstr, <FONT COLOR=#115511>"&lt;/H2&gt;"</FONT>
+
+<FONT COLOR=#1111CC>## A table to present the result pictures</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;table&gt;"</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"  &lt;caption&gt;&lt;/caption&gt;"</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"  &lt;tbody&gt;"</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"    &lt;tr&gt;"</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"      &lt;td&gt;"</FONT>,images[user],<FONT COLOR=#115511>"&lt;/td&gt;"</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"      &lt;td&gt;"</FONT>,<FONT COLOR=#115511>"&lt;font color='green'&gt;"</FONT>,message,<FONT COLOR=#115511>"&lt;/font&gt;"</FONT>,<FONT COLOR=#115511>"&lt;/td&gt;"</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"      &lt;td&gt;"</FONT>,images[comp],<FONT COLOR=#115511>"&lt;/td&gt;"</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"    &lt;/tr&gt;"</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"  &lt;/tbody&gt;"</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;/table&gt;"</FONT>
+
+<FONT COLOR=#1111CC># Print the result message:</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> winner == -1:
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;h2&gt;&lt;font color='green'&gt;You Tied!&lt;/font&gt;&lt;/h2&gt;"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> winner == 1:
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;h2&gt;&lt;font color='blue'&gt;You Win!&lt;/font&gt;&lt;/h2&gt;"</FONT>
+<FONT COLOR=#3333CC><B>else</B></FONT>:
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;h2&gt;&lt;font color='red'&gt;You Lose!&lt;/font&gt;&lt;/h2&gt;"</FONT>
+
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;h2&gt;Again?&lt;/h2&gt;"</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'&lt;FORM action="http://www.penzilla.net/cgi-bin/rpssl.py" method="GET" enctype="application/x-www-form-urlencoded"&gt;'</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;b&gt;"</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Rock&lt;INPUT type="radio" name="choice" value="0"&gt;&lt;br&gt;'</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Paper&lt;INPUT type="radio" name="choice" value="1"&gt;&lt;br&gt;'</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Scissors&lt;INPUT type="radio" name="choice" value="2"&gt;&lt;br&gt;'</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Spock&lt;INPUT type="radio" name="choice" value="3"&gt;&lt;br&gt;'</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Lizard&lt;INPUT type="radio" name="choice" value="4"&gt;&lt;br&gt;'</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;/b&gt;"</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'&lt;INPUT type="submit" name="submit" value="Throw"&gt;'</FONT>
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"&lt;/FORM&gt;"</FONT>
+</PRE>
+                  <!--footer-->
+                  </BODY>

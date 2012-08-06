@@ -1,0 +1,30 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># map.py</FONT>
+<FONT COLOR=#1111CC># We can use append here</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="map"><FONT COLOR=#CC0000><B> map</B></FONT></A>( fun, list ):
+    nlist = []
+    <FONT COLOR=#3333CC><B>for</B></FONT> item <FONT COLOR=#3333CC><B>in</B></FONT> list:
+        nlist.append( fun( item ) )
+    <FONT COLOR=#3333CC><B>return</B></FONT> nlist
+<FONT COLOR=#1111CC># But here we have to use concatenation, or the + operator for lists.</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="rmap"><FONT COLOR=#CC0000><B> rmap</B></FONT></A> ( fun, list ):
+    <FONT COLOR=#3333CC><B>if</B></FONT> list == []:
+        <FONT COLOR=#3333CC><B>return</B></FONT> []
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#3333CC><B>return</B></FONT> [fun( list[0] )] + rmap( fun, list[1:] )
+
+<FONT COLOR=#1111CC># Make a sample test function</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="increment"><FONT COLOR=#CC0000><B> increment</B></FONT></A>(x):
+    <FONT COLOR=#3333CC><B>return</B></FONT> x+1
+
+<FONT COLOR=#1111CC># Test them out!</FONT>
+map( increment, [1,2,3,4,5] )
+<FONT COLOR=#1111CC># should return [2,3,4,5,6]</FONT>
+map( increment, [1,2,3,4,5] ) == rmap( increment, [1,2,3,4,5] )
+<FONT COLOR=#1111CC># There outputs should be the same!</FONT>
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

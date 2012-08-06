@@ -1,0 +1,62 @@
+<div class="syntax"><pre><span class="c"># Let&#39;s get the average and our grades:</span>
+<span class="n">us</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;Sammy&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="s">&quot;summy&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="s">&quot;spoonman&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">}</span>
+<span class="n">homework_ave</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;hw0grades.txt&quot;</span><span class="p">]</span>
+
+<span class="n">students</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c"># Get the Data</span>
+<span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+    <span class="n">infile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span><span class="s">&quot;r&quot;</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">infile</span><span class="p">:</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">infile</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">person</span> <span class="ow">in</span> <span class="n">us</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">person</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span><span class="o">==</span><span class="nb">len</span><span class="p">(</span><span class="n">person</span><span class="p">):</span>
+                <span class="n">us</span><span class="p">[</span><span class="n">person</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">s</span><span class="p">[</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">students</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="c"># Compute the Average</span>
+<span class="k">print</span> <span class="n">total</span><span class="p">,</span> <span class="n">students</span>
+<span class="n">homework_ave</span> <span class="o">=</span> <span class="n">total</span> <span class="o">/</span> <span class="p">(</span> <span class="n">students</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">)</span> <span class="p">)</span>
+
+<span class="c"># Assume the average is C</span>
+<span class="c"># Define grade ranges:</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">homework_ave</span> 
+<span class="n">cmax</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="n">homework_ave</span> <span class="o">*</span> <span class="o">.</span><span class="mo">05</span>
+<span class="n">cmin</span> <span class="o">=</span> <span class="n">c</span> <span class="o">-</span> <span class="n">homework_ave</span> <span class="o">*</span> <span class="o">.</span><span class="mo">05</span>
+<span class="n">bmax</span> <span class="o">=</span> <span class="n">cmax</span> <span class="o">+</span> <span class="n">homework_ave</span> <span class="o">*</span> <span class="o">.</span><span class="mi">1</span>
+<span class="n">bmin</span> <span class="o">=</span> <span class="n">cmax</span>
+<span class="n">amin</span> <span class="o">=</span> <span class="n">bmax</span>
+<span class="n">amax</span> <span class="o">=</span> <span class="n">cmin</span>
+<span class="n">dmin</span> <span class="o">=</span> <span class="n">cmin</span> <span class="o">-</span> <span class="n">homework_ave</span> <span class="o">*</span> <span class="o">.</span><span class="mi">1</span>
+<span class="n">emax</span> <span class="o">=</span> <span class="n">dmin</span>
+<span class="c"># Print out some STATS:</span>
+<span class="k">print</span> <span class="s">&quot;The AVERAGE for this homework:&quot;</span><span class="p">,</span> <span class="n">homework_ave</span>
+<span class="k">print</span> <span class="s">&quot;The A range:&quot;</span><span class="p">,</span> <span class="s">&quot;&gt;=&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">amin</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&quot;The B range:&quot;</span><span class="p">,</span> <span class="n">bmax</span><span class="p">,</span><span class="s">&quot;-&quot;</span><span class="p">,</span> <span class="n">bmin</span>
+<span class="k">print</span> <span class="s">&quot;The C range:&quot;</span><span class="p">,</span> <span class="n">cmax</span><span class="p">,</span><span class="s">&quot;-&quot;</span><span class="p">,</span> <span class="n">cmin</span>
+<span class="k">print</span> <span class="s">&quot;The D range:&quot;</span><span class="p">,</span> <span class="n">dmax</span><span class="p">,</span><span class="s">&quot;-&quot;</span><span class="p">,</span> <span class="n">dmin</span>
+<span class="k">print</span> <span class="s">&quot;The E range:&quot;</span><span class="p">,</span> <span class="s">&quot;&lt;&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">emax</span><span class="p">)</span>
+
+<span class="c"># Assign grades to us:</span>
+<span class="k">for</span> <span class="n">person</span> <span class="ow">in</span> <span class="n">us</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">us</span><span class="p">[</span><span class="n">person</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">amin</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">person</span><span class="p">,</span><span class="s">&quot;(&quot;</span><span class="p">,</span><span class="n">us</span><span class="p">[</span><span class="n">person</span><span class="p">],</span><span class="s">&quot;)&quot;</span><span class="p">,</span><span class="s">&quot;probably got an A on this assignment.&quot;</span>
+    <span class="k">elif</span> <span class="n">bmax</span> <span class="o">&gt;</span> <span class="n">us</span><span class="p">[</span><span class="n">person</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">bmin</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">person</span><span class="p">,</span><span class="s">&quot;(&quot;</span><span class="p">,</span><span class="n">us</span><span class="p">[</span><span class="n">person</span><span class="p">],</span><span class="s">&quot;)&quot;</span><span class="p">,</span><span class="s">&quot;probably got a B on this assignment.&quot;</span>
+    <span class="k">elif</span> <span class="n">cmax</span> <span class="o">&gt;</span> <span class="n">us</span><span class="p">[</span><span class="n">person</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">cmin</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">person</span><span class="p">,</span><span class="s">&quot;(&quot;</span><span class="p">,</span><span class="n">us</span><span class="p">[</span><span class="n">person</span><span class="p">],</span><span class="s">&quot;)&quot;</span><span class="p">,</span><span class="s">&quot;probably got a C on this assignment.&quot;</span>
+    <span class="k">elif</span> <span class="n">dmax</span> <span class="o">&gt;</span> <span class="n">us</span><span class="p">[</span><span class="n">person</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">dmin</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">person</span><span class="p">,</span><span class="s">&quot;(&quot;</span><span class="p">,</span><span class="n">us</span><span class="p">[</span><span class="n">person</span><span class="p">],</span><span class="s">&quot;)&quot;</span><span class="p">,</span><span class="s">&quot;probably got a D on this assignment.&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">person</span><span class="p">,</span><span class="s">&quot;(&quot;</span><span class="p">,</span><span class="n">us</span><span class="p">[</span><span class="n">person</span><span class="p">],</span><span class="s">&quot;)&quot;</span><span class="p">,</span><span class="s">&quot;probably got a E on this assignment.&quot;</span>
+</pre></div>

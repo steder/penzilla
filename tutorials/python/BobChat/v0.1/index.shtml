@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content=
+          "HTML Tidy for Linux/x86 (vers 1st August 2004), see www.w3.org" />
+    <title>Penzilla.net: Introduction to Python: BobChat v0.1</title>
+    <link rel="StyleSheet" href="../../style.css" type="text/css" media="screen" />
+  </head>
+  <body>
+    <div id="header">
+      <h1>A Python Networking Example</h1>
+      <h2>BobChat: v0.1 Overview</h2>
+      <hr /></div>
+    <div id="sidebar">
+      <div id="menu"><a href="../../index.shtml">&raquo;Tutorial Home</a>
+        <!--#include virtual="/tutorials/python/BobChat/menu.html"-->
+        <!--#include virtual="/tutorials/python/menu.html"-->
+      </div>
+      <!--#include virtual="/tutorials/python/skyscraper_ads.html"--></div>
+    <div id="content"><!-- Comments -->
+      <!-- Body -->
+      <h3>v0.1</h3>
+      <h4>Overview</h4>
+      <p>The 0.1 version of BobChat is the most straightforward.  The server is a mono-threaded 
+        asynchronous select-based program while the a simple mono-threaded app that just 
+        sends and receives messages  BobChat sends and receives just plain text as its message
+        format.  v0.1 is not really a chat program, it is more an example to help me understand
+        how to write socket code in the first place.
+      </p>
+      <p>Given that the client doesn't actually do much this isn't much of a chat program.  v0.2
+        adds to the client to make it a true chat program.</p>
+      <p>Let's take a more indepth look at the <a href="server.shtml">v0.1 server</a></p>
+      <p>Now let's look at the <a href="client.shtml">v0.1 "client"</a></p>
+      <h4>Download</h4>
+      <p>Download the complete source code for v0.1 <a href="BobChat-v0.1.zip">here</a></p>
+      <!--End Body-->
+    </div>
+    <div id="footer">
+      <!--#include virtual="/tutorials/python/footer.shtml"-->
+    </div>
+  </body>
+</html>

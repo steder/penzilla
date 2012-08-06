@@ -1,0 +1,70 @@
+<html>
+<title>Introduction to Python:  Python Scripting</title>
+<body>
+<h2>An Introduction to Python:  Python Scripting</h2>
+<h3>Introductary Python Scripting</h3>
+<a href="../index.html">Table of Contents</a>
+<hr><!--^Header^-->
+<h4><font color="green">Python as Tool</font></h4>
+
+<P>Python has a generally been used for System Scripting tasks.  Although it can certainly be used to generate more serious applications, scripts are something that Python is particularly well suited for.  This is mostly because Python has a large library of utilities for various systems.
+<P>By using scripting languages the average person can gain more control over their system.  A high level language that offers interfaces to lower level components makes it possible for people to write backup routines, strip content from the web, or do some computations that wouldn't be much fun by hand.
+<P>I figure here is as good a place as any to have some system command lists.  Check it out(If you have good links for any of these please send it to me):<br>
+<a href="http://www.microsoft.com/technet/treeview/default.asp?url=/technet/prodtechnol/winxppro/proddocs/ntcmds.asp">Microsoft Technet Command Line Reference for Windows NT+</a><br>
+<a href="">Command line reference for Linux</a><br>
+<a href="">Command line reference for Mac OS X</a><br>
+<a href="">Command line reference for Mac OS Classic</a><br>
+<P>Let's start with a simple example of downloading files from the popular web-comic, Penny Arcade.  You can check out this game related humor/news site <a href="http://www.penny-arcade.com/">here</a>.  I wrote this script because myself and some of my friends are big fans, and we wanted to have access to this comics all the time.  Poking around on the PA webserver a bit, I figured out where the comics were stored and decided to write this script:
+<!--Include Sourcecode-->
+<ul><!--#include virtual="download_pa_images.py.html"--></ul>
+<P>Please note that this code relies on a type written by <a href="http://starship.python.net/crew/jbauer/normaldate/">Jeff Bauer</a> or <a href="http://starship.python.net/">Starship Python</a>.  The code is included here in the downloadedable example, and it is good code worth taking a look at.  However, Mr. Bauer did a very nice job so I won't bother butchering his work here.
+<P>In the above code I'm using a very blunt instrument.  Not a lot of finesse in this application, but then I just wanted a simple hack to download a lot of files from this page.  So a bunch of data is hardcoded when it should be automagically generated, and I could try to not try every single date for the last 6 years.  As it goes, this code will bombard the Penny Arcade server with about 2000 requests.  I don't really recommend using this code too much, but I think it's a decent example.
+<P>Notice that there are two versions of the same code, one that works solely on linux/unix(where I originally wrote the script), and another that should work on any platform that can run Python.  The key difference is a shift from reliance on a system application like "wget", to a Python library, namely "urllib".  Both work fairly similarly, each takes a url and that's about it.  
+
+<h4><font color="green">The Pound-Bang Hack</font></h4>
+<P>You've probably noticed from playing with examples that you run these scripts in the following way.
+
+<font color="purple"><pre><code>
+$ python download_pa_images.py
+</code></pre></font>
+This isn't like running an executable at the command prompt, and can be a little confusing or just inelegant.  A nifty little hack for Unix based systems is the addition of a single line at the beginning of each script you want to use as if it were a program.  The line looks like this:
+<font color="purple"><pre><code>
+#!/usr/bin/python
+# The above should always be the path of your python 
+</code></pre></font>
+Additionally you'll have to make this file executable, and then run it like you normally would:
+<font color="purple"><pre><code>
+$ chmod +x download_pa_images.py
+$ ./download_pa_images.py
+</code></pre></font>
+<P>Alternatively you can use the <b>env</b> program to invoke Python regardless of where it's located on the users system, assuming you <u>can</u> find <b>env</b>.
+<font color="purple"><pre><code>
+#!/usr/bin/env python
+</code></pre></font>
+<P>This hack is unavailable on Windows.  However, doubleclicking on python files in windows will cause them to be executed, which is a behavior that doesn't show up on the Unix side.  
+
+<h4><font color="green">Defining a "__main__" method</font></h4>
+<P>Another thing thats useful in scripting is defining what happens when the script file is run.  Normally typing:
+<font color="purple"><pre><code>
+$ python myfile.py
+</code></pre></font>
+executes all the code in "myfile.py", and prints output if there is any, does computations, makes files, whatever.  However, sometimes you want to define a set of functions, and execute specific ones when you call the file as a script.  By defining a main method, you could specify that when you run "download_pa_images.py" you use the "download_lin()" function, or the "download_cross_platform()" script.
+
+<h4><font color="green">Saving Disk Space/Avoiding WinZip</font></h4>
+<P><i>Note:  I'm playing with Zipfiles here because they are used on a pretty wide variety of systems.  However, Python also has support for Gzip, Bzip, Tar, and possibly others.  So don't think that you don't have options.  These libraries are generally similar in usage, so I won't cover them here (unless someone asks).</i>
+<P>Let's say that you really hate WinZip, but you like Python.  You could do the following:
+<ul><!--#include virtual="zipit.py.html"--></uL>
+<P>And of course we can unzip things too.  You'll notice that unzipping is quite different.  It's similiar enough to file reading with respect to just getting data out of the ZipFile that that isn't too confusing I hope.  On the other hand, what is a little tricky is recreating all the directories that need to exist so that you can write out the appropriate file paths.  A simple check with the <font color="green">os.path.dirname</font> call takes care of it though as you can see.  I can't stress enough how useful the online help for Python is.  
+<ul><!--#include virtual="unzipit.py.html"--></ul>
+<P>Now let's say we have a directory for of Movies, large text files or word documents, and music in the form of mp3's.  Now in an effort to save disk space, and knowing that it's not uncommon for a 20 Megabyte textfile to take up only 1 Megabyte after compression, we figure we can save some space on our 300 Gigabyte Harddrive.  (Ha!)  Using our knowledge from the Zip scripts above, let's write a more specific script to handle the compression of a specific type of file on an entire tree of directories.
+<P>I'm currently using something like this to produce archives of all the sourcecode and examples in this tutorial.  I could have used a program like tar or gzip, or even winzip, but doing it with Python is just more fun I think.
+<!--#include virtual="ziptype.py.html"-->
+<P>That's about it for some scripting examples.  I'd love to do some more diverse things, I kind of got sidetracked on Zipfiles here, but I found that I actually needed a simple zip utility, and now I've got one, and a pretty simple example.  I'd like to apologize then to people who are interested in some other area that they'd like to script.  In an attempt to make it up to those of you who feel slighted, please let me know what you think of these examples, and/or what you would rather see, and I'll add some new examples as soon as possible.
+
+<!--\/Footer\/-->
+<hr>
+<p>Download the source for this example here.
+<p><a href="">linkage</a><br>
+<a href="../index.html">Table of Contents</a>
+</body>
+</html>

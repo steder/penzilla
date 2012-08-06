@@ -1,0 +1,212 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#!/usr/bin/env python</FONT>
+<FONT COLOR=#1111CC># pygame + PyOpenGL version of Nehe's OpenGL lesson08</FONT>
+<FONT COLOR=#1111CC># Paul Furber 2001 - m@verick.co.za</FONT>
+
+<FONT COLOR=#3333CC><B>import</B></FONT> os
+<FONT COLOR=#3333CC><B>from</B></FONT> OpenGL.GL <FONT COLOR=#3333CC><B>import</B></FONT> *
+<FONT COLOR=#3333CC><B>from</B></FONT> OpenGL.GLU <FONT COLOR=#3333CC><B>import</B></FONT> *
+<FONT COLOR=#3333CC><B>import</B></FONT> pygame, pygame.image
+<FONT COLOR=#3333CC><B>from</B></FONT> pygame.locals <FONT COLOR=#3333CC><B>import</B></FONT> *
+
+
+xrot = yrot = 0.0
+xspeed = yspeed = 0.0
+z = -5.0
+textures = []
+filter = 0
+light = 0
+blend = 0
+
+LightAmbient  = ( (0.5, 0.5, 0.5, 1.0) );
+LightDiffuse  = ( (1.0, 1.0, 1.0, 1.0) );
+LightPosition = ( (0.0, 0.0, 2.0, 1.0) );
+
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="resize"><FONT COLOR=#CC0000><B> resize</B></FONT></A>((width, height)):
+    <FONT COLOR=#3333CC><B>if</B></FONT> height==0:
+        height=1.0
+    glViewport(0, 0, width, height)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    gluPerspective(45, 1.0*width/height, 0.1, 100.0)
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="init"><FONT COLOR=#CC0000><B> init</B></FONT></A>():
+    glEnable(GL_TEXTURE_2D)
+    load_textures()
+    glShadeModel(GL_SMOOTH)
+    glClearColor(0.0, 0.0, 0.0, 0.0)
+    glClearDepth(1.0)
+    glEnable(GL_DEPTH_TEST)
+    glDepthFunc(GL_LEQUAL)
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
+    glLightfv( GL_LIGHT1, GL_AMBIENT, LightAmbient )
+    glLightfv( GL_LIGHT1, GL_DIFFUSE, LightDiffuse )
+    glLightfv( GL_LIGHT1, GL_POSITION, LightPosition )
+    glEnable( GL_LIGHT1 )
+    glColor4f( 1.0, 1.0, 1.0, 0.5)
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE )
+
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="load_textures"><FONT COLOR=#CC0000><B> load_textures</B></FONT></A>():
+    <FONT COLOR=#3333CC><B>global</B></FONT> LightAmbient, LightDiffuse, LightPosition, textures
+    
+    texturefile = os.path.join(<FONT COLOR=#115511>'data'</FONT>,<FONT COLOR=#115511>'glass.bmp'</FONT>)
+    textureSurface = pygame.image.load(texturefile)
+    textureData = pygame.image.tostring(textureSurface, <FONT COLOR=#115511>"RGBX"</FONT>, 1)
+
+    textures = glGenTextures(3)
+    
+    glBindTexture(GL_TEXTURE_2D, textures[0])
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, textureSurface.get_width(), textureSurface.get_height(), 0,
+                  GL_RGBA, GL_UNSIGNED_BYTE, textureData )
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+
+    glBindTexture(GL_TEXTURE_2D, textures[1])
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR )
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR )
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, textureSurface.get_width(), textureSurface.get_height(), 0,
+                  GL_RGBA, GL_UNSIGNED_BYTE, textureData )
+
+    glBindTexture( GL_TEXTURE_2D, textures[2])
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST )
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR )
+    gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGBA, textureSurface.get_width(), textureSurface.get_height(),
+                       GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+
+
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="draw"><FONT COLOR=#CC0000><B> draw</B></FONT></A>():
+    <FONT COLOR=#3333CC><B>global</B></FONT> xrot, yrot, xspeed, yspeed, z, filter
+    
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    glLoadIdentity()
+    glTranslatef(0.0, 0.0, z)
+
+    glRotatef(xrot, 1.0, 0.0, 0.0)
+    glRotatef(yrot, 0.0, 1.0, 0.0)
+
+    glBindTexture(GL_TEXTURE_2D, textures[filter])
+    
+    glBegin(GL_QUADS)
+	
+    glNormal3f(0.0, 0.0, 1.0)
+    glTexCoord2f(0.0, 0.0); glVertex3f(-1.0, -1.0,  1.0)	<FONT COLOR=#1111CC># Bottom Left Of The Texture and Quad</FONT>
+    glTexCoord2f(1.0, 0.0); glVertex3f( 1.0, -1.0,  1.0)	<FONT COLOR=#1111CC># Bottom Right Of The Texture and Quad</FONT>
+    glTexCoord2f(1.0, 1.0); glVertex3f( 1.0,  1.0,  1.0)	<FONT COLOR=#1111CC># Top Right Of The Texture and Quad</FONT>
+    glTexCoord2f(0.0, 1.0); glVertex3f(-1.0,  1.0,  1.0)	<FONT COLOR=#1111CC># Top Left Of The Texture and Quad</FONT>
+	
+    <FONT COLOR=#1111CC># Back Face</FONT>
+    glNormal3f(0.0, 0.0, -1.0)
+    glTexCoord2f(0.0, 0.0); glVertex3f(-1.0, -1.0, -1.0)	<FONT COLOR=#1111CC># Bottom Right Of The Texture and Quad</FONT>
+    glTexCoord2f(0.0, 1.0); glVertex3f(-1.0,  1.0, -1.0)	<FONT COLOR=#1111CC># Top Right Of The Texture and Quad</FONT>
+    glTexCoord2f(1.0, 1.0); glVertex3f( 1.0,  1.0, -1.0)	<FONT COLOR=#1111CC># Top Left Of The Texture and Quad</FONT>
+    glTexCoord2f(1.0, 0.0); glVertex3f( 1.0, -1.0, -1.0)	<FONT COLOR=#1111CC># Bottom Left Of The Texture and Quad</FONT>
+	
+    <FONT COLOR=#1111CC># Top Face</FONT>
+    glNormal3f(0.0, 1.0, 0.0)
+    glTexCoord2f(1.0, 1.0); glVertex3f(-1.0,  1.0, -1.0)	<FONT COLOR=#1111CC># Top Left Of The Texture and Quad</FONT>
+    glTexCoord2f(1.0, 0.0); glVertex3f(-1.0,  1.0,  1.0)	<FONT COLOR=#1111CC># Bottom Left Of The Texture and Quad</FONT>
+    glTexCoord2f(0.0, 0.0); glVertex3f( 1.0,  1.0,  1.0)	<FONT COLOR=#1111CC># Bottom Right Of The Texture and Quad</FONT>
+    glTexCoord2f(0.0, 1.0); glVertex3f( 1.0,  1.0, -1.0)	<FONT COLOR=#1111CC># Top Right Of The Texture and Quad</FONT>
+	
+    <FONT COLOR=#1111CC># Bottom Face</FONT>
+    glNormal3f(0.0, -1.0, 0.0)
+    glTexCoord2f(0.0, 1.0); glVertex3f(-1.0, -1.0, -1.0)	<FONT COLOR=#1111CC># Top Right Of The Texture and Quad</FONT>
+    glTexCoord2f(1.0, 1.0); glVertex3f( 1.0, -1.0, -1.0)	<FONT COLOR=#1111CC># Top Left Of The Texture and Quad</FONT>
+    glTexCoord2f(1.0, 0.0); glVertex3f( 1.0, -1.0,  1.0)	<FONT COLOR=#1111CC># Bottom Left Of The Texture and Quad</FONT>
+    glTexCoord2f(0.0, 0.0); glVertex3f(-1.0, -1.0,  1.0)	<FONT COLOR=#1111CC># Bottom Right Of The Texture and Quad</FONT>
+	
+    <FONT COLOR=#1111CC># Right face</FONT>
+    glNormal3f(1.0, 0.0, 0.0)
+    glTexCoord2f(0.0, 0.0); glVertex3f( 1.0, -1.0, -1.0)	<FONT COLOR=#1111CC># Bottom Right Of The Texture and Quad</FONT>
+    glTexCoord2f(0.0, 1.0); glVertex3f( 1.0,  1.0, -1.0)	<FONT COLOR=#1111CC># Top Right Of The Texture and Quad</FONT>
+    glTexCoord2f(1.0, 1.0); glVertex3f( 1.0,  1.0,  1.0)	<FONT COLOR=#1111CC># Top Left Of The Texture and Quad</FONT>
+    glTexCoord2f(1.0, 0.0); glVertex3f( 1.0, -1.0,  1.0)	<FONT COLOR=#1111CC># Bottom Left Of The Texture and Quad</FONT>
+	
+    <FONT COLOR=#1111CC># Left Face</FONT>
+    glNormal3f(-1.0, 0.0, 0.0)
+    glTexCoord2f(1.0, 0.0); glVertex3f(-1.0, -1.0, -1.0)	<FONT COLOR=#1111CC># Bottom Left Of The Texture and Quad</FONT>
+    glTexCoord2f(0.0, 0.0); glVertex3f(-1.0, -1.0,  1.0)	<FONT COLOR=#1111CC># Bottom Right Of The Texture and Quad</FONT>
+    glTexCoord2f(0.0, 1.0); glVertex3f(-1.0,  1.0,  1.0)	<FONT COLOR=#1111CC># Top Right Of The Texture and Quad</FONT>
+    glTexCoord2f(1.0, 1.0); glVertex3f(-1.0,  1.0, -1.0)	<FONT COLOR=#1111CC># Top Left Of The Texture and Quad</FONT>
+	
+    glEnd();				
+    
+    xrot += xspeed
+    yrot += yspeed
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="handle_keys"><FONT COLOR=#CC0000><B> handle_keys</B></FONT></A>(key):
+    <FONT COLOR=#3333CC><B>global</B></FONT> filter, light, z, xspeed, yspeed, blend
+
+    <FONT COLOR=#3333CC><B>if</B></FONT> key == K_ESCAPE:
+        <FONT COLOR=#3333CC><B>return</B></FONT> 0
+    <FONT COLOR=#3333CC><B>if</B></FONT> key == K_f:
+        filter = filter + 1
+        <FONT COLOR=#3333CC><B>if</B></FONT> filter == 3:
+            filter = 0
+    <FONT COLOR=#3333CC><B>elif</B></FONT> key == K_l:
+        light = <FONT COLOR=#3333CC><B>not</B></FONT> light
+        <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> light:
+            glDisable(GL_LIGHTING)
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            glEnable(GL_LIGHTING)
+    <FONT COLOR=#3333CC><B>elif</B></FONT> key == K_b:
+        blend = <FONT COLOR=#3333CC><B>not</B></FONT> blend
+        <FONT COLOR=#3333CC><B>if</B></FONT> blend:
+            glEnable(GL_BLEND)
+            glDisable(GL_DEPTH_TEST)
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            glEnable(GL_DEPTH_TEST)
+            glDisable(GL_BLEND)
+    <FONT COLOR=#3333CC><B>elif</B></FONT> key == K_PAGEUP:
+        z -= 0.05
+    <FONT COLOR=#3333CC><B>elif</B></FONT> key == K_PAGEDOWN:
+        z += 0.05
+    <FONT COLOR=#3333CC><B>elif</B></FONT> key == K_UP:
+        xspeed -= 0.01
+    <FONT COLOR=#3333CC><B>elif</B></FONT> key == K_DOWN:
+        xspeed += 0.01
+    <FONT COLOR=#3333CC><B>elif</B></FONT> key == K_LEFT:
+        yspeed -= 0.01
+    <FONT COLOR=#3333CC><B>elif</B></FONT> key == K_RIGHT:
+        yspeed += 0.01
+    
+    <FONT COLOR=#3333CC><B>return</B></FONT> 1
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="main"><FONT COLOR=#CC0000><B> main</B></FONT></A>():
+
+    video_flags = OPENGL|DOUBLEBUF
+    
+    pygame.init()
+    surface = pygame.display.set_mode((640,480), video_flags)
+
+    resize((640,480))
+    init()
+
+    frames = 0
+    ticks = pygame.time.get_ticks()
+    <FONT COLOR=#3333CC><B>while</B></FONT> 1:
+        event = pygame.event.poll()
+        <FONT COLOR=#3333CC><B>if</B></FONT> event.type == QUIT:
+            <FONT COLOR=#3333CC><B>break</B></FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> event.type == KEYDOWN:
+            <FONT COLOR=#3333CC><B>if</B></FONT> handle_keys(event.key) == 0:
+                <FONT COLOR=#3333CC><B>break</B></FONT>
+        
+        draw()
+        pygame.display.flip()
+        frames = frames+1
+
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"fps:  %d"</FONT> % ((frames*1000)/(pygame.time.get_ticks()-ticks))
+
+
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__ == <FONT COLOR=#115511>'__main__'</FONT>: main()
+</PRE>
+                  <!--footer-->
+                  </BODY>

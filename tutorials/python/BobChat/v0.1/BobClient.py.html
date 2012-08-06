@@ -1,0 +1,58 @@
+<html>
+<head>
+  <title>BobClient.py</title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<pre>
+<font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+BobClient.py
+---
+Simple Ping Client
+&quot;</font><font color="#008000">&quot;&quot;</font>
+
+<strong>import</strong> <font color="#2040a0">thread</font>, <font color="#2040a0">time</font>, <font color="#2040a0">sys</font>
+<strong>from</strong> <font color="#2040a0">socket</font> <strong>import</strong> <font color="#2040a0">socket</font>, <font color="#2040a0">AF_INET</font>, <font color="#2040a0">SOCK_STREAM</font>
+<font color="#2040a0">HOSTNAME</font> <font color="4444FF">=</font> <font color="#008000">&quot;&quot;</font>
+<font color="#2040a0">PORT</font> <font color="4444FF">=</font> <font color="#FF0000">7777</font>
+
+
+<font color="#444444"># These are server side calls</font>
+<font color="#444444">#sockobj.bind((HOSTNAME, PORT))</font>
+<font color="#444444">#sockobj.listen(5)</font>
+
+<font color="#2040a0">message</font> <font color="4444FF">=</font> <font color="4444FF">[</font><font color="#008000">&quot;Ping!&quot;</font><font color="4444FF">]</font>
+<font color="#2040a0">def</font> <font color="#2040a0">pingBob</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">sockobj</font> <font color="4444FF">=</font> <font color="#2040a0">socket</font><font color="4444FF">(</font><font color="#2040a0">AF_INET</font>, <font color="#2040a0">SOCK_STREAM</font><font color="4444FF">)</font>
+    <font color="#2040a0">sockobj</font>.<font color="#2040a0">connect</font><font color="4444FF">(</font><font color="4444FF">(</font><font color="#2040a0">HOSTNAME</font>, <font color="#2040a0">PORT</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <strong>for</strong> <font color="#2040a0">line</font> <strong>in</strong> <font color="#2040a0">message</font><font color="4444FF">:</font>
+        <font color="#2040a0">sockobj</font>.<font color="#2040a0">send</font><font color="4444FF">(</font><font color="#2040a0">line</font><font color="4444FF">)</font>
+        <font color="#2040a0">data</font> <font color="4444FF">=</font> <font color="#2040a0">sockobj</font>.<font color="#2040a0">recv</font><font color="4444FF">(</font><font color="#FF0000">1024</font><font color="4444FF">)</font>
+        <strong>print</strong> <font color="#008000">'Client received:'</font>, `<font color="#2040a0">data</font>`
+    <font color="#2040a0">sockobj</font>.<font color="#2040a0">close</font><font color="4444FF">(</font><font color="4444FF">)</font>
+
+<font color="#2040a0">def</font> <font color="#2040a0">autoBob</font><font color="4444FF">(</font><font color="#2040a0">message</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">sockobj</font> <font color="4444FF">=</font> <font color="#2040a0">socket</font><font color="4444FF">(</font><font color="#2040a0">AF_INET</font>, <font color="#2040a0">SOCK_STREAM</font><font color="4444FF">)</font>
+    <font color="#2040a0">sockobj</font>.<font color="#2040a0">connect</font><font color="4444FF">(</font><font color="4444FF">(</font><font color="#2040a0">HOSTNAME</font>, <font color="#2040a0">PORT</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <font color="#2040a0">done</font> <font color="4444FF">=</font> <font color="#FF0000">0</font>
+    <strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">6</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <font color="#2040a0">time</font>.<font color="#2040a0">sleep</font><font color="4444FF">(</font><font color="#FF0000">1</font><font color="4444FF">)</font>
+        <font color="#2040a0">sockobj</font>.<font color="#2040a0">send</font><font color="4444FF">(</font><font color="#2040a0">message</font><font color="4444FF">)</font>
+        <font color="#2040a0">data</font> <font color="4444FF">=</font> <font color="#2040a0">sockobj</font>.<font color="#2040a0">recv</font><font color="4444FF">(</font><font color="#FF0000">1024</font><font color="4444FF">)</font>
+        <strong>print</strong> <font color="#008000">'Client received:'</font>, `<font color="#2040a0">data</font>`
+    <font color="#2040a0">sockobj</font>.<font color="#2040a0">close</font><font color="4444FF">(</font><font color="4444FF">)</font>
+
+<font color="#2040a0">def</font> <font color="#2040a0">chatBob</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <strong>return</strong>
+
+<strong>if</strong> <font color="#2040a0">__name__</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#008000">&quot;__main__&quot;</font><font color="4444FF">:</font>
+    <strong>if</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">)</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#FF0000">2</font><font color="4444FF">:</font>
+        <font color="#2040a0">autoBob</font><font color="4444FF">(</font><font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">)</font>
+    <strong>else</strong><font color="4444FF">:</font>
+        <font color="#2040a0">chatBob</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    
+
+</pre>
+<hr>
+syntax highlighted by <a href="http://www.palfrader.org/code2html">Code2HTML</a>, v. 0.9.1
+</body>
+</html>

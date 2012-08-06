@@ -1,0 +1,219 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#!/usr/bin/env python</FONT>
+<FONT COLOR=#1111CC>#----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC># fwdmail.py:           Forward e-mail</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># Usage: see __doc__ string below.</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># Requires:</FONT>
+<FONT COLOR=#1111CC>#    - Python 1.5.2 or newer (www.python.org)</FONT>
+<FONT COLOR=#1111CC>#    - modules pop3, imap, message, async (package rgutils)</FONT>
+<FONT COLOR=#1111CC>#    - OS: portable</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># TODO:</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># $Id: //depot/rgutils/scripts/fwdmail.py#4 $</FONT>
+<FONT COLOR=#1111CC>#---------------------------------------------------------------------------</FONT>
+<FONT COLOR=#115511>'''Usage: [python] fwdmail.py [options]
+
+Forward mail and optionally remove it.
+
+Valid options:
+
+  -M MAXMAIL  Don't forward more than MAXMSG mails [-1: forward ALL
+              pending mails]. Set to 0 to forward NO mails (default).
+  -N          [IMAP only] Select only new (=UNSEEN) mails; default is to
+              select all mails not flagged as 'UNDELETED' .
+  -r          Remove mails from original mailbox after forward
+              [default: keep them]
+  -m ADDRESS  Mail server IP address (incoming mails) [default: 'melina.ina.fr']
+  -i          IMAP4 server [default: POP3 server]
+  -u USERNAME Name of user to forward [default: rronfard]
+  -p PASSWD   User password [default: rronfard's password]
+  -F FOLDER[,FOLDER...]
+              [IMAP only] A list of folders to forward [default: INBOX].
+              A/B means subfolder B of folder A. Each folder name may include
+              wildcards * and %. '*' at end means all subfolders recursively.
+
+  -s ADDRESS  SMTP mail server to use to send mails [default: 'melina.ina.fr']
+  -f E-MAIL   Where to forward [default: ronfard@us.ibm.com]
+  -t TAG      Prefix the Subject with this tag in forwarded mails.
+
+  -l LOGFILE  Log file path [default is fwdmail.log in this script's directory]
+  -h          Print this message on stdout and exit.
+  -V          Print fwdmail version on stdout and exit.
+'''</FONT>
+__version__ = <FONT COLOR=#115511>'1.7.'</FONT> + <FONT COLOR=#115511>'$Revision: #4 $'</FONT>[12:-2]
+__author__ = <FONT COLOR=#115511>'Richard Gruet'</FONT>, <FONT COLOR=#115511>'rjgruet@yahoo.com'</FONT>
+__date__    = <FONT COLOR=#115511>'$Date: 2003/04/29 $'</FONT>[7:-2], <FONT COLOR=#115511>'$Author: rgruet $'</FONT>[9:-2]
+__since__ = <FONT COLOR=#115511>'2000/10/15'</FONT>
+
+<FONT COLOR=#3333CC><B>import</B></FONT> sys, os, string, re, getopt
+<FONT COLOR=#3333CC><B>from</B></FONT> rgutils.message <FONT COLOR=#3333CC><B>import</B></FONT> trace, setLogVerbosity, setVerbosity, setLog, dumpMail
+<FONT COLOR=#3333CC><B>import</B></FONT> rgutils.async
+
+true, false =-1, 0
+<FONT COLOR=#1111CC>#SubjectHdr = re.compile(r'Subject: *([^\n]*?) *\n')</FONT>
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="error"><FONT COLOR=#CC0000><B> error</B></FONT></A>(msg):
+    sys.stderr.write(<FONT COLOR=#115511>'fwdmail: error: %s\n'</FONT> % msg)
+    sys.exit(1)
+
+<FONT COLOR=#1111CC># Parse args:</FONT>
+<FONT COLOR=#1111CC># ----------</FONT>
+<FONT COLOR=#3333CC><B>try</B></FONT>:
+    opts, modules = getopt.getopt(sys.argv[1:], <FONT COLOR=#115511>'f:F:hil:m:M:Np:rs:t:u:V'</FONT>, [])
+<FONT COLOR=#3333CC><B>except</B></FONT> getopt.error, e:
+    error(<FONT COLOR=#115511>'%s\n%s'</FONT> % (e, __doc__))
+
+options = {}    <FONT COLOR=#1111CC># a dictionary indexed by opt is more convenient</FONT>
+<FONT COLOR=#3333CC><B>for</B></FONT> opt, value <FONT COLOR=#3333CC><B>in</B></FONT> opts:
+    options[opt] = value
+
+<FONT COLOR=#3333CC><B>if</B></FONT> options.has_key(<FONT COLOR=#115511>'-h'</FONT>):
+    <FONT COLOR=#3333CC><B>print</B></FONT> __doc__
+    sys.exit(0)
+
+<FONT COLOR=#3333CC><B>if</B></FONT> options.has_key(<FONT COLOR=#115511>'-V'</FONT>):
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'fwdmail %d.%d.%d'</FONT> % __version__
+    sys.exit(0)
+
+maxMails = int(options.get(<FONT COLOR=#115511>'-M'</FONT>, <FONT COLOR=#115511>'0'</FONT>))
+<FONT COLOR=#3333CC><B>if</B></FONT> maxMails &lt; 0:
+    maxMails = 10000000
+
+useImap = options.has_key(<FONT COLOR=#115511>'-i'</FONT>)
+<FONT COLOR=#3333CC><B>if</B></FONT> useImap:
+    <FONT COLOR=#3333CC><B>from</B></FONT> rgutils <FONT COLOR=#3333CC><B>import</B></FONT> imap
+    folderSpec = options.get(<FONT COLOR=#115511>'-F'</FONT>, <FONT COLOR=#115511>'INBOX'</FONT>)
+<FONT COLOR=#3333CC><B>else</B></FONT>:
+    <FONT COLOR=#3333CC><B>from</B></FONT> rgutils <FONT COLOR=#3333CC><B>import</B></FONT> pop3
+
+removeMails = options.has_key(<FONT COLOR=#115511>'-r'</FONT>)
+<FONT COLOR=#3333CC><B>if</B></FONT> options.has_key(<FONT COLOR=#115511>'-N'</FONT>):
+    filter = <FONT COLOR=#115511>'(UNSEEN UNDELETED)'</FONT>
+<FONT COLOR=#3333CC><B>else</B></FONT>:
+    filter = <FONT COLOR=#115511>'(UNDELETED)'</FONT>
+mailServer = options.get(<FONT COLOR=#115511>'-m'</FONT>, <FONT COLOR=#115511>'melina.ina.fr'</FONT>)
+smtpServer = options.get(<FONT COLOR=#115511>'-s'</FONT>, <FONT COLOR=#115511>'melina.ina.fr'</FONT>)
+user = options.get(<FONT COLOR=#115511>'-u'</FONT>, <FONT COLOR=#115511>'rronfard'</FONT>)
+passwd = options.get(<FONT COLOR=#115511>'-p'</FONT>, <FONT COLOR=#115511>'ryxqyc5e'</FONT>)
+forwardTo = options.get(<FONT COLOR=#115511>'-f'</FONT>, <FONT COLOR=#115511>'ronfard@us.ibm.com'</FONT>)
+tag = options.get(<FONT COLOR=#115511>'-t'</FONT>, <FONT COLOR=#115511>''</FONT>)
+<FONT COLOR=#3333CC><B>if</B></FONT> tag: tag = tag + <FONT COLOR=#115511>' '</FONT>
+logPath = options.get(<FONT COLOR=#115511>'-l'</FONT>,
+            os.path.join(os.path.dirname(sys.path[0]), <FONT COLOR=#115511>'fwdmail.log'</FONT>))
+
+<FONT COLOR=#1111CC># Do it!</FONT>
+
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'fwdmail %s'</FONT> % __version__
+
+<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'options = %s'</FONT> % options <FONT COLOR=#1111CC>###</FONT>
+
+setLog(open(logPath, <FONT COLOR=#115511>'a'</FONT>))
+setVerbosity(100)
+setLogVerbosity(100)
+
+<FONT COLOR=#3333CC><B>if</B></FONT> useImap:
+    mb = imap.MailBoxSession(mailServer, user, passwd)
+    folders = []
+    <FONT COLOR=#3333CC><B>for</B></FONT> folderPattern <FONT COLOR=#3333CC><B>in</B></FONT> string.split(folderSpec, <FONT COLOR=#115511>','</FONT>):
+        folders.extend(mb.listFolders(pattern=folderPattern))
+    <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>'folders = %s'</FONT> % folders <FONT COLOR=#1111CC>##</FONT>
+<FONT COLOR=#3333CC><B>else</B></FONT>:
+    mb = pop3.MailBoxSession(mailServer, user, passwd)
+    folders = [<FONT COLOR=#115511>''</FONT>]      <FONT COLOR=#1111CC># dummy</FONT>
+
+<FONT COLOR=#3333CC><B>try</B></FONT>:
+
+    <FONT COLOR=#3333CC><B>import</B></FONT> smtplib
+    smtp = smtplib.SMTP(smtpServer)
+
+    <FONT COLOR=#3333CC><B>try</B></FONT>:
+        <FONT COLOR=#3333CC><B>for</B></FONT> folder <FONT COLOR=#3333CC><B>in</B></FONT> folders:
+            <FONT COLOR=#3333CC><B>if</B></FONT> useImap:
+                mb.selectFolder(folder, filter=filter)
+                mailNos = mb.pendingMails
+            <FONT COLOR=#3333CC><B>else</B></FONT>:
+                mailNos = range(1, mb.msgCnt+1)
+
+            <FONT COLOR=#3333CC><B>if</B></FONT> maxMails &gt;= 0:
+                mailNos = mailNos[:maxMails]
+
+            <FONT COLOR=#3333CC><B>if</B></FONT> mb.msgCnt &gt; 0:
+                s = <FONT COLOR=#115511>'%s message(s) for user %s'</FONT> % (mb.msgCnt, mb.user)
+                <FONT COLOR=#3333CC><B>if</B></FONT> useImap:
+                    s = s + <FONT COLOR=#115511>' in folder %s'</FONT> % folder
+                trace(s)
+
+            <FONT COLOR=#3333CC><B>for</B></FONT> msgNo <FONT COLOR=#3333CC><B>in</B></FONT> mailNos:
+                trace(<FONT COLOR=#115511>'Reading mail #%d'</FONT> % msgNo)
+
+                <FONT COLOR=#1111CC># Performs an asynchronous call to get message because a</FONT>
+                <FONT COLOR=#1111CC># timeout sometimes occurs:</FONT>
+                <FONT COLOR=#3333CC><B>try</B></FONT>:
+                    <FONT COLOR=#3333CC><B>from</B></FONT> rgutils <FONT COLOR=#3333CC><B>import</B></FONT> async
+                    msg = async.callWithTimeout(30, mb.getMsg, msgNo,false, 30)
+                <FONT COLOR=#3333CC><B>except</B></FONT> Exception, e:
+                    trace(<FONT COLOR=#115511>"*** Can't read mail #%d (%s) =&gt; skip it"</FONT> %
+                                                                (msgNo, e))
+                    <FONT COLOR=#3333CC><B>if</B></FONT> removeMails:
+                        mb.removeMsg(msgNo)
+                        trace(<FONT COLOR=#115511>'Deleted mail #%d from %s on %s'</FONT> % (msgNo, user,
+                                                                  mailServer))
+                    <FONT COLOR=#3333CC><B>continue</B></FONT>
+
+                trace(<FONT COLOR=#115511>'Forwarding mail #%d "%s" to %s'</FONT> % (msgNo, msg.Subject,
+                                                          forwardTo))
+
+                <FONT COLOR=#1111CC># Extract the message body (starting after 1st empty line:</FONT>
+                <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> range(len(msg.lines)):
+                    line = msg.lines[i]
+                    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> line:
+                        <FONT COLOR=#3333CC><B>break</B></FONT>
+                <FONT COLOR=#3333CC><B>else</B></FONT>:
+                    dumpMail(msg)   <FONT COLOR=#1111CC># (see message.py)</FONT>
+                    <FONT COLOR=#3333CC><B>raise</B></FONT> Exception(<FONT COLOR=#115511>"Can't find header 'Content-Type' or "</FONT>
+                                    <FONT COLOR=#115511>"an empty line in mail (mail dumped in "</FONT>
+                                    <FONT COLOR=#115511>"file %s)."</FONT> % dumpPath)
+                body = string.join(msg.lines[i:], <FONT COLOR=#115511>'\n'</FONT>)
+
+                <FONT COLOR=#1111CC># Avoid empty 'From' header (crashes!):</FONT>
+                <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> msg.rfc822[<FONT COLOR=#115511>'From'</FONT>]:
+                    msg.From = (<FONT COLOR=#115511>'? (forwarded by RGruet)'</FONT>, <FONT COLOR=#115511>'rgruet@ina.fr'</FONT>)
+                    msg.rfc822[<FONT COLOR=#115511>'From'</FONT>] = string.join(msg.From, <FONT COLOR=#115511>', '</FONT>)
+
+                <FONT COLOR=#3333CC><B>if</B></FONT> tag:
+                    <FONT COLOR=#1111CC># Modify the 'Subject' header to add the tag:</FONT>
+                    <FONT COLOR=#3333CC><B>try</B></FONT>:
+                        subject = msg.rfc822[<FONT COLOR=#115511>'Subject'</FONT>]
+                    <FONT COLOR=#3333CC><B>except</B></FONT> KeyError:
+                        subject = <FONT COLOR=#115511>''</FONT>
+                    msg.rfc822[<FONT COLOR=#115511>'Subject'</FONT>] = tag + subject
+
+                msgTxt = string.join(msg.rfc822.headers, <FONT COLOR=#115511>''</FONT>) + body
+                r = smtp.sendmail(msg.From[1], forwardTo, msgTxt)
+                <FONT COLOR=#3333CC><B>if</B></FONT> r:
+                    trace(<FONT COLOR=#115511>"Can't send mail #%d (%s): %s"</FONT> % (i, msg.Subject, r))
+                <FONT COLOR=#3333CC><B>elif</B></FONT> removeMails:
+                    mb.removeMsg(msgNo)
+                    trace(<FONT COLOR=#115511>'Deleted mail #%d from %s on %s'</FONT> % (msgNo,
+                                                              user, mailServer))
+    <FONT COLOR=#3333CC><B>finally</B></FONT>:
+        smtp.quit()
+<FONT COLOR=#3333CC><B>finally</B></FONT>:
+    mb.quit()   <FONT COLOR=#1111CC># This commits the changes (mail deletions)</FONT>
+
+<FONT COLOR=#1111CC># Found no other way to kill the "asyncall" remaining threads (in case of timeout):</FONT>
+<FONT COLOR=#3333CC><B>try</B></FONT>:
+    <FONT COLOR=#3333CC><B>import</B></FONT> win32api
+<FONT COLOR=#3333CC><B>except</B></FONT> ImportError:
+    <FONT COLOR=#3333CC><B>pass</B></FONT>
+<FONT COLOR=#3333CC><B>else</B></FONT>:
+    win32api.TerminateProcess(win32api.GetCurrentProcess(), 0)
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

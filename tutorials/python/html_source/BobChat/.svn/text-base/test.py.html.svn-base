@@ -1,0 +1,17 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#3333CC><B>import</B></FONT> os,sys,thread,string,time <FONT COLOR=#1111CC># haha, thread and string! (SORRY!)</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> BobClient
+
+letters = string.letters 
+
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
+    <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> range(26):
+        message = letters[i]
+        thread.start_new(BobClient.chatBob, (message,))
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Created"</FONT>,message,<FONT COLOR=#115511>"thread!"</FONT>
+        time.sleep(0.2)
+</PRE>
+                  <!--footer-->
+                  </BODY>

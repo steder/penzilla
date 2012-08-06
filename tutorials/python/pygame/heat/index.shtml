@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content=
+          "HTML Tidy for Linux/x86 (vers 1st August 2004), see www.w3.org" />
+    <title>Penzilla.net's Python Tutorial: PyGame - Heat</title>
+    <link rel="StyleSheet" href="../../style.css" type="text/css" media="screen" />
+  </head>
+  <body>
+    <div id="header">
+      <h1>Penzilla.net's Python Tutorial:</h1>
+      <h2>PyGame: Heat</h2>
+      <hr /></div>
+    <div id="sidebar">
+      <div id="menu"><a href="../../index.shtml">&raquo;Tutorial Home</a>
+        <!--#include virtual="/tutorials/python/pygame/menu.html"-->
+        <!--#include virtual="/tutorials/python/menu.html"-->
+      </div>
+      <!--#include virtual="/tutorials/python/skyscraper_ads.html"--></div>
+    <div id="content"><!-- Comments -->
+      <!-- Body -->
+      <h3>Introduction</h3>
+      <img alt="steady state heat visualization graphic" src="heat.png"/>
+      <h4>heat.py</h4>
+      <div id="code">
+        <!--#include virtual="heat.py.html"-->
+      </div>
+      <h3>Download</h3>
+
+      <p>Download this example: <a href="heat.py">heat.py</a>
+      <!--End Body-->
+    </div>
+    <div id="footer">
+      <!--#include virtual="/tutorials/python/footer.shtml"-->
+    </div>
+  </body>
+</html>

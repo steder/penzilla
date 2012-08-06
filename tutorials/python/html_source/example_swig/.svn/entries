@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="10"
+   name=""
+   committed-date="2004-01-09T22:55:59.613144Z"
+   url="http://www.ripplefx.net:81/svn/python/html_source/example_swig"
+   last-author="steder"
+   kind="dir"
+   uuid="996777e2-3ecf-0310-aa64-e0ff611b1bef"
+   revision="17"/>
+<entry
+   committed-rev="10"
+   name="example.c.html"
+   text-time="2004-09-20T02:22:28.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="838780fd0abd3b415f25ba0d72ae755a"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:28.000000Z"/>
+<entry
+   committed-rev="10"
+   name="example.py.html"
+   text-time="2004-09-20T02:22:28.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="58cce2429a0bb87fb7eeb3b44b832e8f"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:28.000000Z"/>
+<entry
+   committed-rev="10"
+   name="example.i.html"
+   text-time="2004-09-20T02:22:28.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="e765a2bdda7b43cb0cef0522b255d85b"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:28.000000Z"/>
+</wc-entries>

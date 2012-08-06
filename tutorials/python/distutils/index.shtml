@@ -1,0 +1,59 @@
+<html>
+<title>Introduction to Python:  Distutils</title>
+<body>
+<h2>An Introduction to Python:  Distutils</h2>
+<h3><font color="blue">Installing and Distributing Python Modules</font></h3>
+<a href="../index.html">Table of Contents</a>
+<hr><!--^Header^-->
+<h4><font color="green">What is Distutils?</font></h4>
+<P>Distutils is a Python Library that can be used to simplify installation of Pure Python software, as well as Python/C extensions.  With a simple handwritten setup script you can build and install these sort of packages.  These setup scripts take care of a lot of platform/system specific variables, including automated configuration of options and paths for the compiler and linker.
+
+<h4><font color="green">When to use Distutils?</font></h4>
+<P>Whenever you are distributing a all Python or Python + C Extension project.
+This includes projects that use SWIG to help generate the C Extensions.  
+
+<h4><font color="green">When Distutils won't cut it</font></h4>
+<P>Distutils works well as long as you don't have to deal with more languages then C/C++ and Python.  For instance, many Climate Science applications are beginning to use C/C++, Fortran, and Python together.  Distutils is currently ignorant about the options and flags necessary to pass to the many different Fortran compilers.  
+
+<h4><font color="green">The Setup Script</font></h4>
+<P>The setup script is the heart of any Distutils project, in the same way that Makefiles are key to all sorts of C or Fortran programs.  Let's take a look at a distutils script that compiles and (optionally) installs Rodrigo Caballero's NumPtr package.
+<P>Here is what his package looks like before we've built anything.
+<pre><code>
+<font color="green">steder@Penzilla</font> <font color="blue">NumPtr $</font> ls
+MANIFEST      NumPtr.i       NumPtr_wrap.o  setup.py  test.py
+Makefile      NumPtr.py      getpointer.c   test.c
+Makefile.old  NumPtr_lib.py  getpointer.o   test.o
+</code></pre>
+<P>Notice the old makefile, the new makefile which simply calls the distutils functions, and the only distutils only file, setup.py.
+<P>This is a fairly standard Python + C + SWIG module.  A wrapper is generated from the *.i files, the C source and wrapper source is compiled and linked together to build a shared library.  
+<P>Our makefile specifies a number of rules and patterns that describe how to build this project.  The order in which the compilation and interface generation steps occur and so on.  With Distutils this is largely taken care of for you.  You primarily need to tell distutils only a few things.
+<P>Let's now look at a setup script:
+<ul><!--#include virtual="setup.py.html"--></ul>
+<P>The first thing to notice is that we can still use normal python code before and after the distutils declaration.  For instance, here I'm globbing for files that match certain patterns so that I don't have to change the script each time I add a source file.
+<P>Next I do a few more hackish things to grab some useful paths, using some os.path functions to find the python header and library directory paths.
+<P>Now onto the actual setup object which is processed by Distutils.  I'm not going to discuss all the parameters because things like "name" and "author" are pretty self explanatory.
+
+<ul>We care about the following options:
+  <li>
+    <pre><code>
+      ext_modules = [Extension('_NumPtr',
+                               files,
+                               include_dirs=[python_incdir],
+                               library_dirs=[python_libdir],
+                               ),
+                     ],
+    </code></pre>
+  </li>
+  <li>packages</li>
+  <li>extra_path</li>
+  <li>py_modules</li>
+</ul>
+
+<!--Include Sourcecode-->
+<ul><!--#include virtual="codefile.py.html"--></ul>
+
+<!--\/Footer\/-->
+<hr>
+<a href="../index.html">Table of Contents</a>
+</body>
+</html>

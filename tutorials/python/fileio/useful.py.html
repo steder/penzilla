@@ -1,0 +1,37 @@
+<div class="syntax"><pre><span class="kn">import</span> <span class="nn">os.path</span>
+<span class="c"># os.path - The key to File I/O</span>
+<span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s">&quot;bob.txt&quot;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s">&quot;bob.txt&quot;</span><span class="p">)</span> <span class="c"># Does bob.txt exist?  Is it a file, or a directory?</span>
+<span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="s">&quot;bob&quot;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="s">&quot;/home/me/bob.txt&quot;</span><span class="p">)</span> <span class="c"># Is it an absolute path to this file?</span>
+
+<span class="c"># Creating cross platform paths</span>
+<span class="c"># This will be slightly different on each platform</span>
+<span class="n">currentdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">curdir</span>
+<span class="n">imagedir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">currentdir</span><span class="p">,</span> <span class="s">&quot;images&quot;</span><span class="p">)</span>
+
+<span class="c"># Let&#39;s say I have a full path, and yet I want to store records based</span>
+<span class="c"># on the name of the file:</span>
+<span class="n">longpath</span> <span class="o">=</span> <span class="s">&quot;/home/me/python/somefiles/junk/notjunk/blah/bingo.txt&quot;</span>
+<span class="n">shortpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">longpath</span><span class="p">)</span>
+
+<span class="c"># Get the type of shortpath:</span>
+<span class="k">print</span> <span class="s">&quot;Type of&quot;</span><span class="p">,</span><span class="n">shortpath</span><span class="p">,</span><span class="s">&quot;is&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">shortpath</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c"># os.path.walk can be used to traverse directories recursively</span>
+<span class="c"># to apply changes to a whole tree of files.</span>
+<span class="k">def</span> <span class="nf">callback</span><span class="p">(</span> <span class="n">arg</span><span class="p">,</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">fnames</span> <span class="p">):</span>
+    <span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">fnames</span><span class="p">:</span>
+        <span class="nb">sum</span> <span class="o">+=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+    <span class="n">arg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span>
+
+<span class="n">arglist</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="s">&quot;./&quot;</span><span class="p">,</span><span class="n">callback</span><span class="p">,</span><span class="n">arglist</span><span class="p">)</span>
+
+<span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">arglist</span><span class="p">:</span>
+    <span class="nb">sum</span> <span class="o">+=</span> <span class="n">value</span>
+
+<span class="k">print</span> <span class="s">&quot;Size of directory:&quot;</span><span class="p">,</span><span class="nb">sum</span>
+</pre></div>

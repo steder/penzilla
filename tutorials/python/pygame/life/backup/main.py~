@@ -1,0 +1,94 @@
+######################################################################
+##  PYTHON POPULATION SIMULATOR v0.00
+##
+##  Main Program And Display Functionality
+##
+##  Contains a script for initial configuration
+##  and a Tk canvas widget custom built for displaying
+##  the current environment of the engine object.
+######################################################################
+
+## IMPORTS
+from engine import *
+import time
+from Tkinter import *
+import string
+
+SCALE = 4
+
+class Display:
+    def __init__(self,parent=None,x=0,y=0,environment=None):
+        print 'Initializing Display Widget'
+        # Initialize Variables
+        self.parent = parent
+        self.x = x
+        self.y = y
+        self.canvas = None
+        self.environment = environment
+        # Create a canvas of X by Y pixels
+        self.makewidgets()
+        if self.environment != None:
+            print 'Debugging Init Display'
+            self.display(environment)
+        else:
+            print 'Environment = None'
+
+    def makewidgets(self):
+        print 'Making Display Widgets'
+        ## 0,0 is the pixel in the top left corner
+        ## x,y is the pixel in the lower right
+        canvas = Canvas(self.parent,width=self.x*SCALE,height=self.y*SCALE,bg='black')
+        canvas.pack(expand=YES, fill=BOTH)
+        self.canvas = canvas
+
+    def display(self, environment=None):
+        #print 'Displaying Environment'
+        if environment!=None:
+            # Clear the canvas with delete
+            #self.canvas.delete('all')
+            #print 'Debugging Display'
+            starttime = time.time()
+            for i in xrange(0,self.x-1):
+                for j in xrange(0,self.y-1):
+                    #item = environment[i][j]
+                    #if item.type != 'e':
+                        #print i,j, '-',item.type
+                    if environment[i][j].type == 'p':
+                        color = 'green'
+                        #self.canvas.create_line(i*SCALE,j*SCALE,(i*SCALE)+1,(j*SCALE)+1,fill=color)
+                    elif environment[i][j].type == 'h':
+                        color = 'yellow'
+                        #self.canvas.create_line(i*SCALE,j*SCALE,(i*SCALE)+1,(j*SCALE)+1,fill=color)
+                    elif environment[i][j].type == 'c':
+                        color = 'red'
+                        #self.canvas.create_line(i*SCALE,j*SCALE,(i*SCALE)+1,(j*SCALE)+1,fill=color)
+                    elif environment[i][j].type == 'e':
+                        color = 'black'
+                        #self.canvas.create_line(i*SCALE,j*SCALE,(i*SCALE)+1,(j*SCALE)+1,fill=color)
+            
+            endtime = time.time()
+            elapsedtime = endtime - starttime
+        else:
+            print 'No Environment to Display'
+        return elapsedtime
+
+if __name__=='__main__':
+    root = Tk()
+    print 'PYTHON POPULATION SIMULATION ( Version',VERSION,')'
+    model = Simulation(100,100,10,10,10)
+    i = 0
+    timesteps = 365
+    output = Display(root,100,100,model.environment)
+    t = 0.0
+    elapsedtime = 0.0
+    while i < timesteps:
+        print 'timestep> ', i, '-',t, '-',elapsedtime
+        t = output.display(model.environment)
+        root.update()
+        starttime = time.time()
+        model.timestep()
+        endtime = time.time()
+        #time.sleep(0.1)
+        elapsedtime = endtime-starttime
+        i = i + 1    
+    raw_input('Press Enter To Exit')

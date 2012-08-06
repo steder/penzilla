@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="10"
+   name=""
+   committed-date="2004-01-09T22:55:59.613144Z"
+   url="http://www.ripplefx.net:81/svn/python/html_source/control"
+   last-author="steder"
+   kind="dir"
+   uuid="996777e2-3ecf-0310-aa64-e0ff611b1bef"
+   revision="17"/>
+<entry
+   committed-rev="10"
+   name="for.py.html"
+   text-time="2004-09-20T02:22:28.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="d06f54759e3cd948673c1fe59e7491be"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:28.000000Z"/>
+<entry
+   committed-rev="10"
+   name="statements.py.html"
+   text-time="2004-09-20T02:22:28.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="03b47c7219406536db4594b0ea1785c7"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:28.000000Z"/>
+<entry
+   committed-rev="10"
+   name="while.py.html"
+   text-time="2004-09-20T02:22:28.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="040345df94f87cdc1d32dc57fb6e2e40"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:28.000000Z"/>
+<entry
+   committed-rev="10"
+   name="case.py.html"
+   text-time="2004-09-20T02:22:28.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="ad9843ed690005773c87a8aee5e6255a"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:28.000000Z"/>
+<entry
+   committed-rev="10"
+   name="if.py.html"
+   text-time="2004-09-20T02:22:28.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="ec416b361516c3cb5ff58639778e1532"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:28.000000Z"/>
+</wc-entries>

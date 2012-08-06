@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="13"
+   name=""
+   committed-date="2004-01-15T14:29:37.920952Z"
+   url="http://www.ripplefx.net:81/svn/python/txt2html"
+   last-author="steder"
+   kind="dir"
+   uuid="996777e2-3ecf-0310-aa64-e0ff611b1bef"
+   revision="17"/>
+<entry
+   committed-rev="18"
+   name="PyFontify.pyc"
+   text-time="2004-10-12T14:40:27.000000Z"
+   committed-date="2004-10-21T04:53:04.910573Z"
+   checksum="e81f94eb00f3a3e21dbd129d6e46e581"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:04.000000Z"
+   revision="18"/>
+<entry
+   committed-rev="1"
+   name="mxTypographify.py"
+   text-time="2004-09-20T02:23:04.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="12db35ce3a71ca237bc80edbc3762ad3"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:04.000000Z"/>
+<entry
+   committed-rev="18"
+   name="PyFontify.py.html"
+   text-time="2005-02-13T05:58:06.000000Z"
+   committed-date="2004-10-21T04:53:04.910573Z"
+   checksum="06795c12084a26b24f3c252e0bd6008a"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:04.000000Z"
+   revision="18"/>
+<entry
+   committed-rev="1"
+   name="TODO.txt"
+   text-time="2004-09-20T02:23:04.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="95796ea8d37f32d768d511382fc107b4"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:04.000000Z"/>
+<entry
+   committed-rev="18"
+   name="mxTypographify.py.html"
+   text-time="2005-02-13T05:58:06.000000Z"
+   committed-date="2004-10-21T04:53:04.910573Z"
+   checksum="6b5ec35f7e38d912c6b0fe4a0ef7b0ce"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:04.000000Z"
+   revision="18"/>
+<entry
+   committed-rev="1"
+   name="WHY.txt"
+   text-time="2004-09-20T02:23:04.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="6e6733506a134f8e0fa89a500df3af97"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:04.000000Z"/>
+<entry
+   committed-rev="1"
+   name="eye.gif"
+   text-time="2004-09-20T02:23:04.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="bc80a0f9c80ffe18910be32b712f1238"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:04.000000Z"/>
+<entry
+   committed-rev="1"
+   name="fetch_txt2html.py"
+   text-time="2004-09-20T02:23:04.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="d3531463d5cabaee1161baa54325215e"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:04.000000Z"/>
+<entry
+   committed-rev="1"
+   name="py2html.py"
+   text-time="2004-09-20T02:23:04.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="f0406c3e8e880bf2d946b305df8982a8"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:04.000000Z"/>
+<entry
+   committed-rev="1"
+   name="txt2html.cgi"
+   text-time="2004-09-20T02:23:05.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="5300ae0e091efd643626bb3e47322d91"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:05.000000Z"/>
+<entry
+   committed-rev="1"
+   name="txt2html.zip"
+   text-time="2004-09-20T02:23:05.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="851e3987bb9e9473cc63043ece090d16"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:05.000000Z"/>
+<entry
+   committed-rev="1"
+   name="dyn_txt2html.py"
+   text-time="2004-09-20T02:23:04.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="6e8cf9acc45ce9dfd354851ad7b49809"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:04.000000Z"/>
+<entry
+   committed-rev="1"
+   name="t2h_textfuncs.py"
+   text-time="2004-09-20T02:23:04.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="4a4840c770980f21d45ac3e6ab137999"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:04.000000Z"/>
+<entry
+   committed-rev="18"
+   name="fetch_txt2html.py.html"
+   text-time="2005-02-13T05:58:06.000000Z"
+   committed-date="2004-10-21T04:53:04.910573Z"
+   checksum="2312973c3acaeea8fcda4d095764e552"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:05.000000Z"
+   revision="18"/>
+<entry
+   committed-rev="18"
+   name="py2html.py.html"
+   text-time="2005-02-13T05:58:06.000000Z"
+   committed-date="2004-10-21T04:53:04.910573Z"
+   checksum="044af9c3bdfab874ea68b5f719c6deb8"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:05.000000Z"
+   revision="18"/>
+<entry
+   committed-rev="18"
+   name="t2h_textfuncs.py.html"
+   text-time="2005-02-13T05:58:06.000000Z"
+   committed-date="2004-10-21T04:53:04.910573Z"
+   checksum="261df414deb7d9ac0d97ebc65bb60275"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:05.000000Z"
+   revision="18"/>
+<entry
+   committed-rev="18"
+   name="dyn_txt2html.py.html"
+   text-time="2005-02-13T05:58:06.000000Z"
+   committed-date="2004-10-21T04:53:04.910573Z"
+   checksum="f7e6fdf567f73b2bb678dbaf1d94d26b"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:05.000000Z"
+   revision="18"/>
+<entry
+   committed-rev="1"
+   name="dmTxt2Html.py"
+   text-time="2004-09-20T02:23:05.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="108fbeb748aa14565a29e74b7cb83b26"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:05.000000Z"/>
+<entry
+   committed-rev="1"
+   name="curses_txt2html.py"
+   text-time="2004-09-20T02:23:05.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="b4801789d0cca88a566264e5431aa34d"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:05.000000Z"/>
+<entry
+   committed-rev="18"
+   name="dmTxt2Html.py.html"
+   text-time="2005-02-13T05:58:06.000000Z"
+   committed-date="2004-10-21T04:53:04.910573Z"
+   checksum="49b25841a06e86afd226776dac596e0e"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:05.000000Z"
+   revision="18"/>
+<entry
+   committed-rev="18"
+   name="curses_txt2html.py.html"
+   text-time="2005-02-13T05:58:06.000000Z"
+   committed-date="2004-10-21T04:53:04.910573Z"
+   checksum="ebc3f7bf4305eff304967f55881802d0"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:05.000000Z"
+   revision="18"/>
+<entry
+   committed-rev="1"
+   name="txt2html.txt"
+   text-time="2004-09-20T02:23:05.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="051552cda03952acfc130b06f7d55c44"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:05.000000Z"/>
+<entry
+   committed-rev="1"
+   name="txt2html_dir.py"
+   text-time="2004-09-20T02:23:05.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="28e67d89200d5fbf3076b81588dfca1d"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:05.000000Z"/>
+<entry
+   committed-rev="1"
+   name="tk_txt2html.py"
+   text-time="2004-09-20T02:23:06.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="18e87d8599d449d01c9932c7b61afd91"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:06.000000Z"/>
+<entry
+   committed-rev="18"
+   name="tk_txt2html.py.html"
+   text-time="2005-02-13T05:58:06.000000Z"
+   committed-date="2004-10-21T04:53:04.910573Z"
+   checksum="85a73c1e21ece68b0b00249828a1744e"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:06.000000Z"
+   revision="18"/>
+<entry
+   committed-rev="1"
+   name="PyFontify.py"
+   text-time="2004-09-20T02:23:06.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="4e584e7af396175fb1d67d689dccfae2"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:06.000000Z"/>
+<entry
+   committed-rev="18"
+   name="txt2html_dir.py.html"
+   text-time="2005-02-13T05:58:06.000000Z"
+   committed-date="2004-10-21T04:53:04.910573Z"
+   checksum="afffea041127e590f606d7a9af810a10"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:06.000000Z"
+   revision="18"/>
+</wc-entries>

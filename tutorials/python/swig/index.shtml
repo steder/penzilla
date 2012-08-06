@@ -1,0 +1,73 @@
+<!--Simple Swig Example-->
+<!--Illustrates C/C++ Integration with Python-->
+<html>
+<title>Introduction to Python:  SWIG</title>
+<h2>Introduction to Python:  SWIG</title>
+<h3>What is SWIG?</h3>
+<a href="../index.html">Table of Contents</a>
+<hr>
+<p>Note:  Due to a few e-mail questions I've updated this page, and the example code to deal with Mac OS X as well.  However, I do not have a Mac, nor is this hosted on a Mac, your mileage may vary.
+<p>SWIG stands for <a href="http://www.swig.org">"Simplified Wrapper Interface Generator."</a>  SWIG is an immensely useful program that allows you to interface many different interpreted languages with C/C++ code, for purposes of extension or interoperability between languages.  Many C/C++ libraries have been ported to Python using this tool, and it allows anyone interested to actually write there own low level code and call it from within Python.  
+<p>SWIG works by looking at a user defined file called an "interface file", and generating valid C interface code for a Python module.  If that doesn't make sense now, it hopefully will by the time we finish a simple example.  SWIG is run on this interface file, generating some C code which we can compile and link against the Python libraries and headers, (in addition to our own libraries of course).  At this point we can generate a shared library capable of being imported at runtime by the Python interpreter.
+<ul>
+  <li>Some quick points about SWIG</li>
+  <ul>
+    <li>Problems with SWIG</li>
+    <ul>
+      <li>Using C/C++ source creates some small porting problems, depends on how portable the C/C++ code is to begin with.</li>
+      <li>The compilation process varies depending on platforms.  Compiling modules on Linux is different then compiling on Darwin(Mac OS X), and different steps are necessary.  (Does the platform support Shared Libraries?)</li>
+      <li>Interface files must be updated whenever a function is changed, added, or removed.  Forgetting to keep interface files updated is a wonderful source of almost untraceable errors.</li>
+      <li><b>NOTE:</b> People(including myself) are working on tools to alleviate/eliminate all of the above issues</li>
+    </ul>
+  <li>Advantages of SWIG</li>
+  <ul>
+    <li>Low overhead access to C/C++ functions and objects(And Libraries!)</li>
+    <li>C speed, Python interface</li>
+    <li>Definitely much easier then writing these interfaces by hand.</li>
+    <li>Large user community and active developers.</li>
+    <li>Used in industry and science as a production tool</li>
+    </ul>
+  </ul>
+</ul>
+
+<h3>An Example</h3>
+<P>Here is the C/C++ code that I would like to wrap.  Let's take a quick look.  Note I use the only correct C coding style :~)
+<ul>
+<!--#include virtual="example.c.html"-->
+</ul>
+<p>Ah, <i>proper</i> brace usage!  I recommend Code2HTML by the way.
+<p>Now, we need to define an interface to this file.  Basically an interface just includes a couple SWIG "directives" (like C preprocessor directives), and then some definitions of your C/C++ objects or functions.
+<ul>
+<!--#include virtual="example.i.html"-->
+</ul>
+<p>Now we can go ahead and run SWIG, and compile.  First we have to run SWIG, the following command should do it for this example(Note the $ indicates the command prompt):
+<pre><code>
+<font color="green"><b>$  swig -python example.i </font></b>
+</pre></code>
+<p>That line generates a file called "example_wrap.c", and possibly also files like "example_wrap.doc" and "example.py".  "example.py" is generated from whatever you specify the module name to be in interface file.  If a python file is generated (as it is with the newer versions of swig) that python file helps clean up the C interface (especially when dealing with C++ objects).  A naming peculiarity involving these python files is that they expect to import a shared library containing your code, which they expect to have the same name as the python file, but with a prepended underscore.  So "example.py" expects to import your compiled code as "_example.so".  
+<p>So after running that command you have the following files:
+<pre><code>
+<font color="green"><b>$  example.c       example.i       example.py      example_wrap.c</font></b>
+</pre></code>
+<p>Next we need to compile this thing.  First we'll compile our C code, but not link it just yet.
+<pre><code>
+<font color="green"><b>$  gcc -c example.c example_wrap.c -I/usr/include/python2.2 -I/usr/lib/python2.2</font></b>
+</pre></code>
+<p>This generates the "example.o" and "example_wrap.o" object code.  Notice that the trickiest part of doing this is remembering the paths to your Python library and header files.  I recommend Makefiles or something else so you don't have to.  
+<p>Now we have our object code both for our example and for its wrapper.  The last step is to link it together into a shared library file so we can use it.  
+<pre><code>
+<font color="green"><b>$  ld -shared -o _example.so example.o example_wrap.o</font></b>
+</code></pre>
+<p>This is where the makefile needs to be different for Mac OS X users.  Since Mac OS X does not include a -shared option, you need to set a bunch of flags that collectively add up to about the same thing.  So, try this:
+<pre><code>
+<font color="green"><b>$  ld -bundle -flat_namespace -undefined suppress -o _example.so example.o example_wrap.o</font></b>
+</code></pre>
+<p>There we go!  One nifty little "cube" function that is written in C but is available to Python.  Now I realize that this example is really pretty simple, but more compliicated examples are more complicated because of the C/C++ code involved, and not because of SWIG.  I'll be happy to do some more exciting examples, just let me know.  
+<p>Anyone interested in playing with SWIG on Mac OS X should let me know and I'll find and post up the instructions for compiling shared libraries on Mac OS.  The above should work on Mac OS, but as I don't have a Mac at the moment, I can't guarantee it.  Please e-mail me if you are interested in Mac OS X examples.
+<p>Also, if there are people using other platforms that are having difficulty getting this code to work, Windows for example, please let me know via e-mail.  Hopefully I'll be able to add a windows example too.  
+<hr>
+Download the source for this example:
+<a href="swig_example1.zip">swig_example1 (Zipfile) -- Now (really) works with OS X! (09/23/2008)</a><br>
+
+syntax highlighted by <a href="http://www.palfrader.org/code2html">Code2HTML</a>, v. 0.9.1
+<a href="../index.html">Table of Contents</a>

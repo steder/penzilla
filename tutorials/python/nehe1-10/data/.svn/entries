@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="1"
+   name=""
+   committed-date="2003-12-24T19:34:15.663229Z"
+   url="http://www.ripplefx.net:81/svn/python/nehe1-10/data"
+   last-author="steder"
+   kind="dir"
+   uuid="996777e2-3ecf-0310-aa64-e0ff611b1bef"
+   revision="17"/>
+<entry
+   committed-rev="1"
+   name="mud.bmp"
+   text-time="2004-09-20T02:23:01.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="9e4adfbbd5e34b2fee526d92d8ae569e"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:01.000000Z"/>
+<entry
+   committed-rev="1"
+   name="world.txt"
+   text-time="2004-09-20T02:23:01.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="f40f1d7ec00faeee1aa69f8204b2ac91"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:01.000000Z"/>
+<entry
+   committed-rev="1"
+   name="star.bmp"
+   text-time="2004-09-20T02:23:01.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="b7b144187f9c44256769ec436968c1d1"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:01.000000Z"/>
+<entry
+   committed-rev="1"
+   name="glass.bmp"
+   text-time="2004-09-20T02:23:02.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="2d159f881a47b6527bb2588fe28986a0"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:02.000000Z"/>
+<entry
+   committed-rev="1"
+   name="crate.bmp"
+   text-time="2004-09-20T02:23:03.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="d28976f6d344045a348c32f30b956bae"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:03.000000Z"/>
+<entry
+   committed-rev="1"
+   name="nehe.bmp"
+   text-time="2004-09-20T02:23:04.000000Z"
+   committed-date="2003-12-24T19:34:15.663229Z"
+   checksum="bc877d7cb47f158e451873cb2afec658"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:23:04.000000Z"/>
+</wc-entries>

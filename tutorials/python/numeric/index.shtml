@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content=
+          "HTML Tidy for Linux/x86 (vers 1st August 2004), see www.w3.org" />
+    <title>Penzilla.net's Python Tutorial: Numeric</title>
+    <link rel="StyleSheet" href="../style.css" type="text/css" media="screen" />
+  </head>
+  <body>
+    <div id="header">
+      <h1>Penzilla.net's Python Tutorial: Numeric</h1>
+      <hr /></div>
+    <div id="sidebar">
+      <div id="menu"><a href="../index.shtml">&raquo;Tutorial Home</a> 
+        <!--#include virtual="/tutorials/python/menu.html"--></div>
+      <!--#include virtual="/tutorials/python/skyscraper_ads.html"--></div>
+    <div id="content"><!-- Comments -->
+      <!-- Body -->
+      <h3><a name="top">Numeric Python and Arrays</a></h3>
+      <!--^Header^-->
+      <P>There is a built in Python array type, but it is generally considered slow, difficult to use, and "non-sexy".  Numeric is a module developed by a group interested in high performance array computations in scientific applications to address these problems.  Numeric Arrays have quite a few built in operations and some of the numerical tricks of Linpack and other number crunching libraries.</P>
+      <ul>
+        <li><a href="#about">Numeric, Numpy, and Scipy.core</a></li>
+        <li><a href="#examples_quick">Some Quick Examples</a></li>
+        <li><a href="#contains">Listing of Numeric Methods</a></li>
+        <li><a href="#examples_more">In Depth Examples</a></li>
+        <!--<li><a href="">(more)In Depth Examples</a></li>-->
+      </ul>
+      <hr/>
+      <h4><a name="about">Numeric, Numpy, and Scipy.core</a></h4>
+      <P>The Numeric community fractured when the future replacement for Numeric (NumPy) was initially released.  For a while Numeric users were in 2 camps, some for Numeric, and some for Numpy.  The reason for this schism was that Numeric was generally those who had to create a large number of small arrays, and NumPy was faster for those who wanted to use huge arrays.</p>
+      <p>Recently the Numeric community has supposedly reunited behind the <a href="http://www.scipy.org">SciPy Organization</a> and a new array package has been released called <a href="http://numeric.scipy.org">Scipy.core</a>.</p>
+      <p>Where Numeric used to mean a specific package, it is beginning to be used to 
+        refer to any of these Python array packages.  At least that's my rationalization for calling this
+        the "Numeric" page of my tutorial instead of the "Scipy.core" page.
+      </p>
+      <h4>Numeric and C</h4>
+      <P><i>If you are interested in working with compiled code and Numeric arrays (i.e.: passing Numeric(Python) arrays to C / passing C arrays to Numeric(Python) ) you should take a look at my <a href="../numpyc/">new page</a> that deals with that topic.  It shows a simple example of code that can take  Numeric array from Python and access it in C.</i></P>
+      <p>
+        <a href="#top">Return to the top</a>
+      </p>
+      <hr/>
+      <h4><a name="examples_quick">Quick Numeric Examples</a></h4>
+      <P>Numeric arrays are not terribly difficult to use, so I'm not going to spend a lot of time on them, but they are worth getting ahold of and using, especially in graphics or numerical programs.  There is a significant difference(some might say a HUGE difference) in performance between Numeric Arrays and the built in Python lists.  If you ever find yourself tempted to write multidimensional Python Lists I strongly encourage you to pick up and use Numeric instead.</P>
+      <P>I'm going to do some brief examples.  They are very similar to Python lists, and it probably helps to think of them as just special cases of lists.  They support many of the same operations, especially slicing, and are mutable(you can change size and shape on the fly).</P>
+      <div id="code">
+        <!--#include virtual="array.py.html"-->
+      </div>
+      
+      <P>
+        So you can create an Numeric array from a list using the "Numeric.array" constructor.  This is kind of an unrealistic usage.  It is faster and more efficient to just create an array using the following methods:</P>
+      <div id="code">
+        <!--#include virtual="zeros.py.html"-->
+      </div>
+      <p>
+        Numeric arrays can also be sliced:
+      </p>
+      <div id="code">
+        <!--#include virtual="slicing.py.html"-->
+      </div>
+      <p>Here's a few additional operations that might be useful.  There are quite a few more operations as you'll see in the next section.
+      </p>
+      <div id="code">
+        <!--#include virtual="otherops.py.html"-->
+      </div>
+      <p>
+        <a href="#top">Return to the top</a>
+      </p>
+      <hr/>
+      <h4><a name="contains">Numeric Methods</a></h4>
+      <P>
+        You can access Numeric arrays just like standard Python lists (using [] brackets), but looping over these arrays using <font color="blue">for</font> is not going to be the most efficient.  Like many math/array packages Numeric includes quite a few specialized routines to help you take full advantage of Numeric arrays.  Depending on what you want to do Numeric may have a specialized method that works quickly and efficently over arrays.
+      </P><P>
+        Some simple examples are the Numeric.sum and Numeric.average functions.  There is a large selection of Numeric operations that can be quickly accessed by typing "help(Numeric)" at the Python prompt.  Here is a brief summary of those functions(shamelessly stolen from Numeric's documentation):
+      </P>
+      <div id="code">
+        <pre><code>
+Functions:
+            
+    -   array                      - NumPy Array construction
+    -   zeros                      - Return an array of all zeros
+    -   shape                      - Return shape of sequence or array
+    -   rank                       - Return number of dimensions
+    -   size                       - Return number of elements in entire array or a
+                                     certain dimension
+    -   fromstring                 - Construct array from (byte) string
+    -   take                       - Select sub-arrays using sequence of indices
+    -   put                        - Set sub-arrays using sequence of 1-D indices
+    -   putmask                    - Set portion of arrays using a mask
+    -   reshape                    - Return array with new shape
+    -   repeat                     - Repeat elements of array
+    -   choose                     - Construct new array from indexed array tuple
+    -   cross_correlate            - Correlate two 1-d arrays
+    -   searchsorted               - Search for element in 1-d array
+    -   sum                        - Total sum over a specified dimension
+    -   average                    - Average, possibly weighted, over axis or array.
+    -   cumsum                     - Cumulative sum over a specified dimension
+    -   product                    - Total product over a specified dimension
+    -   cumproduct                 - Cumulative product over a specified dimension
+    -   alltrue                    - Logical and over an entire axis
+    -   sometrue                   - Logical or over an entire axis
+    -   allclose                   - Tests if sequences are essentially equal
+
+    -   arrayrange (arange)        - Return regularly spaced array
+    -   asarray                    - Guarantee NumPy array
+    -   sarray                     - Guarantee a NumPy array that keeps precision
+    -   convolve                   - Convolve two 1-d arrays
+    -   swapaxes                   - Exchange axes
+    -   concatenate                - Join arrays together
+    -   transpose                  - Permute axes
+    -   sort                       - Sort elements of array
+    -   argsort                    - Indices of sorted array
+    -   argmax                     - Index of largest value
+    -   argmin                     - Index of smallest value
+    -   innerproduct               - Innerproduct of two arrays
+    -   dot                        - Dot product (matrix multiplication)
+    -   outerproduct               - Outerproduct of two arrays
+    -   resize                     - Return array with arbitrary new shape
+    -   indices                    - Tuple of indices
+    -   fromfunction               - Construct array from universal function
+    -   diagonal                   - Return diagonal array
+    -   trace                      - Trace of array
+    -   dump                       - Dump array to file object (pickle)
+    -   dumps                      - Return pickled string representing data
+    -   load                       - Return array stored in file object
+    -   loads                      - Return array from pickled string
+    -   ravel                      - Return array as 1-D
+    -   nonzero                    - Indices of nonzero elements for 1-D array
+    -   shape                      - Shape of array
+    -   where                      - Construct array from binary result
+    -   compress                   - Elements of array where condition is true
+    -   clip                       - Clip array between two values
+    -   zeros                      - Array of all zeros
+    -   ones                       - Array of all ones
+    -   identity                   - 2-D identity array (matrix)
+
+(Universal) Math Functions
+
+           add                    logical_or             exp
+           subtract               logical_xor            log
+           multiply               logical_not            log10
+           divide                 maximum                sin
+           divide_safe            minimum                sinh
+           conjugate              bitwise_and            sqrt
+           power                  bitwise_or             tan
+           absolute               bitwise_xor            tanh
+           negative               invert                 ceil
+           greater                left_shift             fabs
+           greater_equal          right_shift            floor
+           less                   arccos                 arctan2
+           less_equal             arcsin                 fmod
+           equal                  arctan                 hypot
+           not_equal              cos                    around
+           logical_and            cosh                   sign
+           arccosh                arcsinh                arctanh
+        </code></pre>
+      </div>
+      <p>
+        <a href="#top">Return to the top</a>
+      </p>
+      <hr/>
+      <h4><a name="examples_more">Indepth Examples</a></h4>
+      <h5>Steady State Heat (Simple 2D Partial Differential Equation problem)</h5>
+      <p>
+        I realize that this example is a little bit more computationally intensive then many 
+        in this tutorial.  However, given the subject matter it seems natural to do something
+        like this here.
+      </p>
+      <p>None of the code below is something that you won't have already seen so far, so
+        I'm going to just show it to you and let you experiment with it.</p>
+      <div id="code">
+        <!--#include virtual="steady-state.py.html"-->
+      </div>
+      <p>Download <a href="steady-state.py">steady-state.py</a></p>
+      <p>
+        <a href="#top">Return to the top</a>
+      </p>
+      <h5>Steady State with PyGame Visualization</h5>
+      <p>Check it out: <a href="../pygame/">PyGame Examples</a>
+       </p>
+      <a href="../pygame/heat/"><img alt="heat.png" src="../pygame/heat/heat.png"></a>
+      <hr/>
+      <!--
+      <h4><a name="examples_other">More Numeric</a></h4>
+      <p>
+        These examples all fit more into other parts of this tutorial, so follow the links
+        below to Numeric examples in other contexts.
+      </p>
+      <ul>
+        <li>
+        </li>
+      </ul>
+      <p>
+        <a href="#top">Return to the top</a>
+      </p>
+      -->
+      <div id="translations">
+      </div>
+      <!--End of Body-->
+    </div>
+    <div id="footer">
+      <!--#include virtual="/tutorials/python/footer.shtml"-->
+    </div>
+    </body>
+</html>
+
+  <!--
+      <div id="code">
+        <pre><code>
+# Hello World
+print "hello world!"
+        </code></pre>
+      </div>
+-->

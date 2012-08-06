@@ -1,0 +1,93 @@
+<div class="syntax"><pre><span class="c">#############</span>
+<span class="c"># Arithmetic</span>
+<span class="c">#############</span>
+<span class="mf">4</span> <span class="o">+</span> <span class="mf">4</span> <span class="o">==</span> <span class="mf">8</span> 
+<span class="mf">3</span> <span class="o">-</span> <span class="mf">5</span> <span class="o">==</span> <span class="o">-</span><span class="mf">2</span>
+<span class="mf">16</span> <span class="o">/</span> <span class="mf">2</span> <span class="o">==</span> <span class="mf">8</span>
+<span class="mf">16</span> <span class="o">*</span> <span class="mf">4</span> <span class="o">==</span> <span class="mf">64</span>
+<span class="mf">3</span> <span class="o">%</span> <span class="mf">2</span> <span class="o">==</span> <span class="mf">1</span> <span class="c"># Modulus</span>
+
+<span class="c"># Long Int Conversion - Useful for function type mismatches - Not needed here.</span>
+<span class="mf">100000000000000000000</span><span class="n">L</span> <span class="o">+</span> <span class="nb">long</span><span class="p">(</span><span class="mf">100</span><span class="p">)</span> <span class="o">==</span> <span class="mf">100000000000000000100</span><span class="n">L</span>
+
+<span class="c">##########</span>
+<span class="c"># Strings</span>
+<span class="c">##########</span>
+<span class="n">a</span> <span class="o">=</span> <span class="s">&quot;Hello&quot;</span>
+<span class="n">b</span> <span class="o">=</span> <span class="s">&quot;World!&quot;</span>
+
+<span class="c"># Concatenation</span>
+<span class="n">a</span> <span class="o">+</span> <span class="s">&quot; &quot;</span> <span class="o">+</span> <span class="n">b</span> <span class="o">==</span> <span class="s">&quot;Hello World!&quot;</span>
+<span class="c"># Repetition and Concatenation</span>
+<span class="n">a</span> <span class="o">*</span> <span class="mf">3</span> <span class="o">+</span> <span class="s">&quot; &quot;</span> <span class="o">+</span> <span class="n">b</span> <span class="o">==</span> <span class="s">&quot;HelloHelloHello World!&quot;</span>
+<span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="s">&quot; &quot;</span><span class="p">)</span> <span class="o">*</span> <span class="mf">3</span> <span class="o">+</span> <span class="n">b</span> <span class="o">==</span> <span class="s">&quot;Hello Hello Hello World!&quot;</span>
+<span class="c"># Indexing</span>
+<span class="n">b</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;r&quot;</span>
+<span class="c"># Conversion of data to string - Sesame Street:</span>
+<span class="n">c</span> <span class="o">=</span> <span class="mf">7</span> <span class="c"># Backquote ` ` or str() operations</span>
+<span class="p">(</span> <span class="n">a</span> <span class="o">+</span> <span class="s">&quot; number &quot;</span> <span class="o">+</span> <span class="sb">`c`</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">a</span> <span class="o">+</span> <span class="s">&quot; number &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="p">)</span> <span class="o">==</span> <span class="s">&quot;Hello number 7&quot;</span>
+
+<span class="c">########</span>
+<span class="c"># Lists</span>
+<span class="c">########</span>
+<span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">5</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="p">(</span><span class="mf">3</span><span class="p">,</span><span class="mf">4</span><span class="p">),</span> <span class="p">[</span><span class="mf">5</span><span class="p">],</span> <span class="p">{</span><span class="s">&quot;Hello&quot;</span><span class="p">:</span><span class="s">&quot;World!&quot;</span><span class="p">}]</span>
+
+<span class="c"># Append </span>
+<span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">5</span><span class="p">,</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="p">(</span><span class="mf">3</span><span class="p">,</span><span class="mf">4</span><span class="p">),</span> <span class="p">[</span><span class="mf">5</span><span class="p">],</span> <span class="p">{</span><span class="s">&quot;Hello&quot;</span><span class="p">:</span><span class="s">&quot;World!&quot;</span><span class="p">}]</span> <span class="p">]</span>
+<span class="c"># Concatenate - Notice the similarity to Strings</span>
+<span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="mf">3</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mf">4</span><span class="p">,</span><span class="mf">5</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="mf">3</span><span class="p">,</span><span class="mf">4</span><span class="p">,</span><span class="mf">5</span><span class="p">]</span>
+<span class="c"># Multiply/Repeat - Again, strings are similar</span>
+<span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">]</span> <span class="o">*</span> <span class="mf">3</span> <span class="o">==</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">]</span>
+
+<span class="c"># Delete</span>
+<span class="k">del</span> <span class="n">y</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span>
+<span class="n">y2</span> <span class="o">==</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="p">[</span><span class="mf">5</span><span class="p">],</span> <span class="p">{</span><span class="s">&quot;Hello&quot;</span><span class="p">:</span><span class="s">&quot;World!&quot;</span><span class="p">}]</span>
+<span class="c"># Or</span>
+<span class="n">y</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">y</span> <span class="o">==</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;Hello&quot;</span><span class="p">:</span><span class="s">&quot;World!&quot;</span><span class="p">}]</span>
+
+<span class="c"># Pop - Remove and delete the last element of a list</span>
+<span class="n">x</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span> <span class="o">==</span> <span class="mf">5</span>
+<span class="n">x</span> <span class="o">==</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="mf">3</span><span class="p">,</span><span class="mf">4</span><span class="p">]</span>
+<span class="c"># Length of a list</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mf">4</span>
+
+<span class="c">##########</span>
+<span class="c"># Slicing </span>
+<span class="c">##########</span>
+<span class="n">z</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mf">100</span><span class="p">)</span> <span class="c"># [0, 99]</span>
+<span class="n">z</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+<span class="n">z</span><span class="p">[</span><span class="mf">10</span><span class="p">:</span><span class="mf">19</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="mf">89</span><span class="p">,</span> <span class="mf">88</span><span class="p">,</span> <span class="mf">87</span><span class="p">,</span> <span class="mf">86</span><span class="p">,</span> <span class="mf">85</span><span class="p">,</span> <span class="mf">84</span><span class="p">,</span> <span class="mf">83</span><span class="p">,</span> <span class="mf">82</span><span class="p">,</span> <span class="mf">81</span><span class="p">]</span>
+<span class="n">z</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+<span class="n">z</span><span class="p">[:</span><span class="mf">10</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="mf">3</span><span class="p">,</span><span class="mf">4</span><span class="p">,</span><span class="mf">5</span><span class="p">,</span><span class="mf">6</span><span class="p">,</span><span class="mf">7</span><span class="p">,</span><span class="mf">8</span><span class="p">,</span><span class="mf">9</span><span class="p">]</span>
+<span class="n">z</span><span class="p">[</span><span class="mf">5</span><span class="p">:</span><span class="mf">10</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="mf">5</span><span class="p">,</span><span class="mf">6</span><span class="p">,</span><span class="mf">7</span><span class="p">,</span><span class="mf">8</span><span class="p">,</span><span class="mf">9</span><span class="p">]</span>
+
+
+<span class="c">###############</span>
+<span class="c"># Dictionaries</span>
+<span class="c">###############</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;Red Fish&quot;</span><span class="p">:</span><span class="s">&quot;Blue Fish&quot;</span><span class="p">,</span> <span class="s">&quot;One Fish&quot;</span><span class="p">:</span><span class="s">&quot;Two Fish&quot;</span><span class="p">}</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;Bob&quot;</span><span class="p">:</span><span class="s">&quot;(555)555-5575&quot;</span><span class="p">,</span> <span class="s">&quot;Carol&quot;</span><span class="p">:</span><span class="s">&quot;(555)555-7757&quot;</span> <span class="p">}</span>
+
+<span class="c"># Keys</span>
+<span class="n">alpha</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="s">&quot;Red Fish&quot;</span><span class="p">,</span> <span class="s">&quot;One Fish&quot;</span><span class="p">]</span>
+<span class="n">beta</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="s">&quot;Bob&quot;</span><span class="p">,</span> <span class="s">&quot;Carol&quot;</span><span class="p">]</span>
+<span class="c"># Values</span>
+<span class="n">alpha</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="s">&quot;Blue Fish&quot;</span><span class="p">,</span> <span class="s">&quot;Two Fish&quot;</span><span class="p">]</span>
+<span class="c"># Indexing</span>
+<span class="n">alpha</span><span class="p">[</span><span class="s">&quot;Red Fish&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;Blue Fish&quot;</span>
+<span class="n">beta</span><span class="p">[</span><span class="s">&quot;Carol&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;(555)555-7757&quot;</span>
+<span class="c"># Adding to a Dictionary</span>
+<span class="n">beta</span><span class="p">[</span><span class="s">&quot;Dave&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;100&quot;</span>
+<span class="n">beta</span> <span class="o">==</span> <span class="p">{</span> <span class="s">&quot;Bob&quot;</span><span class="p">:</span><span class="s">&quot;(555)555-5575&quot;</span><span class="p">,</span> <span class="s">&quot;Carol&quot;</span><span class="p">:</span><span class="s">&quot;(555)555-7757&quot;</span><span class="p">,</span> <span class="s">&quot;Dave&quot;</span><span class="p">:</span><span class="s">&quot;100&quot;</span> <span class="p">}</span>
+<span class="c"># Deleting an entry</span>
+<span class="n">beta</span><span class="p">[</span><span class="s">&quot;Dave&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="c"># Or</span>
+<span class="k">del</span> <span class="n">beta</span><span class="p">[</span><span class="s">&quot;Dave&quot;</span><span class="p">]</span>
+<span class="n">beta</span> <span class="o">==</span> <span class="p">{</span> <span class="s">&quot;Bob&quot;</span><span class="p">:</span><span class="s">&quot;(555)555-5575&quot;</span><span class="p">,</span> <span class="s">&quot;Carol&quot;</span><span class="p">:</span><span class="s">&quot;(555)555-7757&quot;</span> <span class="p">}</span>
+<span class="c"># Length (Size) Of a dictionary</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">==</span> <span class="mf">2</span>
+<span class="c"># Checking for membership in a dictionary</span>
+<span class="n">beta</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="s">&quot;Carol&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1</span>
+</pre></div>

@@ -1,0 +1,136 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+# If not running interactively, don't do anything
+[ -z "$PS1" ] && return
+
+# don't put duplicate lines in the history. See bash(1) for more options
+export HISTCONTROL=ignoredups
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
+
+# set variable identifying the chroot you work in (used in the prompt below)
+if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+xterm-color)
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\] \[\033[01;34m\]\W\[\033[00m\]\$ '
+    ;;
+*)
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h \W\$ '
+    ;;
+esac
+
+# Comment in the above and uncomment this below for a color prompt
+#PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\W\[\033[00m\]\$ '
+
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in
+xterm*|rxvt*)
+    PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"'
+    ;;
+*)
+    ;;
+esac
+
+# Alias definitions.
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+
+#if [ -f ~/.bash_aliases ]; then
+#    . ~/.bash_aliases
+#fi
+
+# enable color support of ls and also add handy aliases
+if [ "$TERM" != "dumb" ]; then
+    eval "`dircolors -b`"
+    alias ls='ls --color=auto -CF '
+    alias dir='ls --color=auto --format=vertical'
+    alias vdir='ls --color=auto --format=long'
+    alias rm='rm -i'
+    alias mv='mv -i'
+    alias cp='cp -i'
+fi
+
+# some more ls aliases
+alias ll='ls -l'
+alias la='ls -A'
+alias l='ls -CF'
+alias findinpy="find . -name '*.py' | xargs egrep "
+alias svnflakes="svn status | grep '^\M\|^A' | cut -c 8- | xargs pyflakes | uniq"
+alias ducks='du -cks * |sort -rn |head -11'
+alias nox='emacs -nw'
+alias log='svn log --stop-on-copy'
+alias uplog='svn up; svn log --stop-on-copy'
+alias whichpkg='dpkg -S'
+#alias kill=skill
+#alias kill=pkill
+#pgrep - process grep, 'pgrep python' returns the process ids for all running pythons
+#vmstat - current memory details
+#alias tar=pax # pax is an alternative to tar and cpio
+#watch - repeatedly run a command and show you the results
+#netstat
+#lsof
+#ngrep
+#nmap
+#top && ntop
+#httptop
+
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+fi
+
+#
+# tapp configuration
+#
+EMAIL=michael.steder #youremailusername - for database scrubbing
+export TEXTURA_APPDIR=$HOME/appserver1                # so that you don't have to tell tapp where your environment is
+export TEXTURA_TTOOLS_VERBOSE=1                                  # display every command that dbmigration and tapp run along with its output
+export TEXTURA_DATABASE_PATH=$HOME/appserver1 # where dumps are stored (defaults to home directory)
+export T=https://dev1.texturallc.net/svn/textura
+
+export TSVN_BASE=~/bugs
+export TSVN_ARGS="--base-relative --ignore-externals"
+
+export EMAIL
+source /opt/ttools/home/bashrc
+
+VIMRUNTIME=/usr/share/vim
+export VIMRUNTIME
+
+SVN_EDITOR=emacs
+export SVN_EDITOR
+EDITOR=emacs
+export EDITOR
+
+# set PATH so it includes user's private bin if it exists
+if [ -d ~/bin ] ; then
+    PATH=~/bin:"${PATH}"
+fi
+
+PATH=.:/opt/ttools/bin:"${PATH}"
+PYTHONPATH=$HOME/lib/python:"${PYTHONPATH}"
+
+export PATH
+export PYTHONPATH
+
+# COMBINATOR:
+#eval `/usr/bin/python ~/UQDS/Divmod/trunk/Combinator/environment.py`
+alias combinator='eval `/usr/bin/python ~/UQDS/Divmod/trunk/Combinator/environment.py`'
+export GOROOT=$HOME/go
+export GOOS=linux
+export GOARCH=amd64
+export GOBIN=$HOME/bin

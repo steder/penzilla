@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="10"
+   name=""
+   committed-date="2004-01-09T22:55:59.613144Z"
+   url="http://www.ripplefx.net:81/svn/python/html_source/BobChat-v0.3"
+   last-author="steder"
+   kind="dir"
+   uuid="996777e2-3ecf-0310-aa64-e0ff611b1bef"
+   revision="17"/>
+<entry
+   committed-rev="10"
+   name="BobGuiClient.py.html"
+   text-time="2004-09-20T02:22:28.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="02cda1f2bf7cdad4304d44deb717d1b8"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:28.000000Z"/>
+<entry
+   committed-rev="10"
+   name="BobServer.py.html"
+   text-time="2004-09-20T02:22:28.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="8d534733e19aeb113eea8d84e1471578"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:28.000000Z"/>
+<entry
+   committed-rev="10"
+   name="test.py.html"
+   text-time="2004-09-20T02:22:28.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="004e3bc86d81d3e4513e8c1f7e79e2c5"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:28.000000Z"/>
+<entry
+   committed-rev="10"
+   name="BobClient.py.html"
+   text-time="2004-09-20T02:22:28.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="7209ce5c52d87712d6a29d1fd77fe103"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:28.000000Z"/>
+<entry
+   committed-rev="10"
+   name="Protocol.py.html"
+   text-time="2004-09-20T02:22:28.000000Z"
+   committed-date="2004-01-09T22:55:59.613144Z"
+   checksum="16dcecd9bd20347766b2533adc34818c"
+   last-author="steder"
+   kind="file"
+   prop-time="2004-09-20T02:22:28.000000Z"/>
+</wc-entries>

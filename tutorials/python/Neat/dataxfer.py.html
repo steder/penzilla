@@ -1,0 +1,445 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#!/usr/bin/env python</FONT>
+<FONT COLOR=#1111CC>#---------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC># dataxfer.py               Data transfer utilities</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># See __doc__ string below.</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># Requires:</FONT>
+<FONT COLOR=#1111CC>#    - Python 2.0 or newer (www.python.org)</FONT>
+<FONT COLOR=#1111CC>#    - platform.py (http://starship.skyport.net/~lemburg/platform.py)</FONT>
+<FONT COLOR=#1111CC>#    - OS: portable</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># TODO:</FONT>
+<FONT COLOR=#1111CC>#   - verbose mode</FONT>
+<FONT COLOR=#1111CC>#   - delete uploaded files on FTP server (in retrieveData) ??</FONT>
+<FONT COLOR=#1111CC>#   - binary and text modes.</FONT>
+<FONT COLOR=#1111CC>#   x cache FTP connection.</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># $Id: //depot/rgutils/rgutils/dataxfer.py#1 $</FONT>
+<FONT COLOR=#1111CC>#---------------------------------------------------------------------------</FONT>
+<FONT COLOR=#115511>'''
+Functions for transfering arbitrary sized data in a distributed
+(client/server) environment.
+
+Typical use is for passing a big amount of data as an argument to a
+remote call. Instead of passing the data itself as an arg, you should
+call L{prepareData}(data,...) and pass the returned I{data handle} instead.
+The handle is later converted back to the original data by calling
+L{retrieveData}(handle,...).
+
+Internally, data is passed "as is" in the handle if its size is less
+than a given threshold (option), otherwise it is gzipped, uploaded to
+a FTP server and the URL is passed in the handle.
+Source data my be passed to prepareData as a string or as a path of
+a file containing the data. Likewise, data may be retrieved as a string
+or as a local file, INDEPENDENTLY of the way it was passed to
+L{prepareData}(), e.g.:
+
+B{client}::
+    import dataxfer
+    # Data is a string
+    dh = dataxfer.prepareData(stringData, storeThreshold=10000)
+    == OR ==
+    # Data is in a file
+    fh = dataxfer.prepareData(filePath, isFilePath=true, 
+                              storeThreshold=10000)
+    server.foo(dh, otherArgs...)
+
+B{server}::
+    import dataxfer
+    def foo(self, dh, otherArgs...):
+        # Retrieve data as a string:
+        data = dataxfer.retrieveData(dh)
+        == OR ==
+        # Retrieve data at a temp local path:
+        fDataPath = dataxfer.retrieveData(dh, filePath='')
+        # Retrieve data at a specified local path:
+            dataxfer.retrieveData(dh, filePath='myDir/myFile')
+'''</FONT>
+__version__ = <FONT COLOR=#115511>'1.0.'</FONT> + <FONT COLOR=#115511>'$Revision: #1 $'</FONT>[12:-2]
+__author__ = <FONT COLOR=#115511>'Richard Gruet'</FONT>, <FONT COLOR=#115511>'rjgruet@yahoo.com'</FONT>
+__date__    = <FONT COLOR=#115511>'$Date: 2003/05/23 $'</FONT>[7:-2], <FONT COLOR=#115511>'$Author: rgruet $'</FONT>[9:-2]
+__since__ = <FONT COLOR=#115511>'2000-10-11'</FONT>
+__doc__ += <FONT COLOR=#115511>'\n@author: %s (U{%s})\n@version: %s'</FONT> % (__author__[0],
+                                            __author__[1], __version__)
+
+<FONT COLOR=#3333CC><B>import</B></FONT> os, sys, string, re, time
+<FONT COLOR=#3333CC><B>import</B></FONT> gzip, tempfile, urlparse, ftplib, cStringIO
+<FONT COLOR=#3333CC><B>import</B></FONT> platform <FONT COLOR=#1111CC># M.A. Lemburg's utility</FONT>
+
+true, false = -1, 0
+MAGIC = <FONT COLOR=#115511>'21121957'</FONT>  <FONT COLOR=#1111CC># Magic number for data handles.</FONT>
+
+
+<FONT COLOR=#1111CC>#------------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="prepareData"><FONT COLOR=#CC0000><B> prepareData</B></FONT></A>(data, isFilePath=false, **options):
+<FONT COLOR=#1111CC>#------------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#115511>'''
+    Prepares the given string or file for transfer.
+
+    Returns a string representing a "handle" to be used with the function
+    retrieveData to retrieve the data.
+    If data size is &lt; C{storeThreshold}, this handle is simply the data
+    itself, uncompressed.
+    Otherwise, the "handle" is the FTP URL of a gzipped file containing the compressed data.
+
+    B{Header:}
+
+    In both case, the handle also contains a header with meta information, so
+    you B{must} always use L{retrieveData()} to retrieve the data. 
+    The header is a single LF terminated line containing a comma separated
+    unordered list of keywords among:
+
+        - C{magic}=L{MAGIC}       -- identifies a dataxfer handle
+        - C{type}={data|url}      -- handle either directly contains data, or the
+                                FTP URL of a file containing data.
+        - C{filename}=I{basename} -- base name of original file if known.
+        - C{compresslevel}=1-9    -- The gzip compression level used if data
+                              transfered via FTP.
+        - C{sent-by}==I{hostName}  -- the hostname of the caller
+        - C{sent-on}=YYYYMMDDHHMMSS -- Send GMT date+time.
+
+
+    @param data: [string] The data to transfer or the path of a B{local} file
+                containing that data, according to C{isFilePath}.
+    @param isFilePath: [boolean] Determines whether C{data} represents a
+                       file path or directly the data.
+    @param options: Keyword options:
+        - C{compressLevel} [1-9, default:9] --  1:fastest, low compression;
+                                             9:slowest, best compression
+        - C{storeThreshold} -- Above this size (in bytes), the data will be uploaded
+                to a FTP server and its URL returned. Set threshold to 0 if you
+                want to ALWAYS transfer via FTP [default: 2000000]
+        - C{ftpHost}  -- IP address of the FTP server to use if store is needed.
+                Defaults to envt var DATAXFR_FTP if it exists, 'localhost'
+                otherwise.
+        - C{ftpDir}  -- Relative directory on the FTP server where to upload
+                  the gzipped file [default: 'corba-tmp']
+        - C{ftpUser}, C{ftpPasswd} -- User name and password to use for the FTP
+                  connection [default: 'corba', 'corba']
+        - C{ftpBlkSize} -- Size of transfer blocks in bytes [default: 8192]
+
+    @return: [string] The data transfer "handle" to pass to the remote call.
+            It is either the data itself (if size &lt; threshold), or the FTP
+            URL of the gzipped file (to be downloaded).
+    @see: L{retrieveData}()
+    '''</FONT>
+    header = [
+              <FONT COLOR=#115511>'magic=%s'</FONT> % MAGIC,
+              <FONT COLOR=#115511>'sent-on=%s'</FONT> % time.strftime(<FONT COLOR=#115511>'%Y%m%d%H%M%S'</FONT>,
+                                            time.gmtime(time.time())),
+              <FONT COLOR=#115511>'sent-by=%s'</FONT> % platform.node()
+             ]
+    
+    <FONT COLOR=#1111CC># Determine transfer method according to data size:</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> isFilePath:
+        size = os.path.getsize(data)
+        header.append(<FONT COLOR=#115511>'filename=%s'</FONT> % os.path.basename(data))
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        size = len(data)
+    
+    storeThreshold = options.get(<FONT COLOR=#115511>'storeThreshold'</FONT>, 2000000)
+    <FONT COLOR=#3333CC><B>if</B></FONT> storeThreshold &lt;= 0 <FONT COLOR=#3333CC><B>or</B></FONT> size &gt;= storeThreshold:
+        
+        <FONT COLOR=#1111CC># Compress data:</FONT>
+        compressLevel = options.get(<FONT COLOR=#115511>'compressLevel'</FONT>, 9)
+        header.extend([<FONT COLOR=#115511>'type=url'</FONT>, <FONT COLOR=#115511>'compresslevel=%d'</FONT> % compressLevel])
+        
+        <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> isFilePath:
+            f = cStringIO.StringIO(data)
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            f = open(data, <FONT COLOR=#115511>'rb'</FONT>)
+        
+        gzPath = tempfile.mktemp(<FONT COLOR=#115511>'.gz'</FONT>)
+        z = gzip.open(gzPath, <FONT COLOR=#115511>'wb'</FONT>, compressLevel)
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            <FONT COLOR=#3333CC><B>while</B></FONT> true:
+                s = f.read(100000)
+                <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> s:
+                    <FONT COLOR=#3333CC><B>break</B></FONT>
+                z.write(s)
+        <FONT COLOR=#3333CC><B>finally</B></FONT>:
+            z.close()   <FONT COLOR=#1111CC># required to flush!</FONT>
+            f.close()
+        
+        <FONT COLOR=#1111CC># Upload gzipped file to the FTP server:</FONT>
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            <FONT COLOR=#3333CC><B>try</B></FONT>:
+                ftpHost = options[<FONT COLOR=#115511>'ftpHost'</FONT>]
+            <FONT COLOR=#3333CC><B>except</B></FONT> KeyError:
+                ftpHost = os.environ.get(<FONT COLOR=#115511>'DATAXFR_FTP'</FONT>, <FONT COLOR=#115511>'localhost'</FONT>)
+
+            ftpDir = options.get(<FONT COLOR=#115511>'ftpDir'</FONT>, <FONT COLOR=#115511>'corba-tmp'</FONT>)
+            <FONT COLOR=#3333CC><B>if</B></FONT> ftpDir[0] == <FONT COLOR=#115511>'/'</FONT>:        <FONT COLOR=#1111CC># path must be relative for ftp</FONT>
+                ftpDir = ftpDir[1:]
+            <FONT COLOR=#3333CC><B>if</B></FONT> ftpDir[-1] == <FONT COLOR=#115511>'/'</FONT>:
+                ftpDir = ftpDir[:-1]
+            uploadPath = <FONT COLOR=#115511>'%s/%s'</FONT> % (ftpDir, os.path.basename(gzPath))
+            url = <FONT COLOR=#115511>'ftp://%s/%s'</FONT> % (ftpHost, uploadPath)
+
+            <FONT COLOR=#3333CC><B>try</B></FONT>:
+                ftpUser = options.get(<FONT COLOR=#115511>'ftpUser'</FONT>, <FONT COLOR=#115511>'corba'</FONT>)
+                ftpPasswd = options.get(<FONT COLOR=#115511>'ftpPasswd'</FONT>, <FONT COLOR=#115511>'corba'</FONT>)
+                ftp = _FTPLog(ftpHost, ftpUser, ftpPasswd)
+            <FONT COLOR=#3333CC><B>except</B></FONT>:
+                t, v, tb = sys.exc_info()   <FONT COLOR=#1111CC>#(old-style string exceptions!)</FONT>
+                <FONT COLOR=#3333CC><B>raise</B></FONT> Exception(<FONT COLOR=#115511>'Cannot connect or log to FTP server "%s" as '</FONT>
+                        <FONT COLOR=#115511>'user %s (%s): %s'</FONT> % (ftpHost, ftpUser, ftpPasswd, v))
+            <FONT COLOR=#3333CC><B>try</B></FONT>:
+                ftp.storbinary(<FONT COLOR=#115511>'STOR %s'</FONT> % uploadPath, open(gzPath, <FONT COLOR=#115511>'rb'</FONT>),
+                                options.get(<FONT COLOR=#115511>'ftpBlkSize'</FONT>, 8192))
+                _FTPClose(ftp)
+            <FONT COLOR=#3333CC><B>except</B></FONT>:
+                t, v, tb = sys.exc_info()
+                <FONT COLOR=#3333CC><B>raise</B></FONT> Exception(<FONT COLOR=#115511>"can't upload %s to %s: %s"</FONT> % (gzPath, url, v))
+            dataHandle = <FONT COLOR=#115511>'%s\n%s'</FONT> % (string.join(header, <FONT COLOR=#115511>','</FONT>), url)
+        <FONT COLOR=#3333CC><B>finally</B></FONT>:
+            os.remove(gzPath)
+
+    <FONT COLOR=#3333CC><B>else</B></FONT>:   <FONT COLOR=#1111CC># [data size &lt; threshold]</FONT>
+        header.append(<FONT COLOR=#115511>'type=data'</FONT>)
+        header = string.join(header, <FONT COLOR=#115511>','</FONT>) + <FONT COLOR=#115511>'\n'</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> isFilePath:
+            dataHandle = header + open(data, <FONT COLOR=#115511>'rb'</FONT>).read()
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            dataHandle = header + data
+
+    <FONT COLOR=#3333CC><B>return</B></FONT> dataHandle   
+
+<FONT COLOR=#1111CC>#------------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="retrieveData"><FONT COLOR=#CC0000><B> retrieveData</B></FONT></A>(dataHandle, **options):
+<FONT COLOR=#1111CC>#------------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#115511>'''
+    Retrieves data transfered from a data transfer "handle".
+    
+    Given a "data transfer handle" produced by L{prepareData}, this
+    function retrieves the data as a string or a local file.
+
+    @param dataHandle: The data "handle" produced by L{prepareData()}.
+    @param options: Keyword options:
+        - C{localPath} -- if specified, store data as a file at given path;
+                        if localPath='', store data in directory C{localDir}
+                        (see below) with an automatically assigned name.
+                        if not specified, data is returned as a mere string.
+        - C{localDir} -- Local directory where to create the local file (if.
+                        [default is $TEMP directory]
+        - C{ftpUser}, C{ftpPasswd} -- User name and password to use for the FTP
+                        connection [default: 'corba', 'corba']
+        - C{ftpBlkSize} -- Size of transfer blocks in bytes [default: 8192]
+
+    @return: The data transfered, or the path of a local file containing
+            that data, depending if option C{localPath} specified or not.
+    @see: L{prepareData()}
+    '''</FONT> 
+    <FONT COLOR=#1111CC># Parse header (first line):</FONT>
+    i = string.find(dataHandle, <FONT COLOR=#115511>'\n'</FONT>)
+    <FONT COLOR=#3333CC><B>if</B></FONT> i == -1:
+        <FONT COLOR=#3333CC><B>raise</B></FONT> Exception(<FONT COLOR=#115511>"Can't find header in data handle."</FONT>)
+    header = dataHandle[:i]
+    body = dataHandle[i+1:]
+    
+    kw = {}
+    <FONT COLOR=#3333CC><B>for</B></FONT> name, value <FONT COLOR=#3333CC><B>in</B></FONT> re.findall(r<FONT COLOR=#115511>'([\w\-_]+)[ \t]*=[ \t]*([\w\-_]+)'</FONT>,
+                                                                header):
+        kw[string.lower(name)] = value
+
+    magic = kw.get(<FONT COLOR=#115511>'magic'</FONT>, <FONT COLOR=#115511>''</FONT>)
+    <FONT COLOR=#3333CC><B>if</B></FONT> magic != MAGIC:
+        <FONT COLOR=#3333CC><B>raise</B></FONT> Exception(<FONT COLOR=#115511>"Invalid data handle (bad magic number)."</FONT>)
+    
+    typ = kw.get(<FONT COLOR=#115511>'type'</FONT>, <FONT COLOR=#115511>''</FONT>)
+    <FONT COLOR=#3333CC><B>if</B></FONT> typ <FONT COLOR=#3333CC><B>not</B></FONT> <FONT COLOR=#3333CC><B>in</B></FONT> (<FONT COLOR=#115511>'url'</FONT>, <FONT COLOR=#115511>'data'</FONT>):
+        <FONT COLOR=#3333CC><B>raise</B></FONT> Exception(<FONT COLOR=#115511>'No type or invalid type info ("%s") in header.'</FONT> % t)
+    
+    fileName = kw.get(<FONT COLOR=#115511>'filename'</FONT>, <FONT COLOR=#115511>''</FONT>)
+    
+    <FONT COLOR=#1111CC># If we must store on file, compute local path:</FONT>
+    storeAsFile = options.has_key(<FONT COLOR=#115511>'localPath'</FONT>)
+    <FONT COLOR=#3333CC><B>if</B></FONT> storeAsFile:
+        localPath = options[<FONT COLOR=#115511>'localPath'</FONT>]
+        <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> localPath:       
+            localDir = options.get(<FONT COLOR=#115511>'localDir'</FONT>, tempfile.gettempdir())
+            <FONT COLOR=#3333CC><B>if</B></FONT> fileName:
+                localPath = os.path.join(localDir, fileName)
+            <FONT COLOR=#3333CC><B>else</B></FONT>:
+                localPath = os.path.join(localDir, tempfile.gettempprefix())
+    
+    <FONT COLOR=#1111CC># Retrieve data :</FONT>
+    <FONT COLOR=#3333CC><B>if</B></FONT> typ == <FONT COLOR=#115511>'data'</FONT>:
+        <FONT COLOR=#3333CC><B>if</B></FONT> storeAsFile:
+            open(localPath, <FONT COLOR=#115511>'wb'</FONT>).write(body)
+            r = localPath
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            r = body
+        
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#1111CC># [typ=='url'] Download the gzipped data into a temporary file:</FONT>
+        url = body
+        gzPath = tempfile.mktemp(<FONT COLOR=#115511>'.gz'</FONT>)
+        scheme,ftpHost, path, parms, query, frag = urlparse.urlparse(url)
+        <FONT COLOR=#3333CC><B>if</B></FONT> scheme != <FONT COLOR=#115511>'ftp'</FONT> <FONT COLOR=#3333CC><B>or</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> ftpHost <FONT COLOR=#3333CC><B>or</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> path:
+            <FONT COLOR=#3333CC><B>raise</B></FONT> Exception(<FONT COLOR=#115511>'Not a legal FTP URL: "%s".'</FONT> % url)
+    
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            ftpUser = options.get(<FONT COLOR=#115511>'ftpUser'</FONT>, <FONT COLOR=#115511>'corba'</FONT>)
+            ftpPasswd = options.get(<FONT COLOR=#115511>'ftpPasswd'</FONT>, <FONT COLOR=#115511>'corba'</FONT>)
+            ftp = _FTPLog(ftpHost, ftpUser, ftpPasswd)
+        <FONT COLOR=#3333CC><B>except</B></FONT>:
+            t, v, tb = sys.exc_info()   <FONT COLOR=#1111CC>#(old-style string exceptions!)</FONT>
+            <FONT COLOR=#3333CC><B>raise</B></FONT> Exception(<FONT COLOR=#115511>'Cannot connect or log to FTP server "%s" as '</FONT>
+                    <FONT COLOR=#115511>'user %s (%s): %s'</FONT> % (ftpHost, ftpUser, ftpPasswd, v))
+    
+        path = path[1:]     <FONT COLOR=#1111CC># avoid '/', path must be relative for ftp</FONT>
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            ftp.retrbinary(<FONT COLOR=#115511>'RETR %s'</FONT> % path, open(gzPath, <FONT COLOR=#115511>'wb'</FONT>).write,
+                            options.get(<FONT COLOR=#115511>'ftpBlkSize'</FONT>, 8192))
+            _FTPClose(ftp)
+        <FONT COLOR=#3333CC><B>except</B></FONT>:
+            t, v, tb = sys.exc_info()
+            <FONT COLOR=#3333CC><B>raise</B></FONT> Exception(<FONT COLOR=#115511>"Can't download %s to %s: %s"</FONT> % (url, gzPath, v))
+    
+        <FONT COLOR=#1111CC># Unzip data into a string or a local file (preferably the one</FONT>
+        <FONT COLOR=#1111CC># indicated, if any):</FONT>
+        z = gzip.open(gzPath, <FONT COLOR=#115511>'rb'</FONT>)
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            <FONT COLOR=#3333CC><B>if</B></FONT> storeAsFile:
+                f = open(localPath, <FONT COLOR=#115511>'wb'</FONT>)
+                <FONT COLOR=#3333CC><B>try</B></FONT>:
+                    <FONT COLOR=#3333CC><B>while</B></FONT> true:
+                        s = z.read(100000)
+                        <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> s:
+                            <FONT COLOR=#3333CC><B>break</B></FONT>
+                        f.write(s)
+                <FONT COLOR=#3333CC><B>finally</B></FONT>:
+                    f.close()
+                r = localPath
+            <FONT COLOR=#3333CC><B>else</B></FONT>:
+                r = z.read()
+        <FONT COLOR=#3333CC><B>finally</B></FONT>:
+            z.close()
+
+    <FONT COLOR=#3333CC><B>return</B></FONT> r        
+    
+<FONT COLOR=#1111CC>#------------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC>#                           P R I V A T E</FONT>
+<FONT COLOR=#1111CC>#------------------------------------------------------------------------------</FONT>
+
+_ftpCache = {} <FONT COLOR=#1111CC># FTP cache { (host, user, passwd): FTP object,..}</FONT>
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_FTPLog"><FONT COLOR=#CC0000><B> _FTPLog</B></FONT></A>(host, user, passwd, useCache=true):
+    <FONT COLOR=#115511>''' Connects to a FTP server.
+    
+        Transparently uses cached connections.
+        @param host: FTP host address
+        @param user: Login user name 
+        @param passwd: User password
+        @param useCache: If true use cached connections
+        @return: A ftplib.FTP instance
+    '''</FONT>
+    ftp = None
+    <FONT COLOR=#3333CC><B>if</B></FONT> useCache:
+        <FONT COLOR=#3333CC><B>global</B></FONT> _ftpCache
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            ftp = _ftpCache[host, user, passwd]
+        <FONT COLOR=#3333CC><B>except</B></FONT> KeyError:
+            <FONT COLOR=#3333CC><B>pass</B></FONT>
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#3333CC><B>try</B></FONT>:
+                ftp.pwd()       <FONT COLOR=#1111CC># check timeout</FONT>
+            <FONT COLOR=#3333CC><B>except</B></FONT>:
+                ftp = None
+    
+    <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> ftp:
+        <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>'_FTPLog: not in cache, must connect'</FONT> <FONT COLOR=#1111CC>##</FONT>
+        ftp = _ftpCache[host, user, passwd] = ftplib.FTP(host)
+        ftp.login(user, passwd)
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#3333CC><B>pass</B></FONT> <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>'Use cached connection'</FONT> <FONT COLOR=#1111CC>##</FONT>
+    
+    <FONT COLOR=#3333CC><B>return</B></FONT> ftp
+    
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_FTPClose"><FONT COLOR=#CC0000><B> _FTPClose</B></FONT></A>(ftp):
+    <FONT COLOR=#115511>''' Disconnect from a FTP server.
+    
+        Disconnection is not actually performed since we cache
+        the connections for later use.
+        
+        @param ftp: [ftplib.FTP] 
+    '''</FONT>
+    <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+<FONT COLOR=#1111CC>#------------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="tests"><FONT COLOR=#CC0000><B> tests</B></FONT></A>():
+<FONT COLOR=#1111CC>#------------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#115511>''' Module self-tests.
+    '''</FONT>
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Testing dataxfer...'</FONT>
+    <FONT COLOR=#1111CC># Generate our own test file:</FONT>
+    fPath = tempfile.mktemp()
+    testString = <FONT COLOR=#115511>'Corba is good for you, folks! '</FONT> * 1000
+    f = open(fPath, <FONT COLOR=#115511>'w'</FONT>)
+    f.write(testString)
+    f.close()
+    <FONT COLOR=#3333CC><B>try</B></FONT>:
+        _test(testString, fPath, <FONT COLOR=#115511>'string'</FONT>, <FONT COLOR=#115511>'string'</FONT>, false)
+        _test(testString, fPath, <FONT COLOR=#115511>'string'</FONT>, <FONT COLOR=#115511>'string'</FONT>, true)
+        _test(testString, fPath, <FONT COLOR=#115511>'string'</FONT>, <FONT COLOR=#115511>'file'</FONT>, false)
+        _test(testString, fPath, <FONT COLOR=#115511>'string'</FONT>, <FONT COLOR=#115511>'file'</FONT>, true)
+        _test(testString, fPath, <FONT COLOR=#115511>'file'</FONT>, <FONT COLOR=#115511>'string'</FONT>, false)
+        _test(testString, fPath, <FONT COLOR=#115511>'file'</FONT>, <FONT COLOR=#115511>'string'</FONT>, true)
+        _test(testString, fPath, <FONT COLOR=#115511>'file'</FONT>, <FONT COLOR=#115511>'file'</FONT>, false)
+        _test(testString, fPath, <FONT COLOR=#115511>'file'</FONT>, <FONT COLOR=#115511>'file'</FONT>, true)
+        
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Performing 10 x transfers via FTP...'</FONT>
+        t0 = time.time()
+        <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> range(10):
+            _test(testString, fPath, <FONT COLOR=#115511>'string'</FONT>, <FONT COLOR=#115511>'string'</FONT>, true)
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'done in %.2f sec.'</FONT> % (time.time() - t0)
+            
+    <FONT COLOR=#3333CC><B>finally</B></FONT>:
+        os.remove(fPath)
+    
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'=&gt; tests passed.'</FONT>
+
+_testNo = 0
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_test"><FONT COLOR=#CC0000><B> _test</B></FONT></A>(testString, fPath, src, dst, ftp):
+    <FONT COLOR=#3333CC><B>global</B></FONT> _testNo
+    _testNo = _testNo + 1
+    isFilePath = (src == <FONT COLOR=#115511>'file'</FONT>)
+    <FONT COLOR=#3333CC><B>if</B></FONT> ftp:
+        s = <FONT COLOR=#115511>'FTP/compressed'</FONT>
+        storeThreshold=0
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        s = <FONT COLOR=#115511>'uncompressed'</FONT>
+        storeThreshold=2000000
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Test #%d: %s to %s, %s...'</FONT> % (_testNo, src, dst, s)
+    <FONT COLOR=#3333CC><B>if</B></FONT> isFilePath: data = fPath
+    <FONT COLOR=#3333CC><B>else</B></FONT>: data = testString
+    dh = prepareData(data, isFilePath, storeThreshold=storeThreshold)
+    <FONT COLOR=#3333CC><B>if</B></FONT> dst == <FONT COLOR=#115511>'file'</FONT>:
+        path = retrieveData(dh, localPath=<FONT COLOR=#115511>''</FONT>)
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            gotString = open(path).read()
+        <FONT COLOR=#3333CC><B>finally</B></FONT>:
+            os.remove(path)
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        gotString = retrieveData(dh)
+    
+    <FONT COLOR=#3333CC><B>if</B></FONT> gotString != testString:
+        <FONT COLOR=#3333CC><B>raise</B></FONT> Exception(<FONT COLOR=#115511>'test failed.'</FONT>)
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'OK'</FONT>
+    
+<FONT COLOR=#1111CC>#------------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC>#                           M  A  I  N</FONT>
+<FONT COLOR=#1111CC>#------------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__ == <FONT COLOR=#115511>'__main__'</FONT>:
+    tests()
+    </PRE>
+                  <!--footer-->
+                  </BODY>

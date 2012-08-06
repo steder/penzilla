@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="24"
+   name=""
+   committed-date="2005-02-24T16:27:18.754022Z"
+   url="http://www.ripplefx.net:81/svn/python/pympi/simple_extension"
+   last-author="steder"
+   kind="dir"
+   revision="24"/>
+<entry
+   committed-rev="24"
+   name="test.py"
+   text-time="2004-10-20T23:22:42.000000Z"
+   committed-date="2005-02-24T16:27:18.754022Z"
+   checksum="89200c83ab1e9ca9219f682843dcf130"
+   last-author="steder"
+   kind="file"/>
+<entry
+   name="CVS"
+   kind="dir"/>
+<entry
+   committed-rev="24"
+   name="mpimodule.c"
+   text-time="2004-10-20T23:22:42.000000Z"
+   committed-date="2005-02-24T16:27:18.754022Z"
+   checksum="e507a3bb3c4634b64253519b50c671d7"
+   last-author="steder"
+   kind="file"/>
+<entry
+   committed-rev="24"
+   name="Makefile"
+   text-time="2004-10-20T23:22:42.000000Z"
+   committed-date="2005-02-24T16:27:18.754022Z"
+   checksum="29306eefabbf0834c8274f07fb20f8ff"
+   last-author="steder"
+   kind="file"/>
+</wc-entries>

@@ -1,0 +1,39 @@
+<html>
+<title>Introduction to Python:  Pointers to Numeric Arrays with NumPtr</title>
+<body>
+<h2>An Introduction to Python:  Pointers to Numeric with NumPtr</h2>
+<h3><font color="blue">NumPtr( Providing Pointers to Numeric Arrays in Python )</font></h3>
+<a href="../index.html">Table of Contents</a>
+<hr><!--^Header^-->
+<h4><font color="green">Why?</font></h4>
+<P>Imagine that you have some Python code that needs to do some quick number crunching.  After prototyping the algorithm in Python you find that
+it is far to slow for your purposes.  To produce results faster you rewrite the algorithm in C.  However, you would still like to have access to the data in
+Python as well.  There are a number of reasons that you might need access to the data in both C and Python.  Perhaps you need to generate the data
+in C and then simply access it in Python to format it and display in on a webpage or otherwise visualize the data.  Perhaps you generate the dataset in Python and simply want to leverage C to get some of your calculations finished a bit faster.</P>
+<P>Whatever the reasoning, an easy way to make your C code accessible from Python is by using <a href="../swig">SWIG</a>.  Earlier I show an <a href="../numpyc/">example</a> of a way to use Numeric Arrays with C code.  However, this requires manually writing C extensions which is often a hassle when you have a large amount of C code you'd like to wrap and use from Python.  To speed up the process you can use SWIG.</P>
+<P>However, SWIG does not handle C arrays very gracefully.</P>
+<P>NumPtr ( download <a href="NumPtr-1.1.tar.gz">NumPtr-1.1.tar.gz</a> ) is a simple module that can take a Numeric array and return a SWIG-understandable pointer to that arrays data, allowing you to access that array normally in your SWIG'ed C code.</P>
+
+<h4><font color="green">An Example</font></h4>
+<P>Let's do a quick example.  Assume we have a file "average.c" which contains a single function "double ave( int n, double *array );".  "ave" takes a single argument, an array of doubles, and returns a single result(also a double).  We would swig this code with the following interface file:</P>
+<ul><pre><code>
+/* file: average.i */
+%module average
+%{
+extern double ave( int n, double *array );
+%}
+%include average.c
+</code></pre></ul>
+
+We can compile this code using the same commands found in the makefile described <a href="../swig/">here</a>.
+
+
+
+<!--Include Sourcecode-->
+<ul><!--#include virtual="example.py.html"--></ul>
+
+<!--\/Footer\/-->
+<hr>
+<a href="../index.html">Table of Contents</a>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<html>
+<head>
+  <title>Introduction to Python:  File I/O</title>
+<LINK REL=StyleSheet HREF="highlights.css" TYPE="text/css" MEDIA=screen>
+</head>
+<body>
+<h2>An Introduction to Python:  File I/O</h2>
+<h3>File I/O</h3>
+<a href="../index.html">Table of Contents</a>
+<hr>
+<h4><font color="green">Let's do things with files!</font></h4>
+<!--^Header^-->
+<P>File I/O in C/C++ required including several header files and
+  defining a series of stream or file objects.  Python is similar,
+  but simpler.  The <font color="blue">open</font> builtin function
+  and the Python <font color="green">File</font> object provide a
+  very convenient interface.</P>
+<P>Let's create a file quickly and dump some text into it.
+  In this case a list of names that we'll enter at the commandline.</P>
+<!--Include create.py-->
+<ul><!--#include virtual="create.py.html"--></ul>
+<P>Notice that we simply have to use the <font color="blue">open</font>
+  function to open a file, and give it the "r" argument to indicate we want
+  to open the file for reading.
+  The value returned from this function is a file object,
+  which we can use to read (or write, by specified the "w" flag).
+  From there you can either read the entire file with a
+  <font color="blue">fileobject.read()</font> method, or read a
+  line at a time with <font color="blue">readline()</font>.
+</P>
+<P>If you find opening a file and remember to close it to be a bit of a pain
+  you could try this little hack:</P>
+<ul><!--#include virtual="unbuffered.py.html"--></ul>
+<P>The above only works because you've selected unbuffered IO.  Depending on
+  the platform you're on unbuffered IO may be the default.</P>
+<P>However, unbuffered IO is not the write way to ensure that files get
+  cleaned up and closed properly.  Instead Python2.6 gives us a very
+  nice way to manage file objects with <a href="">Context Managers</a>:
+  </P>
+<ul><!-- #include virtual="context.py.html"--></ul>
+<P>By using your file object as a context manager as soon as your execution leaves
+  your with block the file will be closed properly.
+</P>
+<P>Now let's go over some useful utility functions:
+<ul><!--#include virtual="useful.py.html"--></ul>
+
+<!--\/Footer\/-->
+<hr>
+<a href="hello.py">hello.py</a><br>
+<a href="../index.html">Table of Contents</a>
+</body>
+</html>

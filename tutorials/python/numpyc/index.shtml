@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content=
+          "HTML Tidy for Linux/x86 (vers 1st August 2004), see www.w3.org" />
+    <title>Penzilla.net's Python Tutorial: Numeric and C</title>
+    <link rel="StyleSheet" href="../style.css" type="text/css" media="screen" />
+  </head>
+  <body>
+    <div id="header">
+      <h1>Penzilla.net's Python Tutorial: Numeric and C</h1>
+      <hr /></div>
+    <div id="sidebar">
+      <div id="menu"><a href="../index.shtml">&raquo;Tutorial Home</a> 
+        <!--#include virtual="/tutorials/python/menu.html"--></div>
+      <!--#include virtual="/tutorials/python/skyscraper_ads.html"--></div>
+    <div id="content"><!-- Comments -->
+    
+      <!-- Body -->
+      <h3>Using Numeric Arrays in C Extensions</h3>
+      <P>
+        Numeric Arrays are really nice on the Python side of things.  They are faster and much more efficient then lists.  They tend to provide some difficulty for people when they are working with both SWIG'ed and handrolled Python/C extensions however.  
+      </P>
+      <P>While Numeric Arrays can really improve performance of some applications it often isn't enough.  If you need the best performance possible it sometimes becomes necessary to rewrite parts of your Python program as C Extensions.  (Numeric is a C Extension actually).  For example, perhaps you want to extend Numeric by adding a new operation to it.  So you'd like to write a routine that takes a Numeric array and manipulates the C array structure inside of it.</P>
+      
+      <h3>Into C</h3>
+      <P>
+        I apologize in advance to any Python programmers offended by seeing C code and to any C programmers offended by seeing <u>my</u> C code.  I'm not going to cover all the nuts and bolts of building and writing this sort of thing, at least not right at the moment.</p>
+      <h4>The Module</h4>
+      <p>
+        First, a quick overview of the files involved:
+      </P>
+      <div id="terminal"><pre><code>
+steder@Penzilla numpyc $ ls
+myarray.py Makefile mymodule.c
+      </code></pre></div>
+      <h5>Simple C Extension: myarray.c</h5>
+      <P>
+        This is the code necessary to write a single extension function callable from
+        Python that can access and manipulate the data inside of a Numeric array.
+      </P>
+      <p>This code is standard for CPython extensions.  It's also close to the minimum
+        necessary code to yield a useful module.</p>
+      <div id="code">
+        <!--#include virtual="mymodule.c.html"-->
+      </div>
+      <p>We'll look at the functions contained in <b>identity.h</b> and <b>create_array.h</b> in 
+        just a moment.</p>
+      <p>You really need to notice just a few things about the above code:</p>
+      <ul>
+        <li>the #include directives</li>
+        <li>the functions (we'll cover them in a bit)</li>
+        <li>the myMethods table</li>
+        <li>the init function</li>
+      </ul>
+      <p>
+        The #include statements are pretty straightforward.  I just wanted to mention that you need
+        both the Python and the Numeric includes.
+      </p>
+      <p>The methods table just provides a listing of all the functions defined by this module.
+        The first part of each entry is the name of the function that shows up when you use the 
+        module in python or run "dir( modulename )" at the interpreter.  The second part is the 
+        C name of the function.  The third part determines what arguments the function takes.
+        <table>
+          <thead><th>Type</th><th>Use</th></thead>
+          <tr>
+            <td>METH_VARARGS</td>
+            <td>Typical Case:  Expects a tuple of arguments(PyArg_ParseTuple(...)</td>
+          </tr>
+          <tr>
+            <td>METH_KEYWORDS</td>
+            <td>Like METH_VARARGS but defines a function that parses it's argument list with 
+              keywords.(PyArg_ParseTupleAndKeywords(...))</td>
+          </tr>
+          <tr>
+            <td>METH_NOARGS</td>
+            <td>Optimized case for functions that take no arguments</td>
+          </tr>
+          <tr>
+            <td>METH_O</td>
+            <td>Optimized case for functions that take a single argument</td>
+          </td>
+        </table>
+      <p>
+        The underscore in the function <em>init_myarray</em>  is a common convention with extension modules.  The C library itself is called <em>_name</em> while the Python interface to this library is usually called simply <em>name</em>.  I define a simple <em>myarray.py</em> later on.  Note that this convention is optional.  You are free to come up with your own naming conventions.  However, it's important to note that the name of your init function matches the name of the compiled C extension.  (The module you build from <em>init_myarray</em> needs to be called <em>_myarray</em>.)
+      </p>
+      <h4>The Functions</h4>
+      <h5>Identity</h5>
+      <p>This function doesn't do anything to the array.  However, it shows you how to access the 
+        array data if you were interested in manipulating it.</p>
+      <div id="code">
+        <!--#include virtual="identity.h.html"-->
+      </div>
+      <h5>Create Array</h5>
+      <div id="code">
+        <!--#include virtual="create_array.h.html"-->
+      </div>
+      <p>The important parts of the above examples are</p>
+      <ul>
+        <li>PyArg_ParseTuple</li>
+        <li>PyArray_ContiguousFromObject</li>
+        <li>PyArray_Return</li>
+        <li>PyArray_FromDims</li>
+      </ul>
+      <p><dfn>PyArg_ParseTuple</dfn> takes a variable list of arguments.  It's first argument is a constant string (just like "cilO|si") that defines a set of arguments and optional arguments to this function. ("cilO|s" says, my first argument is a Character, my next argument an Int, then a Long, a Python Object, and optionally ("|" means what follows is optional) a string and another int.)  You can get more info on PyArg_ParseTuple, and PyArg_ParseTupleAndKeywords @ <a href="http://docs.python.org/api/arg-parsing.html">http://docs.python.org/api/arg-parsing.html</a> on the Python website.</p>
+      <p><dfn>PyArray_ContiguousFromObject</dfn> will make any sequence (list, tuple, Numeric Array) into a Numeric Array object.  Its first argument is the object you want to convert, the type you want to convert it into, the minimum number of dimensions it should be, and the maximum number of dimensions you'll accept.  (If you set the max to 0 then there will be no upper limit.)</p>
+      <p><dfn>PyArray_Return</dfn> simply does the extra work of properly returning an array.  (If an array is size 0, it returns a single element instead of an array).</p>
+      <p><dfn>PyArray_FromDims</dfn> allolws you to create a Numeric array with unitialized
+        data.  The first argument is the size of the second argument (the dimensions array).  The 
+        dimension array argument is just a 1D C array where each element of the array is the size
+        of that dimension.  (int dimensions[2] = { 4, 3 }; /*defines a 4 by 3 array*/.) The third 
+        argument is just the desired type.</p>
+      <p>I hope that the above functions are at least somewhat understandable at this point.  I recommend that you download the code (see the link at the bottom of this page) and play around with it a bit.</p>
+      <p>In the meantime, here is the makefile that you can use to build the above code:</p>
+      <h5>The Makefile</h5>
+      <P>
+        This is a Linux Makefile that builds the above code into a Python module.  Because the makefile script below is specific to Linux you might also check out the <a href="../swig/">swig page</a> as it shows the appropriate flags for Mac OS X as well.
+      </P>
+      <div id="code"><pre><code>
+            <!--#include virtual="makefile.html"-->
+      </code></pre></div>
+
+      <h4>Wrapping it up</h4>
+      <P>
+        It's really quite common to wrap your compiled module in a higher level Python module. 
+        The goal of this sort of wrapping is to hide some of the ugliness of your C code and
+        provide a more user friendly interface to your users at that Python level.
+      </P>
+      <p>For a module as simple as this there isn't much of a point.  These files can still be useful.
+        For instance, it's much easier to add docstrings and optional arguments at this point.  You 
+        might also add some error checking or exception handling code at this point.  It's generally
+        preferable to catch errors in your arguments before they reach the C program.</p>
+      <p>A runtime error in Python simply throws an exception.</p>
+      <p>A runtime error occuring inside of a C module like ours (that doesn't  provide
+        error checking or exception handling of it's own) can cause an interpreter crash.</p>
+      <div id="code">
+        <!--#include virtual="myarray.py.html"-->
+      </div>
+      <P>
+        Notice in the <em>if __name__==</em> block, the extra argment passed to <b>Numeric.zeros(...)</b>.  The <b>Numeric.Int32</b> argument indicates the C type used to represent the data in this Array.  It is important to set the type of arrays that you wish to pass to C.  If you don't set it explicitly, Python will guess, and if your C code doesn't account for this (by checking the type itself) your code may run into problems.
+      </P>
+      <h3>Conclusion</h3>
+      <p>I hope that this page was helpful.  As this material is a little more difficult, and this is my
+        first time presenting it this way, I would love feedback on this page.  So if you read this and 
+        and would like to comment or complain I'd appreciate hearing from you.  My e-mail is 
+        <a href="mailto:steder@gmail.com">steder@gmail.com</a>.  Thanks!</p>
+      <h4>The Source</h4>
+      <P>You can get the source for the examples shown above by downloading <a href="numpyc.zip">numpyc.zip</a></P>
+    </div>
+    <div id="footer">
+      <!--#include virtual="/tutorials/python/footer.shtml"-->
+    </div>
+  </body>
+</html>

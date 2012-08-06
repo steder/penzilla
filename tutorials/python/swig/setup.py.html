@@ -1,0 +1,20 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#3333CC><B>from</B></FONT> distutils.core <FONT COLOR=#3333CC><B>import</B></FONT> setup, Extension
+
+files = [<FONT COLOR=#115511>"example.c"</FONT>,<FONT COLOR=#115511>"example.i"</FONT>]
+
+libraries = []
+<FONT COLOR=#1111CC>#libraries = ["efence"] # uncomment to use ElectricFence</FONT>
+includes = [<FONT COLOR=#115511>'include'</FONT>, <FONT COLOR=#115511>'python'</FONT>]
+setup(name = <FONT COLOR=#115511>"example"</FONT>, version = <FONT COLOR=#115511>"0.3"</FONT>,
+       ext_modules = [Extension(<FONT COLOR=#115511>"_example"</FONT>, files,
+                                libraries = libraries,
+                                include_dirs =  includes,
+                               )
+                     ],
+      )
+</PRE>
+                  <!--footer-->
+                  </BODY>

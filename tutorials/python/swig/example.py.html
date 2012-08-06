@@ -1,0 +1,41 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># This file was created automatically by SWIG.</FONT>
+<FONT COLOR=#1111CC># Don't modify this file, modify the SWIG interface instead.</FONT>
+<FONT COLOR=#1111CC># This file is compatible with both classic and new-style classes.</FONT>
+
+<FONT COLOR=#3333CC><B>import</B></FONT> _example
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_swig_setattr"><FONT COLOR=#CC0000><B> _swig_setattr</B></FONT></A>(self,class_type,name,value):
+    <FONT COLOR=#3333CC><B>if</B></FONT> (name == <FONT COLOR=#115511>"this"</FONT>):
+        <FONT COLOR=#3333CC><B>if</B></FONT> isinstance(value, class_type):
+            self.__dict__[name] = value.this
+            <FONT COLOR=#3333CC><B>if</B></FONT> hasattr(value,<FONT COLOR=#115511>"thisown"</FONT>): self.__dict__[<FONT COLOR=#115511>"thisown"</FONT>] = value.thisown
+            <FONT COLOR=#3333CC><B>del</B></FONT> value.thisown
+            <FONT COLOR=#3333CC><B>return</B></FONT>
+    method = class_type.__swig_setmethods__.get(name,None)
+    <FONT COLOR=#3333CC><B>if</B></FONT> method: <FONT COLOR=#3333CC><B>return</B></FONT> method(self,value)
+    self.__dict__[name] = value
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_swig_getattr"><FONT COLOR=#CC0000><B> _swig_getattr</B></FONT></A>(self,class_type,name):
+    method = class_type.__swig_getmethods__.get(name,None)
+    <FONT COLOR=#3333CC><B>if</B></FONT> method: <FONT COLOR=#3333CC><B>return</B></FONT> method(self)
+    <FONT COLOR=#3333CC><B>raise</B></FONT> AttributeError,name
+
+<FONT COLOR=#3333CC><B>import</B></FONT> types
+<FONT COLOR=#3333CC><B>try</B></FONT>:
+    _object = types.ObjectType
+    _newclass = 1
+<FONT COLOR=#3333CC><B>except</B></FONT> AttributeError:
+    <FONT COLOR=#3333CC><B>class</B></FONT><A NAME="_object"><FONT COLOR=#CC0000><B> _object</B></FONT></A> : <FONT COLOR=#3333CC><B>pass</B></FONT>
+    _newclass = 0
+<FONT COLOR=#3333CC><B>del</B></FONT> types
+
+
+
+cube = _example.cube
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

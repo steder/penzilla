@@ -1,0 +1,66 @@
+<html>
+  <head>
+    <LINK REL=StyleSheet HREF="../style.css" TYPE="text/css" MEDIA=screen>
+    <title>Penzilla.net: Introduction to Python: Hello World!</title>
+  </head>
+  <body>
+    <div id="header">
+      <h1>An Introduction to Python:</h1>
+      <h2>Hello World!</h2>
+      <hr>
+    </div>
+    <div id="sidebar">
+      <div id="menu">
+        <a href="index.shtml">&raquo;Tutorial Home</a> 
+        <!--#include virtual="/tutorials/python/menu.html"-->
+        </div>
+      <!--#include virtual="/tutorials/python/skyscraper_ads.html"-->
+    </div>
+    <div id="content">
+      <h3>Basic Python Syntax</h3>
+      <p>I don't know if you've ever had an argument with someone about how to format functions and brackets in C/C++, but I have, and it went something like this:</p>
+      <p>
+        <span style="color: purple">Me:</span>There is only one true way to write C++ function calls!  You're an idiot if you don't do it this way:
+        <div id="code">
+          <pre><code>
+void foo ( void )
+{ 
+  /* Body of Foo */
+}
+          </code></pre>
+          </div>
+      </p>
+      <p>
+        <span style="color: brown">My Ex-Friend:</span>What the hell!  That's unreadable!!  I don't have a clue what you're doing there.  Let me show you how it should be done:
+        <div id="code">
+          <pre><code>
+void bar ( void ) {
+  /* Body of Bar */
+}
+          </code></pre>
+        </div>
+      </p>
+      <p>
+        Now, while I do feel strongly about my C/C++ formatting, as do many people, the creators of Python thought they could skirt the whole argument by attempting to allow only "THE ONE WAY":
+        <center><img alt="indentation!" src="indentation.png"></center>
+      </p>
+      <h3>Indentation?</h3>
+      <p>Yep, and it's suprisingly elegant too(although the forthcoming example is nothing to write home about).  I'm going to throw some code here, don't worry, we'll cover the specifics of these structures and more later on.</p>
+      <div id="code">
+        <!--#include virtual="indentation.py.html"-->
+      </div>
+      <p>Now let's try the <i>only</i> example you'll ever need when attempting to teach a programming language:  <b>Hello World!</b>  Notice this is mostly comments, and I'm actually doing hello world in several different ways.  </p>
+      <P>
+        One of the ways not shown is using modules (although this file could also be a module).  All python source is also a module (and modules can be gathered into packages for convenience and logical organization).  We'll cover this more later.  Suffice it to say you can execute hello world within the python interpreter by "importing" this python file ("hello.py").
+      </p>  
+      <P>
+        You can download this Python file and try it yourself very quickly.
+        <div id="code">
+          <!--#include virtual="hello.py.html"-->
+        </div>
+    </div>
+    <div id="footer">
+      <!--#include virtual="/tutorials/python/footer.shtml"-->
+    </div>
+</body>
+</html>

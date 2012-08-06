@@ -1,0 +1,17 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC># Case In Python</FONT>
+age = raw_input(<FONT COLOR=#115511>"Enter Your Age:"</FONT>)
+<FONT COLOR=#3333CC><B>if</B></FONT> age &lt; 5:
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"You're too young for computers, Go Outside!"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> age = 6:
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"I like case structures!"</FONT>
+<FONT COLOR=#3333CC><B>elif</B></FONT> age = 70:
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"You youngin's are spoiled with your 'Case' structures!  Back in my day we had to flip bits with our death!"</FONT>
+<FONT COLOR=#3333CC><B>else</B></FONT>: <FONT COLOR=#1111CC># Default case</FONT>
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"This is so lame, Mike!"</FONT>
+    
+</PRE>
+                  <!--footer-->
+                  </BODY>

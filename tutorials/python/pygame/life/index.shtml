@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content=
+          "HTML Tidy for Linux/x86 (vers 1st August 2004), see www.w3.org" />
+    <title>Penzilla.net's Python Tutorial: PyGame - Life</title>
+    <link rel="StyleSheet" href="../../style.css" type="text/css" media="screen" />
+  </head>
+  <body>
+    <div id="header">
+      <h1>Penzilla.net's Python Tutorial:</h1>
+      <h2>PyGame: Life</h2>
+      <hr /></div>
+    <div id="sidebar">
+      <div id="menu"><a href="../../index.shtml">&raquo;Tutorial Home</a>
+        <!--#include virtual="/tutorials/python/pygame/menu.html"-->
+        <!--#include virtual="/tutorials/python/menu.html"-->
+      </div>
+      <!--#include virtual="/tutorials/python/skyscraper_ads.html"--></div>
+    <div id="content"><!-- Comments -->
+      <!-- Body -->
+      <h3>Introduction</h3>
+      <img alt="game of life image" src="life.png"/>
+      <p>Life is an implementation of the Game of Life that automatically
+        generates a large field of cells and lets it develop.  This could easily be the beginnings of a
+        screensaver or quickly adapted into a more traditional game of life (much smaller grid, 
+        place cells with your mouse, hit play and see if the colony lives or dies).</p>
+      <p>If you're not familiar with the Game of Life the concept is simple.  Each green cell
+        represents a living thing.  Depending on the number of neighbors each cell has, it is either
+        happy (and reproduces), average( it just sits there ), or depressed (it dies).</p>
+      <p>There is no traditional goal in this game.  You don't really "win" or "lose".  It's usually
+        just interesting to see what sort of patterns come out of this simple algorithm.</p>
+      <p>The performance of this problem on this size grid is not nearly as good as I'd like but I 
+        haven't had sufficient time to optimize it.  Perhaps optimization can be left to you
+        as an exercise?</p>
+      <h3>The Code</h3>
+      <p><em>Note</em>:  I have only the briefest descriptions here because I just wanted
+        to get these pages up quickly.  I'll be adding more soon hopefully.  Until then I hoped that
+        the code would still be interesting to look at and experiment with.  Enjoy!</p>
+      <h4>life.py</h4>
+      <p>Life.py contains all the code for drawing the state of the game that is provided by 
+        engine.py.</p>
+      <div id="code">
+        <!--#include virtual="life.py.html"-->
+      </div>
+      <p>This example uses Surfarray to convert the Numeric Array data returned from
+        "model.timestep()" into graphics.  (Essentially, each cell represents a pixel of the 
+        image).</p>
+      <h4>engine.py</h4>
+      <p>engine.py generates the array that we display in life.py.  Engine.py defines a 
+        Simulation class that handles the bookkeeping of what cells are occupied.  When it's 
+        "timestep" method is called it loops over all occupied spaces and determines if they
+        die, do nothing, or reproduce.</p>
+      <div id="code">
+        <!--#include virtual="engine.py.html"-->
+      </div>
+      <h3>Download</h3>
+      <P>Download this Game of <a href="life.zip">Life</a> example.</P>
+      <!--End Body-->
+    </div>
+    <div id="footer">
+      <!--#include virtual="/tutorials/python/footer.shtml"-->
+    </div>
+  </body>
+</html>

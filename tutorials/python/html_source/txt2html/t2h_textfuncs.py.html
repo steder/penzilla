@@ -1,0 +1,48 @@
+<HTML><HEAD><TITLE>/home/steder/PythonLectures/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#115511>"""Hot-pluggable replacement functions for Txt2Html"""</FONT>
+
+<FONT COLOR=#1111CC>#-- Functions to massage blocks by type</FONT>
+<FONT COLOR=#1111CC>#def </FONT>Titleify(block):
+<FONT COLOR=#1111CC>#def </FONT>Authorify(block):
+<FONT COLOR=#1111CC>#def </FONT>fixcode(block, doctype):
+<FONT COLOR=#1111CC>#def </FONT>fixquote(block):
+<FONT COLOR=#1111CC>#def </FONT>fixtext(block):
+<FONT COLOR=#1111CC>#def </FONT>fixhead(block):
+
+<FONT COLOR=#1111CC>#-- Utility functions for text transformation</FONT>
+<FONT COLOR=#1111CC>#def </FONT>AdjustCaps(txt):
+<FONT COLOR=#1111CC>#def </FONT>capwords(txt):
+<FONT COLOR=#1111CC>#def </FONT>LeftMargin(txt):
+<FONT COLOR=#1111CC>#def </FONT>Detag(txt):
+<FONT COLOR=#1111CC>#def </FONT>URLify(txt):
+<FONT COLOR=#1111CC>#def </FONT>Proxify(txt, cgi_prog):
+<FONT COLOR=#1111CC>#def </FONT>Absolutize(txt, base_href):
+<FONT COLOR=#1111CC>#def </FONT>Rulify(txt):
+<FONT COLOR=#1111CC>#def </FONT>NoRule(txt):
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="Typographify"><FONT COLOR=#CC0000><B> Typographify</B></FONT></A>(txt):
+    <FONT COLOR=#1111CC># [module] names</FONT>
+    r = re.compile(r<FONT COLOR=#115511>"""([\(\s'/"&gt;]|^)\[(.*?)\]([&lt;\s\.\),:;'"?!/-])"""</FONT>, re.M | re.S)
+    txt = r.sub(<FONT COLOR=#115511>'\\1&lt;em&gt;&lt;code&gt;\\2&lt;/code&gt;&lt;/em&gt;\\3'</FONT>,txt)
+    <FONT COLOR=#1111CC># *strongly emphasize* words</FONT>
+    r = re.compile(r<FONT COLOR=#115511>"""([\(\s'/"]|^)\*(.*?)\*([\s\.\),:;'"?!/-])"""</FONT>, re.M | re.S)
+    txt = r.sub(<FONT COLOR=#115511>'\\1&lt;strong&gt;\\2&lt;/strong&gt;\\3'</FONT>, txt)
+    <FONT COLOR=#1111CC># -emphasize- words</FONT>
+    r = re.compile(r<FONT COLOR=#115511>"""([\(\s'/"]|^)-(.*?)-([\s\.\),:;'"?!/])"""</FONT>, re.M | re.S)
+    txt = r.sub(<FONT COLOR=#115511>'\\1&lt;em&gt;\\2&lt;/em&gt;\\3'</FONT>, txt)
+    <FONT COLOR=#1111CC># _Book Title_ citations</FONT>
+    r = re.compile(r<FONT COLOR=#115511>"""([\(\s'/"]|^)_(.*?)_([\s\.\),:;'"?!/-])"""</FONT>, re.M | re.S)
+    txt = r.sub(<FONT COLOR=#115511>'\\1&lt;cite&gt;\\2&lt;/cite&gt;\\3'</FONT>, txt)
+    <FONT COLOR=#1111CC># 'Function()' names</FONT>
+    r = re.compile(r<FONT COLOR=#115511>"""([\(\s/"]|^)'(.*?)'([\s\.\),:;"?!/-])"""</FONT>, re.M | re.S)
+    txt = r.sub(<FONT COLOR=#115511>"\\1&lt;code&gt;\\2&lt;/code&gt;\\3"</FONT>, txt)
+    <FONT COLOR=#3333CC><B>return</B></FONT> txt
+
+<FONT COLOR=#1111CC>#-- Miscellaneous type-specific functions</FONT>
+<FONT COLOR=#1111CC>#def </FONT>infer_type(fname):
+<FONT COLOR=#1111CC>#def </FONT>Regex_by_filetype(intype):
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

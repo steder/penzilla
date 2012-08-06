@@ -1,0 +1,105 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#115511>"""
+This is a simple script to download all of the
+comic strips off of the penny arcade site for archival.
+"""</FONT>
+
+<FONT COLOR=#3333CC><B>import</B></FONT> normalDate <FONT COLOR=#1111CC>#This file needs to be in the path, or in the same directory</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> string
+<FONT COLOR=#3333CC><B>import</B></FONT> os
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="download_lin"><FONT COLOR=#CC0000><B> download_lin</B></FONT></A>():
+    <FONT COLOR=#115511>"""&lt;evil laugh&gt;Using this nifty date class I can easily iterate
+    through the dates that conveniently fit the penny arcade naming
+    convention...  &lt;/evil laugh&gt;"""</FONT>
+    <FONT COLOR=#115511>'''
+    Just Change the year and the year on the directory in the
+    path variable and you can download the entire PA comic archive.
+    '''</FONT>
+    <FONT COLOR=#3333CC><B>for</B></FONT> year <FONT COLOR=#3333CC><B>in</B></FONT> YEARS:
+        today = START[year]
+        <FONT COLOR=#1111CC># Depending on the year PA used either Jpegs or Gifs</FONT>
+        <FONT COLOR=#1111CC># A more intelligent script could probably check to see</FONT>
+        <FONT COLOR=#1111CC># which one is available, and then download appropriately.</FONT>
+        <FONT COLOR=#1111CC># This one just bruteforce tries both types for everything.</FONT>
+        type = <FONT COLOR=#115511>"h.jpg"</FONT>
+        type2 = <FONT COLOR=#115511>"h.gif"</FONT>
+        finish = FINISH[year]
+        <FONT COLOR=#3333CC><B>while</B></FONT>(today &gt;= finish):
+            list,list2 = [],[]
+            list.append(<FONT COLOR=#115511>"%s"</FONT> % today)
+            list2.append(<FONT COLOR=#115511>"%s"</FONT> % today)
+            list.append(type)
+            list2.append(type2)
+            item = string.join(list,<FONT COLOR=#115511>''</FONT>)
+            item2 = string.join(list2,<FONT COLOR=#115511>''</FONT>)
+            <FONT COLOR=#1111CC># Notice this is the one thing that isn't crossplatform</FONT>
+            path = string.join([<FONT COLOR=#115511>"wget -nc"</FONT>, year],<FONT COLOR=#115511>" "</FONT>)
+            command, command2 = [], []
+            command.append(path)
+            command.append(item)
+            command2.append(path)
+            command2.append(item2)
+            <FONT COLOR=#1111CC># This is crossplatform, but the command string itself</FONT>
+            <FONT COLOR=#1111CC># is not.</FONT>
+            os.popen(string.join(command,<FONT COLOR=#115511>''</FONT>))
+            os.popen(string.join(command2,<FONT COLOR=#115511>''</FONT>))
+            today = today - 1
+
+<FONT COLOR=#3333CC><B>import</B></FONT> urllib
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="download_cross_platform"><FONT COLOR=#CC0000><B> download_cross_platform</B></FONT></A>():
+    <FONT COLOR=#3333CC><B>for</B></FONT> year <FONT COLOR=#3333CC><B>in</B></FONT> YEARS:
+        <FONT COLOR=#3333CC><B>print</B></FONT> year
+        today = START[year]
+        <FONT COLOR=#1111CC># Depending on the year PA used either Jpegs or Gifs</FONT>
+        <FONT COLOR=#1111CC># A more intelligent script could probably check to see</FONT>
+        <FONT COLOR=#1111CC># which one is available, and then download appropriately.</FONT>
+        <FONT COLOR=#1111CC># This one just bruteforce tries both types for everything.</FONT>
+        type = <FONT COLOR=#115511>"h.jpg"</FONT>
+        type2 = <FONT COLOR=#115511>"h.gif"</FONT>
+        finish = FINISH[year]
+        <FONT COLOR=#3333CC><B>while</B></FONT>(today &gt;= finish):
+            list,list2 = [],[]
+            list.append(<FONT COLOR=#115511>"%s"</FONT> % today)
+            list2.append(<FONT COLOR=#115511>"%s"</FONT> % today)
+            list.append(type)
+            list2.append(type2)
+            item = string.join(list,<FONT COLOR=#115511>''</FONT>)
+            item2 = string.join(list2,<FONT COLOR=#115511>''</FONT>)
+            path = string.join([year,item],<FONT COLOR=#115511>""</FONT>)
+            path2 = string.join([year,item2],<FONT COLOR=#115511>""</FONT>)
+            <FONT COLOR=#3333CC><B>print</B></FONT> path
+            urllib.urlretrieve(path, item)
+            <FONT COLOR=#3333CC><B>print</B></FONT> path2
+            urllib.urlretrieve(path2, item2)
+            today = today - 1
+            
+<FONT COLOR=#1111CC># Useful Data values for the above functions:            </FONT>
+YEARS = [<FONT COLOR=#115511>"http://www.penny-arcade.com/images/1998/"</FONT>,
+         <FONT COLOR=#115511>"http://www.penny-arcade.com/images/1999/"</FONT>,
+         <FONT COLOR=#115511>"http://www.penny-arcade.com/images/2000/"</FONT>,
+         <FONT COLOR=#115511>"http://www.penny-arcade.com/images/2001/"</FONT>,
+         <FONT COLOR=#115511>"http://www.penny-arcade.com/images/2002/"</FONT>,
+         <FONT COLOR=#115511>"http://www.penny-arcade.com/images/2003/"</FONT>]
+
+START = {<FONT COLOR=#115511>"http://www.penny-arcade.com/images/1998/"</FONT>:normalDate.ND(19981231),
+         <FONT COLOR=#115511>"http://www.penny-arcade.com/images/1999/"</FONT>:normalDate.ND(19991231),
+         <FONT COLOR=#115511>"http://www.penny-arcade.com/images/2000/"</FONT>:normalDate.ND(20001231),
+         <FONT COLOR=#115511>"http://www.penny-arcade.com/images/2001/"</FONT>:normalDate.ND(20011231),
+         <FONT COLOR=#115511>"http://www.penny-arcade.com/images/2002/"</FONT>:normalDate.ND(20021231),
+         <FONT COLOR=#115511>"http://www.penny-arcade.com/images/2003/"</FONT>:normalDate.ND(20031231)}
+
+FINISH = {<FONT COLOR=#115511>"http://www.penny-arcade.com/images/1998/"</FONT>:normalDate.ND(19980101),
+         <FONT COLOR=#115511>"http://www.penny-arcade.com/images/1999/"</FONT>:normalDate.ND(19990101),
+         <FONT COLOR=#115511>"http://www.penny-arcade.com/images/2000/"</FONT>:normalDate.ND(20000101),
+         <FONT COLOR=#115511>"http://www.penny-arcade.com/images/2001/"</FONT>:normalDate.ND(20010101),
+         <FONT COLOR=#115511>"http://www.penny-arcade.com/images/2002/"</FONT>:normalDate.ND(20020101),
+         <FONT COLOR=#115511>"http://www.penny-arcade.com/images/2003/"</FONT>:normalDate.ND(20030101)}
+
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
+    download_cross_platform()
+</PRE>
+                  <!--footer-->
+                  </BODY>

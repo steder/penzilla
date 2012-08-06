@@ -1,0 +1,35 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/mpi-python/pympi/max.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#3333CC><B>import</B></FONT> mpi
+<FONT COLOR=#3333CC><B>import</B></FONT> random
+<FONT COLOR=#1111CC># Create a toy dataset:</FONT>
+
+data = range( 1, 1001 ) <FONT COLOR=#1111CC># We know what the max will be already :-)</FONT>
+random.shuffle( data ) <FONT COLOR=#1111CC># Modifies data in place</FONT>
+
+<FONT COLOR=#1111CC>#  Divide up the problem (if we can divide it evenly)</FONT>
+
+<FONT COLOR=#3333CC><B>if</B></FONT>( len(data) % mpi.size == 0 ):
+    myrank = mpi.rank
+    blocksize = len(data) / mpi.size
+    start = blocksize * myrank
+    end = start + blocksize
+    mydata = data[ start : end ]
+    <FONT COLOR=#3333CC><B>print</B></FONT> mydata
+    max = -1
+    <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> mydata:
+        <FONT COLOR=#3333CC><B>if</B></FONT> ( i &gt; max ):
+            max = i
+    maximums = mpi.gather( [ max ] )
+    <FONT COLOR=#3333CC><B>if</B></FONT> ( mpi.rank == 0 ):
+        max = -1
+        <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> maximums:
+            <FONT COLOR=#3333CC><B>if</B></FONT> ( i &gt; max ):
+                max = i
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"The maximum value is:"</FONT>,max
+<FONT COLOR=#3333CC><B>else</B></FONT>:
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Sorry, I don't know how to split up the problem, aborting!"</FONT>
+</PRE>
+                  <!--footer-->
+                  </BODY>

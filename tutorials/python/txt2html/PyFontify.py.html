@@ -1,0 +1,159 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#115511>"""Module to analyze Python source code; for syntax coloring tools.
+
+Interface:
+	tags = fontify(pytext, searchfrom, searchto)
+
+The 'pytext' argument is a string containing Python source code.
+The (optional) arguments 'searchfrom' and 'searchto' may contain a slice in pytext. 
+The returned value is a list of tuples, formatted like this:
+	[('keyword', 0, 6, None), ('keyword', 11, 17, None), ('comment', 23, 53, None), etc. ]
+The tuple contents are always like this:
+	(tag, startindex, endindex, sublist)
+tag is one of 'keyword', 'string', 'comment' or 'identifier'
+sublist is not used, hence always None. 
+"""</FONT>
+
+<FONT COLOR=#1111CC># Based on FontText.py by Mitchell S. Chapman,</FONT>
+<FONT COLOR=#1111CC># which was modified by Zachary Roadhouse,</FONT>
+<FONT COLOR=#1111CC># then un-Tk'd by Just van Rossum.</FONT>
+<FONT COLOR=#1111CC># Many thanks for regular expression debugging & authoring are due to:</FONT>
+<FONT COLOR=#1111CC>#	Tim (the-incredib-ly y'rs) Peters and Cristian Tismer</FONT>
+<FONT COLOR=#1111CC># So, who owns the copyright? ;-) How about this:</FONT>
+<FONT COLOR=#1111CC># Copyright 1996-1997: </FONT>
+<FONT COLOR=#1111CC>#	Mitchell S. Chapman,</FONT>
+<FONT COLOR=#1111CC>#	Zachary Roadhouse,</FONT>
+<FONT COLOR=#1111CC>#	Tim Peters,</FONT>
+<FONT COLOR=#1111CC>#	Just van Rossum</FONT>
+
+__version__ = <FONT COLOR=#115511>"0.3.1"</FONT>
+
+<FONT COLOR=#3333CC><B>import</B></FONT> string, regex
+
+<FONT COLOR=#1111CC># First a little helper, since I don't like to repeat things. (Tismer speaking)</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> string
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="replace"><FONT COLOR=#CC0000><B> replace</B></FONT></A>(where, what, with):
+	<FONT COLOR=#3333CC><B>return</B></FONT> string.join(string.split(where, what), with)
+
+<FONT COLOR=#1111CC># This list of keywords is taken from ref/node13.html of the</FONT>
+<FONT COLOR=#1111CC># Python 1.3 HTML documentation. ("access" is intentionally omitted.)</FONT>
+keywordsList = [
+	<FONT COLOR=#115511>"del"</FONT>, <FONT COLOR=#115511>"from"</FONT>, <FONT COLOR=#115511>"lambda"</FONT>, <FONT COLOR=#115511>"return"</FONT>,
+	<FONT COLOR=#115511>"and"</FONT>, <FONT COLOR=#115511>"elif"</FONT>, <FONT COLOR=#115511>"global"</FONT>, <FONT COLOR=#115511>"not"</FONT>, <FONT COLOR=#115511>"try"</FONT>,
+	<FONT COLOR=#115511>"break"</FONT>, <FONT COLOR=#115511>"else"</FONT>, <FONT COLOR=#115511>"if"</FONT>, <FONT COLOR=#115511>"or"</FONT>, <FONT COLOR=#115511>"while"</FONT>,
+	<FONT COLOR=#115511>"class"</FONT>, <FONT COLOR=#115511>"except"</FONT>, <FONT COLOR=#115511>"import"</FONT>, <FONT COLOR=#115511>"pass"</FONT>,
+	<FONT COLOR=#115511>"continue"</FONT>, <FONT COLOR=#115511>"finally"</FONT>, <FONT COLOR=#115511>"in"</FONT>, <FONT COLOR=#115511>"print"</FONT>,
+	<FONT COLOR=#115511>"def"</FONT>, <FONT COLOR=#115511>"for"</FONT>, <FONT COLOR=#115511>"is"</FONT>, <FONT COLOR=#115511>"raise"</FONT>]
+
+<FONT COLOR=#1111CC># Build up a regular expression which will match anything</FONT>
+<FONT COLOR=#1111CC># interesting, including multi-line triple-quoted strings.</FONT>
+commentPat = <FONT COLOR=#115511>"#.*"</FONT>
+
+pat = <FONT COLOR=#115511>"q[^\q\n]*\(\\\\[\000-\377][^\q\n]*\)*q"</FONT>
+quotePat = replace(pat, <FONT COLOR=#115511>"q"</FONT>, <FONT COLOR=#115511>"'"</FONT>) + <FONT COLOR=#115511>"\|"</FONT> + replace(pat, <FONT COLOR=#115511>'q'</FONT>, <FONT COLOR=#115511>'"'</FONT>)
+
+<FONT COLOR=#1111CC># Way to go, Tim!</FONT>
+pat = <FONT COLOR=#115511>"""
+	qqq
+	[^\\q]*
+	\(
+		\(	\\\\[\000-\377]
+		\|	q
+			\(	\\\\[\000-\377]
+			\|	[^\\q]
+			\|	q
+				\(	\\\\[\000-\377]
+				\|	[^\\q]
+				\)
+			\)
+		\)
+		[^\\q]*
+	\)*
+	qqq
+"""</FONT>
+pat = string.join(string.split(pat), <FONT COLOR=#115511>''</FONT>)	<FONT COLOR=#1111CC># get rid of whitespace</FONT>
+tripleQuotePat = replace(pat, <FONT COLOR=#115511>"q"</FONT>, <FONT COLOR=#115511>"'"</FONT>) + <FONT COLOR=#115511>"\|"</FONT> + replace(pat, <FONT COLOR=#115511>'q'</FONT>, <FONT COLOR=#115511>'"'</FONT>)
+
+<FONT COLOR=#1111CC># Build up a regular expression which matches all and only</FONT>
+<FONT COLOR=#1111CC># Python keywords. This will let us skip the uninteresting</FONT>
+<FONT COLOR=#1111CC># identifier references.</FONT>
+<FONT COLOR=#1111CC># nonKeyPat identifies characters which may legally precede</FONT>
+<FONT COLOR=#1111CC># a keyword pattern.</FONT>
+nonKeyPat = <FONT COLOR=#115511>"\(^\|[^a-zA-Z0-9_.\"']\)"</FONT>
+
+keyPat = nonKeyPat + <FONT COLOR=#115511>"\("</FONT>
+<FONT COLOR=#3333CC><B>for</B></FONT> keyword <FONT COLOR=#3333CC><B>in</B></FONT> keywordsList:
+	keyPat = keyPat + keyword + <FONT COLOR=#115511>"\|"</FONT>
+keyPat = keyPat[:-2] + <FONT COLOR=#115511>"\)"</FONT> + nonKeyPat
+
+matchPat = keyPat + <FONT COLOR=#115511>"\|"</FONT> + commentPat + <FONT COLOR=#115511>"\|"</FONT> + tripleQuotePat + <FONT COLOR=#115511>"\|"</FONT> + quotePat
+matchRE = regex.compile(matchPat)
+
+idKeyPat = <FONT COLOR=#115511>"[ \t]*[A-Za-z_][A-Za-z_0-9.]*"</FONT>	<FONT COLOR=#1111CC># Ident w. leading whitespace.</FONT>
+idRE = regex.compile(idKeyPat)
+
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="fontify"><FONT COLOR=#CC0000><B> fontify</B></FONT></A>(pytext, searchfrom = 0, searchto = None):
+	<FONT COLOR=#3333CC><B>if</B></FONT> searchto <FONT COLOR=#3333CC><B>is</B></FONT> None:
+		searchto = len(pytext)
+	<FONT COLOR=#1111CC># Cache a few attributes for quicker reference.</FONT>
+	search = matchRE.search
+	group = matchRE.group
+	idSearch = idRE.search
+	idGroup = idRE.group
+	
+	tags = []
+	tags_append = tags.append
+	commentTag = <FONT COLOR=#115511>'comment'</FONT>
+	stringTag = <FONT COLOR=#115511>'string'</FONT>
+	keywordTag = <FONT COLOR=#115511>'keyword'</FONT>
+	identifierTag = <FONT COLOR=#115511>'identifier'</FONT>
+	
+	start = 0
+	end = searchfrom
+	<FONT COLOR=#3333CC><B>while</B></FONT> 1:
+		start = search(pytext, end)
+		<FONT COLOR=#3333CC><B>if</B></FONT> start &lt; 0 <FONT COLOR=#3333CC><B>or</B></FONT> start &gt;= searchto:
+			<FONT COLOR=#3333CC><B>break</B></FONT>	<FONT COLOR=#1111CC># EXIT LOOP</FONT>
+		match = group(0)
+		end = start + len(match)
+		c = match[0]
+		<FONT COLOR=#3333CC><B>if</B></FONT> c <FONT COLOR=#3333CC><B>not</B></FONT> <FONT COLOR=#3333CC><B>in</B></FONT> <FONT COLOR=#115511>"#'\""</FONT>:
+			<FONT COLOR=#1111CC># Must have matched a keyword.</FONT>
+			<FONT COLOR=#3333CC><B>if</B></FONT> start &lt;&gt; searchfrom:
+				<FONT COLOR=#1111CC># there's still a redundant char before and after it, strip!</FONT>
+				match = match[1:-1]
+				start = start + 1
+			<FONT COLOR=#3333CC><B>else</B></FONT>:
+				<FONT COLOR=#1111CC># this is the first keyword in the text.</FONT>
+				<FONT COLOR=#1111CC># Only a space at the end.</FONT>
+				match = match[:-1]
+			end = end - 1
+			tags_append((keywordTag, start, end, None))
+			<FONT COLOR=#1111CC># If this was a defining keyword, look ahead to the</FONT>
+			<FONT COLOR=#1111CC># following identifier.</FONT>
+			<FONT COLOR=#3333CC><B>if</B></FONT> match <FONT COLOR=#3333CC><B>in</B></FONT> [<FONT COLOR=#115511>"def"</FONT>, <FONT COLOR=#115511>"class"</FONT>]:
+				start = idSearch(pytext, end)
+				<FONT COLOR=#3333CC><B>if</B></FONT> start == end:
+					match = idGroup(0)
+					end = start + len(match)
+					tags_append((identifierTag, start, end, None))
+		<FONT COLOR=#3333CC><B>elif</B></FONT> c == <FONT COLOR=#115511>"#"</FONT>:
+			tags_append((commentTag, start, end, None))
+		<FONT COLOR=#3333CC><B>else</B></FONT>:
+			tags_append((stringTag, start, end, None))
+	<FONT COLOR=#3333CC><B>return</B></FONT> tags
+
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="test"><FONT COLOR=#CC0000><B> test</B></FONT></A>(path):
+	f = open(path)
+	text = f.read()
+	f.close()
+	tags = fontify(text)
+	<FONT COLOR=#3333CC><B>for</B></FONT> tag, start, end, sublist <FONT COLOR=#3333CC><B>in</B></FONT> tags:
+		<FONT COLOR=#3333CC><B>print</B></FONT> tag, `text[start:end]`
+</PRE>
+                  <!--footer-->
+                  </BODY>

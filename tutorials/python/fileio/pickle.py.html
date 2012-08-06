@@ -1,0 +1,50 @@
+<div class="syntax"><pre><span class="c"># Let&#39;s define a class quick:</span>
+<span class="k">class</span> <span class="nc">Student</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">school</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">major</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">gpa</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">school</span> <span class="o">=</span> <span class="n">school</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">major</span> <span class="o">=</span> <span class="n">major</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">year</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gpa</span> <span class="o">=</span> <span class="n">gpa</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;++++++++++++++++++++++&quot;</span><span class="p">,</span> 
+                 <span class="s">&quot;+&quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">,</span>
+                 <span class="s">&quot;+&quot;</span> <span class="o">+</span> <span class="n">school</span><span class="p">,</span>
+                 <span class="s">&quot;+&quot;</span> <span class="o">+</span> <span class="n">major</span><span class="p">,</span>
+                 <span class="s">&quot;+&quot;</span> <span class="o">+</span> <span class="n">year</span><span class="p">,</span>
+                 <span class="s">&quot;+&quot;</span> <span class="o">+</span> <span class="n">gpa</span><span class="p">,</span>
+                 <span class="s">&quot;++++++++++++++++++++++&quot;</span><span class="p">]</span>
+                 
+        <span class="k">return</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+
+<span class="c"># Now I&#39;ll create a student:</span>
+<span class="n">Mike</span> <span class="o">=</span> <span class="n">Student</span><span class="p">(</span><span class="s">&quot;Mike&quot;</span><span class="p">,</span> <span class="s">&quot;UIUC&quot;</span><span class="p">,</span> <span class="s">&quot;CS&quot;</span><span class="p">,</span> <span class="s">&quot;Senior&quot;</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">)</span>
+
+<span class="c"># Now, let&#39;s Pickle Mike</span>
+<span class="n">mike_the_pickle</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">Mike</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">mike_the_pickle</span>
+
+<span class="c"># Now let&#39;s clone mike!</span>
+<span class="n">Mike2</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">mike_the_pickle</span><span class="p">)</span>
+<span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">Mike</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="n">Mike2</span><span class="p">):</span>
+    <span class="k">print</span> <span class="s">&quot;Mike and Mike2 are of type:&quot;</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">Mike</span><span class="p">)))</span>
+
+<span class="c"># Create A Pickler</span>
+<span class="n">P</span><span class="o">.</span><span class="n">pickle</span><span class="o">.</span><span class="n">Pickler</span><span class="p">(</span><span class="s">&quot;pickle.dat&quot;</span><span class="p">)</span>
+<span class="c"># Write to your Pickler</span>
+<span class="n">P</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">Mike</span><span class="p">)</span>
+<span class="c"># OR, combine the last 2 lines</span>
+<span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">Mike</span><span class="p">,</span> <span class="s">&quot;pickle.dat&quot;</span><span class="p">)</span>
+
+<span class="c"># Now, Create an Unpickler, and get Mike back</span>
+<span class="n">U</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">Unpickler</span><span class="p">(</span><span class="s">&quot;pickle.dat&quot;</span><span class="p">)</span>
+<span class="c"># Read from the pickler</span>
+<span class="n">Mike</span> <span class="o">=</span> <span class="n">U</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="c"># Do it in one line</span>
+<span class="n">Mike2</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">&quot;pickle.dat&quot;</span><span class="p">)</span>
+
+<span class="c"># Just something to keep in mind:</span>
+<span class="c"># For more sophisticated usage, you may want to use the Shelve module,</span>
+<span class="c"># or other Database modules.</span>
+</pre></div>

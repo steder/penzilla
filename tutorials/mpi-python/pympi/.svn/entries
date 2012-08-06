@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="24"
+   name=""
+   committed-date="2005-02-24T16:27:18.754022Z"
+   url="http://www.ripplefx.net:81/svn/python/pympi"
+   last-author="steder"
+   kind="dir"
+   revision="24"/>
+<entry
+   committed-rev="24"
+   name="max.py.html"
+   text-time="2005-02-13T05:58:06.000000Z"
+   committed-date="2005-02-24T16:27:18.754022Z"
+   checksum="b1963d67fc936039c92236ac9cdc695b"
+   last-author="steder"
+   kind="file"/>
+<entry
+   name="simple_extension"
+   kind="dir"/>
+<entry
+   committed-rev="24"
+   name="simple_extension.tar.gz"
+   text-time="2004-10-20T23:22:35.000000Z"
+   committed-date="2005-02-24T16:27:18.754022Z"
+   checksum="7d637abadde6e2d1dbfc116467cda5af"
+   last-author="steder"
+   kind="file"
+   prop-time="2005-02-24T16:06:06.000000Z"/>
+<entry
+   committed-rev="24"
+   name="index.html"
+   text-time="2005-02-13T06:06:08.000000Z"
+   committed-date="2005-02-24T16:27:18.754022Z"
+   checksum="4d740bd1bfbbb47b18077df125acc2ab"
+   last-author="steder"
+   kind="file"
+   prop-time="2005-02-24T16:06:06.000000Z"/>
+<entry
+   committed-rev="24"
+   name="montecarlo.py"
+   text-time="2004-10-20T23:22:35.000000Z"
+   committed-date="2005-02-24T16:27:18.754022Z"
+   checksum="91559218804f93975a22e8fc9c8d71dc"
+   last-author="steder"
+   kind="file"/>
+<entry
+   committed-rev="24"
+   name="max.py"
+   text-time="2005-02-13T05:57:12.000000Z"
+   committed-date="2005-02-24T16:27:18.754022Z"
+   checksum="25277b4684e3a60330492ce4c60e354e"
+   last-author="steder"
+   kind="file"/>
+<entry
+   committed-rev="24"
+   name="montecarlo.py.html"
+   text-time="2005-02-13T05:58:06.000000Z"
+   committed-date="2005-02-24T16:27:18.754022Z"
+   checksum="0291316f1519c7db371ccc3f6008df32"
+   last-author="steder"
+   kind="file"/>
+</wc-entries>

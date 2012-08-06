@@ -1,0 +1,103 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#115511>"""
+Stopwatch.py:
+Define a stopwatch object that can be used to time blocks of code
+in a reasonably intuitive way.  (Like a stopwatch :~))
+"""</FONT>
+<FONT COLOR=#3333CC><B>import</B></FONT> time
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Stopwatch"><FONT COLOR=#CC0000><B> Stopwatch</B></FONT></A>:
+    <FONT COLOR=#115511>"""
+    Stopwatch(self, name='Stopwatch')
+    """</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, name=<FONT COLOR=#115511>"Stopwatch"</FONT>):
+        self.name = name
+        self.stopped = 1
+        self.init()
+        
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="init"><FONT COLOR=#CC0000><B> init</B></FONT></A>(self):
+        self.starttime = 0.0
+        self.stoptime = 0.0
+        self.elapsedtime = 0.0
+        self.hours, self.mins, self.secs, self.hundredths = 0.0,0.0,0.0,0.0
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__add__"><FONT COLOR=#CC0000><B> __add__</B></FONT></A>(self, time):
+        <FONT COLOR=#3333CC><B>if</B></FONT> type(time) == type(self):
+            self.elapsedtime += time.elapsedtime
+        <FONT COLOR=#3333CC><B>elif</B></FONT> type(time)==type(self.elapsedtime):
+            self.elapsedtime += time
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            <FONT COLOR=#3333CC><B>raise</B></FONT> TypeError
+        <FONT COLOR=#3333CC><B>return</B></FONT> self
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__radd__"><FONT COLOR=#CC0000><B> __radd__</B></FONT></A>(self, time):
+        <FONT COLOR=#3333CC><B>return</B></FONT> __add__(self, time)
+        
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__cmp__"><FONT COLOR=#CC0000><B> __cmp__</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.__len__()
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__len__"><FONT COLOR=#CC0000><B> __len__</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.elapsedtime
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="start"><FONT COLOR=#CC0000><B> start</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.stopped == 1:
+            self.starttime = time.time()
+            self.stopped = 0
+            
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="reset"><FONT COLOR=#CC0000><B> reset</B></FONT></A>(self):
+        self.init()
+        self.stopped = 1
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="stop"><FONT COLOR=#CC0000><B> stop</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.stopped == 0:
+            self.stoptime = time.time()
+            self.elapsedtime = self.stoptime - self.starttime
+            self.stopped = 1
+            
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="display"><FONT COLOR=#CC0000><B> display</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>if</B></FONT> self.stopped == 1:
+            <FONT COLOR=#3333CC><B>print</B></FONT> self.str()
+        <FONT COLOR=#3333CC><B>else</B></FONT>:
+            self.elapsedtime = self.stoptime - self.starttime + self.elapsedtime
+            <FONT COLOR=#3333CC><B>print</B></FONT> self.str()
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="str"><FONT COLOR=#CC0000><B> str</B></FONT></A>(self):
+        self.hours = int(self.elapsedtime / 3600)
+        self.elapsedtime -= (self.hours * 3600)
+        self.mins = int(self.elapsedtime / 60)
+        self.elapsedtime -= (self.mins * 60)
+        self.secs = int(self.elapsedtime)
+        self.hundredths = int((self.elapsedtime - self.secs)*100)
+        string = self.name + <FONT COLOR=#115511>": "</FONT> + `self.hours` + <FONT COLOR=#115511>":"</FONT> +\
+                 `self.mins`+ <FONT COLOR=#115511>":"</FONT> + `self.secs`+<FONT COLOR=#115511>":"</FONT> + `self.hundredths`
+        <FONT COLOR=#3333CC><B>return</B></FONT> string
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__repr__"><FONT COLOR=#CC0000><B> __repr__</B></FONT></A>(self):
+        self.gettime()
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.str()
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__str__"><FONT COLOR=#CC0000><B> __str__</B></FONT></A>(self):
+        self.gettime()
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.str()
+
+
+
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
+    A = Stopwatch(<FONT COLOR=#115511>"A"</FONT>)
+    B = Stopwatch(<FONT COLOR=#115511>"B"</FONT>)
+    A.start()
+    time.sleep(1.2)
+    B.start()
+    time.sleep(0.8)
+    A.stop()
+    B.stop()
+    A.display()
+    B.display()
+        
+        
+
+    
+</PRE>
+                  <!--footer-->
+                  </BODY>

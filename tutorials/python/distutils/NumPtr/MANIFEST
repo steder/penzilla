@@ -1,0 +1,7 @@
+NumPtr.i
+NumPtr.py
+NumPtr_wrap.c
+getpointer.c
+setup.py
+test.c
+test.py

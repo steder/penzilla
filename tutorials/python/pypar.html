@@ -1,0 +1,60 @@
+<pre><table border="0"><tr><td align="right" valign="top"><td align="right" valign="top"><pre><font face="Lucida,Courier New" color="#000000">  1 
+2 
+3 
+4 
+5 
+6 
+7 
+8 
+9 
+10 
+11 
+12 
+13 
+14 
+15 
+16 
+17 
+18 
+19 
+20 
+21 
+22 
+23 
+24 
+25 
+26 
+27 
+28 
+</font></pre></td><td valign="top"><pre><font face="Lucida,Courier New"><font color="#C00000">import</font> <font color="#000000">pypar</font>                         <font color="#008000"># The Python-MPI interface </font>
+                                   <font color="#000000">numproc</font> <font color="#0000C0">=</font> <font color="#000000">pypar</font><font color="#0000C0">.</font><font color="#000000">size</font><font color="#0000C0">(</font><font color="#0000C0">)</font>               <font color="#008000"># Number of processes as specified by mpirun</font>
+                                   <font color="#000000">myid</font> <font color="#0000C0">=</font>    <font color="#000000">pypar</font><font color="#0000C0">.</font><font color="#000000">rank</font><font color="#0000C0">(</font><font color="#0000C0">)</font>               <font color="#008000"># Id of of this process (myid in [0, numproc-1]) </font>
+
+                                   <font color="#000000">node</font> <font color="#0000C0">=</font>    <font color="#000000">pypar</font><font color="#0000C0">.</font><font color="#000000">get_processor_name</font><font color="#0000C0">(</font><font color="#0000C0">)</font> <font color="#008000"># Host name on which current process is running</font>
+
+                                   <font color="#C00000">print</font> <font color="#004080">"I am proc %d of %d on node %s"</font> <font color="#0000C0">%</font><font color="#0000C0">(</font><font color="#000000">myid</font><font color="#0000C0">,</font> <font color="#000000">numproc</font><font color="#0000C0">,</font> <font color="#000000">node</font><font color="#0000C0">)</font>
+
+                                   <font color="#C00000">if</font> <font color="#000000">myid</font> <font color="#0000C0">==</font> <font color="#0080C0">0</font><font color="#0000C0">:</font>
+                                     <font color="#008000"># Actions for process 0 
+                                     </font>
+                                       <font color="#000000">msg</font> <font color="#0000C0">=</font> <font color="#004080">"P0"</font>
+
+                                         <font color="#000000">pypar</font><font color="#0000C0">.</font><font color="#000000">send</font><font color="#0000C0">(</font><font color="#000000">msg</font><font color="#0000C0">,</font> <font color="#000000">destination</font><font color="#0000C0">=</font><font color="#0080C0">1</font><font color="#0000C0">)</font>                   <font color="#008000"># Send message to proces 1 (right hand neighbour)</font>
+                                           <font color="#000000">msg</font> <font color="#0000C0">=</font> <font color="#000000">pypar</font><font color="#0000C0">.</font><font color="#000000">receive</font><font color="#0000C0">(</font><font color="#000000">source</font><font color="#0000C0">=</font><font color="#000000">numproc</font><font color="#0000C0">-</font><font color="#0080C0">1</font><font color="#0000C0">)</font>            <font color="#008000"># Receive message from last process</font>
+
+                                             <font color="#C00000">print</font> <font color="#004080">'Processor 0 received message "%s" from processor %d'</font> <font color="#0000C0">%</font><font color="#0000C0">(</font><font color="#000000">msg</font><font color="#0000C0">,</font> <font color="#000000">numproc</font><font color="#0000C0">-</font><font color="#0080C0">1</font><font color="#0000C0">)</font>
+
+                                             <font color="#C00000">else</font><font color="#0000C0">:</font>
+                                               <font color="#008000"># Actions for all other processes
+                                               </font>
+                                                 <font color="#000000">source</font> <font color="#0000C0">=</font> <font color="#000000">myid</font><font color="#0000C0">-</font><font color="#0080C0">1</font>
+                                                   <font color="#000000">destination</font> <font color="#0000C0">=</font> <font color="#0000C0">(</font><font color="#000000">myid</font><font color="#0000C0">+</font><font color="#0080C0">1</font><font color="#0000C0">)</font><font color="#0000C0">%</font><font color="#000000">numproc</font>
+
+                                                     <font color="#000000">msg</font> <font color="#0000C0">=</font> <font color="#000000">pypar</font><font color="#0000C0">.</font><font color="#000000">receive</font><font color="#0000C0">(</font><font color="#000000">source</font><font color="#0000C0">)</font>
+                                                       <font color="#000000">msg</font> <font color="#0000C0">=</font> <font color="#000000">msg</font> <font color="#0000C0">+</font> <font color="#004080">'P'</font> <font color="#0000C0">+</font> <font color="#000000">str</font><font color="#0000C0">(</font><font color="#000000">myid</font><font color="#0000C0">)</font>                      <font color="#008000"># Update message     </font>
+
+                                                         <font color="#000000">pypar</font><font color="#0000C0">.</font><font color="#000000">send</font><font color="#0000C0">(</font><font color="#000000">msg</font><font color="#0000C0">,</font> <font color="#000000">destination</font><font color="#0000C0">)</font>
+
+                                                         <font color="#000000">pypar</font><font color="#0000C0">.</font><font color="#000000">finalize</font><font color="#0000C0">(</font><font color="#0000C0">)</font><font color="#000000"></font></font></pre></td></tr></table></pre> 
+
+                                                         </p>

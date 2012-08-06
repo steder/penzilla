@@ -1,0 +1,81 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#!/usr/bin/env python</FONT>
+<FONT COLOR=#1111CC># pygame + PyOpenGL version of Nehe's OpenGL lesson02</FONT>
+<FONT COLOR=#1111CC># Paul Furber 2001 - m@verick.co.za</FONT>
+
+<FONT COLOR=#3333CC><B>from</B></FONT> OpenGL.GL <FONT COLOR=#3333CC><B>import</B></FONT> *
+<FONT COLOR=#3333CC><B>from</B></FONT> OpenGL.GLU <FONT COLOR=#3333CC><B>import</B></FONT> *
+<FONT COLOR=#3333CC><B>import</B></FONT> pygame
+<FONT COLOR=#3333CC><B>from</B></FONT> pygame.locals <FONT COLOR=#3333CC><B>import</B></FONT> *
+
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="resize"><FONT COLOR=#CC0000><B> resize</B></FONT></A>((width, height)):
+    <FONT COLOR=#3333CC><B>if</B></FONT> height==0:
+        height=1
+    glViewport(0, 0, width, height)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    gluPerspective(45, 1.0*width/height, 0.1, 100.0)
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="init"><FONT COLOR=#CC0000><B> init</B></FONT></A>():
+    glShadeModel(GL_SMOOTH)
+    glClearColor(0.0, 0.0, 0.0, 0.0)
+    glClearDepth(1.0)
+    glEnable(GL_DEPTH_TEST)
+    glDepthFunc(GL_LEQUAL)
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="draw"><FONT COLOR=#CC0000><B> draw</B></FONT></A>():
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+    glLoadIdentity()
+
+    glTranslatef(-1.5, 0.0, -6.0)
+
+    glBegin(GL_TRIANGLES)
+    glVertex3f(0.0, 1.0, 0.0)
+    glVertex3f(-1.0, -1.0, 0)
+    glVertex3f(1.0, -1.0, 0)
+    glEnd()
+
+    glTranslatef(3.0, 0.0, 0.0)
+
+    glBegin(GL_QUADS)
+    glVertex3f(-1.0, 1.0, 0)
+    glVertex3f(1.0, 1.0, 0)
+    glVertex3f(1.0, -1.0, 0)
+    glVertex3f(-1.0, -1.0, 0)
+    glEnd()
+
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="main"><FONT COLOR=#CC0000><B> main</B></FONT></A>():
+
+    video_flags = OPENGL|DOUBLEBUF
+    
+    pygame.init()
+    pygame.display.set_mode((640,480), video_flags)
+
+    resize((640,480))
+    init()
+
+    frames = 0
+    ticks = pygame.time.get_ticks()
+    <FONT COLOR=#3333CC><B>while</B></FONT> 1:
+        event = pygame.event.poll()
+        <FONT COLOR=#3333CC><B>if</B></FONT> event.type == QUIT <FONT COLOR=#3333CC><B>or</B></FONT> (event.type == KEYDOWN <FONT COLOR=#3333CC><B>and</B></FONT> event.key == K_ESCAPE):
+            <FONT COLOR=#3333CC><B>break</B></FONT>
+        
+        draw()
+        pygame.display.flip()
+        frames = frames+1
+
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"fps:  %d"</FONT> % ((frames*1000)/(pygame.time.get_ticks()-ticks))
+
+
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__ == <FONT COLOR=#115511>'__main__'</FONT>: main()
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

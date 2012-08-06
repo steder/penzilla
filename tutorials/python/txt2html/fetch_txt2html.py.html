@@ -1,0 +1,16 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#3333CC><B>import</B></FONT> sys
+<FONT COLOR=#3333CC><B>from</B></FONT> urllib <FONT COLOR=#3333CC><B>import</B></FONT> urlopen, urlencode
+<FONT COLOR=#3333CC><B>if</B></FONT> len(sys.argv) == 2:
+  cgi = <FONT COLOR=#115511>'http://gnosis.cx/cgi/txt2html.cgi'</FONT>
+  opts = urlencode({<FONT COLOR=#115511>'proxy'</FONT>: <FONT COLOR=#115511>'NONE'</FONT>,
+                    <FONT COLOR=#115511>'source'</FONT>: sys.argv[1]})
+  <FONT COLOR=#3333CC><B>print</B></FONT> urlopen(cgi, opts).read()
+<FONT COLOR=#3333CC><B>else</B></FONT>:
+  <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Please specify URL for Txt2Html conversion"</FONT>
+
+</PRE>
+                  <!--footer-->
+                  </BODY>

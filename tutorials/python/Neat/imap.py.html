@@ -1,0 +1,408 @@
+<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
+                  <BODY BGCOLOR=#FFFFFF>
+                  <!--header-->
+                  <!--script--><PRE><FONT COLOR=#1111CC>#!/usr/bin/env python</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC># imap.py:      utilities for reading mail via imap</FONT>
+<FONT COLOR=#1111CC>#               (using std library imaplib.py)</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># See __doc__ string below.</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># Requires:</FONT>
+<FONT COLOR=#1111CC>#   - Python 1.5.2 or &gt;, with imaplib (standard module)</FONT>
+<FONT COLOR=#1111CC>#   - module message.</FONT>
+<FONT COLOR=#1111CC>#   - OS: portable</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># TODO</FONT>
+<FONT COLOR=#1111CC>#   - could be more object oriented, with classes MailBox, Folder. Message</FONT>
+<FONT COLOR=#1111CC>#     and Part (borrowed from message.py) should be specialized here since </FONT>
+<FONT COLOR=#1111CC>#     some info like FLAGS could become attributes in those messages.</FONT>
+<FONT COLOR=#1111CC>#</FONT>
+<FONT COLOR=#1111CC># $Id: //depot/rgutils/rgutils/imap.py#2 $</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#115511>'''
+Utilities for reading IMAP mail.
+
+B{Classes}:
+  - L{MailBoxSession}  -- a connection with a IMAP mailbox.
+'''</FONT>
+__version__ = <FONT COLOR=#115511>'1.2.'</FONT> + <FONT COLOR=#115511>'$Revision: #2 $'</FONT>[12:-2]
+__author__ = <FONT COLOR=#115511>'Richard Gruet'</FONT>, <FONT COLOR=#115511>'rjgruet@yahoo.com'</FONT>
+__date__    = <FONT COLOR=#115511>'$Date: 2003/05/25 $'</FONT>[7:-2], <FONT COLOR=#115511>'$Author: rgruet $'</FONT>[9:-2]
+__since__ = <FONT COLOR=#115511>'2000/01/18'</FONT>
+__doc__ += <FONT COLOR=#115511>'\n@author: %s (U{%s})\n@version: %s'</FONT> % (__author__[0],
+                                            __author__[1], __version__)
+
+
+<FONT COLOR=#3333CC><B>import</B></FONT> string, re
+<FONT COLOR=#3333CC><B>import</B></FONT> imaplib
+
+<FONT COLOR=#3333CC><B>from</B></FONT> message <FONT COLOR=#3333CC><B>import</B></FONT> trace, Message, Part
+
+true, false = -1, 0
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="MailBoxSession"><FONT COLOR=#CC0000><B> MailBoxSession</B></FONT></A>:
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+    <FONT COLOR=#115511>''' A connection with an IMAP mailbox.
+
+        B{** Access is very limited compared to the full IMAP spec!! **}
+        
+        Typical usage for a mail scan::
+
+            mb = MailBoxSession(host, user, passwd, folder)
+            mb.scan()   # read messages -&gt; mb.msgCnt
+            for msgNo in range(1, mb.msgCnt+1):
+                msg = mb.getMsg(msgNo, removeIt=true)
+                ## process message as desired (see class: Message)...
+            mb.quit()   # commit changes
+    '''</FONT>
+    MAX_CONNECTION_ATTEMPTS = 3
+
+    <FONT COLOR=#1111CC>#   Defaults:</FONT>
+    <FONT COLOR=#1111CC>#   --------</FONT>
+    MAIL_SERVER = <FONT COLOR=#115511>'melina.ina.fr'</FONT>
+    USER =  <FONT COLOR=#115511>'rgruet'</FONT>
+    PASSWD = <FONT COLOR=#115511>''</FONT>
+    FOLDER = <FONT COLOR=#115511>'INBOX'</FONT>        <FONT COLOR=#1111CC># initial folder</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self, mailServer=MAIL_SERVER, user=USER, passwd=PASSWD,
+                       folder = FOLDER):
+        self.server = mailServer
+        self.user = user
+        self.passwd = passwd
+        self.folder = folder        <FONT COLOR=#1111CC># name of current mail box (IMAP)</FONT>
+        trace(<FONT COLOR=#115511>'(connecting to %s)...'</FONT> % mailServer, 20)
+        
+        <FONT COLOR=#1111CC># (Socket) connection may fail sometimes, so we try several times:</FONT>
+        <FONT COLOR=#3333CC><B>import</B></FONT> socket
+        attempts = 0
+        <FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> range(MailBoxSession.MAX_CONNECTION_ATTEMPTS):
+            <FONT COLOR=#3333CC><B>try</B></FONT>:
+                self.imap = imaplib.IMAP4(self.server)
+            <FONT COLOR=#3333CC><B>except</B></FONT> socket.error, e:
+                trace(<FONT COLOR=#115511>'Socket error during IMAP connection: %s'</FONT> % e)
+                attempts = attempts + 1
+                <FONT COLOR=#3333CC><B>if</B></FONT> attempts &lt; MailBoxSession.MAX_CONNECTION_ATTEMPTS:
+                    trace(<FONT COLOR=#115511>'-&gt; Retry connection...'</FONT>)
+                <FONT COLOR=#3333CC><B>else</B></FONT>:
+                    trace(<FONT COLOR=#115511>'-&gt; Connection failed after %d attempts'</FONT> % 
+                            MailBoxSession.MAX_CONNECTION_ATTEMPTS)
+                    <FONT COLOR=#3333CC><B>raise</B></FONT> Exception(<FONT COLOR=#115511>"Can't create MailBoxSession: "</FONT>
+                                    <FONT COLOR=#115511>"socket connection failed."</FONT>)
+            <FONT COLOR=#3333CC><B>else</B></FONT>:
+                <FONT COLOR=#3333CC><B>break</B></FONT>
+        trace(<FONT COLOR=#115511>'connected.'</FONT>, 20)
+
+        <FONT COLOR=#1111CC># Log in & open mail box:</FONT>
+        self._exec(<FONT COLOR=#115511>'login'</FONT>, (user, passwd))
+        self.selectFolder(folder)
+        self.msgCnt = 0     <FONT COLOR=#1111CC># pending mails count</FONT>
+        self.msgSize = 0    <FONT COLOR=#1111CC># pending mails total size</FONT>
+        self.pendingMails = [] <FONT COLOR=#1111CC># list of pending mails numbers.</FONT>
+        
+        self.scan(refresh=false)    <FONT COLOR=#1111CC># initial scan (refresh already done)</FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__del__"><FONT COLOR=#CC0000><B> __del__</B></FONT></A>(self):
+        <FONT COLOR=#3333CC><B>try</B></FONT>:
+            self.quit()     <FONT COLOR=#1111CC># Commit changes, close mail box & connection</FONT>
+        <FONT COLOR=#3333CC><B>except</B></FONT>:
+            <FONT COLOR=#3333CC><B>pass</B></FONT>
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__repr__"><FONT COLOR=#CC0000><B> __repr__</B></FONT></A>(self):
+        self.scan() <FONT COLOR=#1111CC># ??</FONT>
+        <FONT COLOR=#3333CC><B>return</B></FONT> <FONT COLOR=#115511>'&lt;IMAP folder "%s", user %s on %s, %d mail(s), state=%s&gt;'</FONT> % (
+                self.folder, self.user, self.server, self.msgCnt, self.state())
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="scan"><FONT COLOR=#CC0000><B> scan</B></FONT></A>(self, filter=<FONT COLOR=#115511>'(UNSEEN UNDELETED)'</FONT>, refresh=true):
+        <FONT COLOR=#115511>''' Scans mail box for messages.
+        
+            Updates current pending mail list.
+            
+            @param filter: Selection criteria (see IMAP spec). Default is
+                          to select messages not read and not marked as
+                          deleted.
+            @param refresh: Ensure folder is up to date.
+            @return: (message count, message size) 
+                     [also stored in self.msgCnt, self.msgSize]
+        '''</FONT>
+        self.pendingMails = self.searchMails(filter, refresh)
+        totalSize = 0
+        <FONT COLOR=#3333CC><B>for</B></FONT> msgNo <FONT COLOR=#3333CC><B>in</B></FONT> self.pendingMails:
+            totalSize = totalSize + self.getMsgSize(msgNo)
+        self.msgCnt = len(self.pendingMails)
+        self.msgSize = totalSize
+        <FONT COLOR=#3333CC><B>return</B></FONT> (self.msgCnt, self.msgSize)
+
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getMsg"><FONT COLOR=#CC0000><B> getMsg</B></FONT></A>(self, msgNo, removeIt=false, seen=true):
+        <FONT COLOR=#115511>''' Reads and returns the C{msgNo}th pending mail in current folder.
+
+            This implicitely marks the mail as 'SEEN', so it won't appear
+            in next scans. Re-scan is NOT done explicitely, you have to
+            call it.
+            
+            NB: unlike POP3, messages nos can't be guessed from the
+            pending message range [1-msgCnt[
+            
+            "Remove" mail from server if &lt;removeIt&gt; true [see L{removeMsg()}]
+            Mark mail as read if &lt;seen&gt; true (a Seen mail doesn't
+            appear in pendingMails list).
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> msgNo <FONT COLOR=#3333CC><B>not</B></FONT> <FONT COLOR=#3333CC><B>in</B></FONT> self.pendingMails:
+            <FONT COLOR=#3333CC><B>raise</B></FONT> ValueError(<FONT COLOR=#115511>'No pending mail #%d'</FONT> % msgNo)
+
+        data = self._exec(<FONT COLOR=#115511>'fetch'</FONT>, (msgNo, <FONT COLOR=#115511>'(RFC822)'</FONT>))
+        msgSize = int(imaplib.Literal.findall(data[0][0])[0][1])
+        msgLines = string.replace(data[0][1], <FONT COLOR=#115511>'\r\n'</FONT>, <FONT COLOR=#115511>'\n'</FONT>) <FONT COLOR=#1111CC># remove CR</FONT>
+        msg = Message(msgSize, msgLines)
+        
+        <FONT COLOR=#3333CC><B>if</B></FONT> <FONT COLOR=#3333CC><B>not</B></FONT> seen:
+            self.markNotSeen(msgNo)
+
+        <FONT COLOR=#3333CC><B>if</B></FONT> removeIt:
+            self.removeMsg(msgNo)
+        
+        <FONT COLOR=#3333CC><B>return</B></FONT> msg
+
+    getMail = getMsg <FONT COLOR=#1111CC># an alias</FONT>
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="removeMsg"><FONT COLOR=#CC0000><B> removeMsg</B></FONT></A>(self, msgNo):
+        <FONT COLOR=#115511>''' Removes the given message from current folder.
+
+            NB: This only sets the flag \Deleted. the msg appears (to scan)
+            as deleted, but deletion is effective only on close [quit()]
+            and can be canceled by calling undelete().
+        '''</FONT>
+        self._exec(<FONT COLOR=#115511>'store'</FONT>, (msgNo, <FONT COLOR=#115511>'+FLAGS.SILENT'</FONT>, r<FONT COLOR=#115511>'(\Deleted)'</FONT>))
+        self.scan()
+
+    removeMail = removeMsg <FONT COLOR=#1111CC># alias</FONT>
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="quit"><FONT COLOR=#CC0000><B> quit</B></FONT></A>(self):
+        <FONT COLOR=#115511>'''Commits changes, unlock/close mail box & connection.
+
+           *Must* be called to commit changes! After this call, the object
+           is no more functional!
+        '''</FONT>
+        self._exec(<FONT COLOR=#115511>'close'</FONT>)     <FONT COLOR=#1111CC># close mail box, commit changes.</FONT>
+        self._exec(<FONT COLOR=#115511>'logout'</FONT>)    <FONT COLOR=#1111CC># shutdown connection to the server</FONT>
+        trace(<FONT COLOR=#115511>'(session closed with %s, changes committed)...'</FONT> % self.server)
+
+    <FONT COLOR=#1111CC># IMAP specific:</FONT>
+    <FONT COLOR=#1111CC># -------------</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getMsgSize"><FONT COLOR=#CC0000><B> getMsgSize</B></FONT></A>(self,  msgNo):
+        <FONT COLOR=#115511>''' Returns size of message in RFC822 format.
+            [IMAP specific]
+        '''</FONT>
+        data = self._exec(<FONT COLOR=#115511>'fetch'</FONT>, (msgNo, <FONT COLOR=#115511>'(RFC822.SIZE)'</FONT>))
+        size = re.findall(<FONT COLOR=#115511>'\(RFC822.SIZE (\d+)\)'</FONT>, data[0])[0]
+        <FONT COLOR=#3333CC><B>return</B></FONT> int(size)
+
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="getFlags"><FONT COLOR=#CC0000><B> getFlags</B></FONT></A>(self, msgNo):
+        <FONT COLOR=#115511>''' Returns flags (tags) for a mail as a sequence of strings
+            ('\Deleted', '\Seen', '\Recent', '\Flagged', '\Answered'...).
+            [IMAP specific]
+        '''</FONT>
+        data = self._exec(<FONT COLOR=#115511>'fetch'</FONT>, (msgNo, <FONT COLOR=#115511>'(FLAGS)'</FONT>))
+        flags = re.findall(r<FONT COLOR=#115511>'\(FLAGS \((.*?)\)'</FONT>, data[0])[0]
+        <FONT COLOR=#3333CC><B>return</B></FONT> string.split(flags)
+                
+        
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="setFlags"><FONT COLOR=#CC0000><B> setFlags</B></FONT></A>(self, msgNo, flags, rescan=false):
+        <FONT COLOR=#115511>''' Sets the flags for a mail [IMAP specific].
+            
+            Each flag ('\Deleted', '\Seen', '\Answered', etc..) will
+            be set if prefixed by a '+', cleared if prefixed by a '-'.
+            @param flags: A string of flag specs separated with ' '.
+                         e.g. '+\Flagged -\Seen'
+            @param rescan: If TRUE and flags have changed, perform a scan()
+            @return: the current set of flags for the mail.
+        '''</FONT>
+        curFlags = self.getFlags(msgNo)
+
+        flagsToSet = []
+        <FONT COLOR=#3333CC><B>for</B></FONT> f <FONT COLOR=#3333CC><B>in</B></FONT> re.findall(r<FONT COLOR=#115511>'\+(\\\w+)'</FONT>, flags):
+            <FONT COLOR=#3333CC><B>if</B></FONT> f <FONT COLOR=#3333CC><B>not</B></FONT> <FONT COLOR=#3333CC><B>in</B></FONT> curFlags:
+                flagsToSet.append(f)
+        <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>'flagsToSet='</FONT>, flagsToSet <FONT COLOR=#1111CC>##</FONT>
+        self._exec(<FONT COLOR=#115511>'store'</FONT>, (msgNo, <FONT COLOR=#115511>'+FLAGS.SILENT'</FONT>, <FONT COLOR=#115511>'(%s)'</FONT> %
+                                                string.join(flagsToSet)))
+        
+        flagsToClear = []
+        <FONT COLOR=#3333CC><B>for</B></FONT> f <FONT COLOR=#3333CC><B>in</B></FONT> re.findall(r<FONT COLOR=#115511>'-(\\\w+)'</FONT>, flags):
+            <FONT COLOR=#3333CC><B>if</B></FONT> f <FONT COLOR=#3333CC><B>in</B></FONT> curFlags:
+                flagsToClear.append(f)
+        <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>'flagsToClear='</FONT>, flagsToClear <FONT COLOR=#1111CC>##</FONT>
+        self._exec(<FONT COLOR=#115511>'store'</FONT>, (msgNo, <FONT COLOR=#115511>'-FLAGS.SILENT'</FONT>, <FONT COLOR=#115511>'(%s)'</FONT> %
+                                                string.join(flagsToClear)))
+        
+        <FONT COLOR=#3333CC><B>if</B></FONT> (flagsToSet <FONT COLOR=#3333CC><B>or</B></FONT> flagsToClear) <FONT COLOR=#3333CC><B>and</B></FONT> rescan:
+            self.scan()
+            
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.getFlags(msgNo)
+    
+    <FONT COLOR=#1111CC># Some shortcuts for setFlags():</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="markSeen"><FONT COLOR=#CC0000><B> markSeen</B></FONT></A>(self, msgNo, rescan=false):
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.setFlags(msgNo, r<FONT COLOR=#115511>'+\Seen'</FONT>, rescan)
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="markNotSeen"><FONT COLOR=#CC0000><B> markNotSeen</B></FONT></A>(self, msgNo, rescan=false):
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.setFlags(msgNo, r<FONT COLOR=#115511>'-\Seen'</FONT>, rescan)
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="markDeleted"><FONT COLOR=#CC0000><B> markDeleted</B></FONT></A>(self, msgNo, rescan=false):
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.setFlags(msgNo, r<FONT COLOR=#115511>'+\Deleted'</FONT>, rescan)
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="markNotDeleted"><FONT COLOR=#CC0000><B> markNotDeleted</B></FONT></A>(self, msgNo, rescan=false):
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.setFlags(msgNo, r<FONT COLOR=#115511>'-\Deleted'</FONT>, rescan)
+    undelete = markNotDeleted <FONT COLOR=#1111CC># an alias</FONT>
+    
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="listFolders"><FONT COLOR=#CC0000><B> listFolders</B></FONT></A>(self, pattern=<FONT COLOR=#115511>'*'</FONT>, parentFolder = <FONT COLOR=#115511>'/'</FONT>):
+        <FONT COLOR=#115511>''' Returns the folder names matching the given pattern.
+
+            Pattern may be a path of folders (A, A/B/C) containing
+            wildcards * and %. '*' used at right end indicates to
+            include all subfolders.
+            [IMAP specific; folders are called 'mailboxes' in IMAP]
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> pattern[0] == <FONT COLOR=#115511>'/'</FONT>:       <FONT COLOR=#1111CC># strip initial '/'</FONT>
+            pattern = pattern[1:]
+        names = []
+        <FONT COLOR=#3333CC><B>for</B></FONT> e <FONT COLOR=#3333CC><B>in</B></FONT> self._exec(<FONT COLOR=#115511>'list'</FONT>, (parentFolder, pattern)):
+            <FONT COLOR=#3333CC><B>if</B></FONT> e <FONT COLOR=#3333CC><B>is</B></FONT> None:
+                <FONT COLOR=#3333CC><B>break</B></FONT>
+            names.append(re.findall(r<FONT COLOR=#115511>'" "?(.*?)"?$'</FONT>, e)[0])
+        <FONT COLOR=#3333CC><B>return</B></FONT> names
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="selectFolder"><FONT COLOR=#CC0000><B> selectFolder</B></FONT></A>(self, folderName=<FONT COLOR=#115511>'INBOX'</FONT>, filter = <FONT COLOR=#115511>'(UNSEEN UNDELETED)'</FONT>,
+                     commit=true):
+        <FONT COLOR=#115511>''' Sets the given folder as current (selected).
+            
+            C{folderName} is case sensitive, except for 'INBOX'!!
+            Changes in previous folder are committed if
+            C{commit} true.
+            @return: number of pending mails in new folder.
+            [IMAP specific; folders are called 'mailboxes' in IMAP]
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> folderName[0] == <FONT COLOR=#115511>'/'</FONT>:        <FONT COLOR=#1111CC># strip initial '/'</FONT>
+            folderName = folderName[1:]
+        <FONT COLOR=#3333CC><B>if</B></FONT> commit <FONT COLOR=#3333CC><B>and</B></FONT> (self.state() == <FONT COLOR=#115511>'SELECTED'</FONT>):
+            self._exec(<FONT COLOR=#115511>'close'</FONT>)     <FONT COLOR=#1111CC># close current mail box</FONT>
+        self._exec(<FONT COLOR=#115511>'select'</FONT>, (folderName,))
+        self.folder = folderName
+        self.scan(filter=filter, refresh=false)     <FONT COLOR=#1111CC># (refresh just done)</FONT>
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.msgCnt
+    
+    select = selectFolder   <FONT COLOR=#1111CC># an alias</FONT>
+        
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="searchMails"><FONT COLOR=#CC0000><B> searchMails</B></FONT></A>(self, filter=<FONT COLOR=#115511>'(UNSEEN UNDELETED)'</FONT>, refresh=true):
+        <FONT COLOR=#115511>''' Searches mails in current folder.
+            @param filter: Selection criteria (see IMAP spec). Default is
+                          to select messages not read and not marked as deleted.
+            @param refresh: Ensure current folder's view is up to date.
+            @return: The list of msg numbers (as integers)
+            [IMAP specific]
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>if</B></FONT> refresh:
+            self._exec(<FONT COLOR=#115511>'select'</FONT>, (self.folder,))
+        data = self._exec(<FONT COLOR=#115511>'search'</FONT>, (None, filter)) <FONT COLOR=#1111CC># -&gt; seq of mail #</FONT>
+        <FONT COLOR=#3333CC><B>return</B></FONT> map(<FONT COLOR=#3333CC><B>lambda</B></FONT> x: int(x), string.split(data[0]))
+    
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="state"><FONT COLOR=#CC0000><B> state</B></FONT></A>(self):
+        <FONT COLOR=#115511>''' Returns the current IMAP state as a string [IMAP specific]
+            (e.g. 'SELECTED').
+            
+        '''</FONT>
+        <FONT COLOR=#3333CC><B>return</B></FONT> self.imap.state
+        
+    <FONT COLOR=#1111CC># Private:</FONT>
+    <FONT COLOR=#3333CC><B>def</B></FONT><A NAME="_exec"><FONT COLOR=#CC0000><B> _exec</B></FONT></A>(self, cmd, args=()):
+        <FONT COLOR=#115511>''' Executes an IMAP command.
+            Raise an exception if NOK.
+            Return: data if OK.
+        '''</FONT>
+        cmd = <FONT COLOR=#115511>'self.imap.%s%s'</FONT> % (cmd, repr(args))
+        typ, data = eval(cmd) 
+        <FONT COLOR=#3333CC><B>if</B></FONT> typ <FONT COLOR=#3333CC><B>not</B></FONT> <FONT COLOR=#3333CC><B>in</B></FONT> (<FONT COLOR=#115511>'OK'</FONT>, <FONT COLOR=#115511>'BYE'</FONT>):
+            <FONT COLOR=#3333CC><B>raise</B></FONT> Exception(<FONT COLOR=#115511>'IMAP command "%s" failed: %s, %s'</FONT> %
+                                                    (cmd, typ, data))
+        <FONT COLOR=#3333CC><B>return</B></FONT> data
+
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC>#                           U T I L I T I E S</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC>#                               T E S T S</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="testMailBox"><FONT COLOR=#CC0000><B> testMailBox</B></FONT></A>(smtpServer):
+    
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Testing imap...'</FONT>
+    mb = MailBoxSession()
+    <FONT COLOR=#3333CC><B>print</B></FONT> mb
+    
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Folders defined for %s:\n'</FONT> % MailBoxSession.USER
+    <FONT COLOR=#3333CC><B>for</B></FONT> name <FONT COLOR=#3333CC><B>in</B></FONT> mb.listFolders():
+        <FONT COLOR=#3333CC><B>print</B></FONT> (<FONT COLOR=#115511>'* Folder "%s":'</FONT> % name),
+        mb.selectFolder(name)
+        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'%d mail(s) pending, total size: %d'</FONT> % (mb.msgCnt, mb.msgSize)
+    <FONT COLOR=#3333CC><B>print</B></FONT>
+    
+    <FONT COLOR=#1111CC># Send one test message to inbox folder </FONT>
+    
+    msgCnt0 = mb.selectFolder(<FONT COLOR=#115511>'INBOX'</FONT>)
+    <FONT COLOR=#3333CC><B>import</B></FONT> smtplib
+    smtp = smtplib.SMTP(smtpServer)
+    From = To = <FONT COLOR=#115511>'yourName@yourServer.fr'</FONT>
+    subject = <FONT COLOR=#115511>'Test IMAP Python'</FONT>
+    msgTxt = (<FONT COLOR=#115511>'From: %s\nTo: %s\nSubject: %s\n\nPython is good for you!\n'</FONT>
+               % (From, To, subject))
+    r = smtp.sendmail(From, To, msgTxt)
+    <FONT COLOR=#3333CC><B>if</B></FONT> r:
+        trace(<FONT COLOR=#115511>"Can't send mail '%s' to %s: %s"</FONT> % (subject, To, r))
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Test mail "%s" sent to %s.'</FONT> % (subject, To)
+    
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'waiting for mail reception...'</FONT>,
+    <FONT COLOR=#3333CC><B>import</B></FONT> time
+    n = 0
+    <FONT COLOR=#3333CC><B>while</B></FONT> n &lt; 15:
+        msgCnt, msgSz = mb.scan()
+        <FONT COLOR=#3333CC><B>if</B></FONT> msgCnt &gt; msgCnt0:
+            <FONT COLOR=#3333CC><B>break</B></FONT>
+        time.sleep(1)
+        n = n + 1
+    <FONT COLOR=#3333CC><B>else</B></FONT>:
+        <FONT COLOR=#3333CC><B>raise</B></FONT> Exception(<FONT COLOR=#115511>'Test mail not received (time out)'</FONT>)
+    msgNo = mb.pendingMails[-1]
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'OK (msg #%d)'</FONT> % msgNo
+    
+    <FONT COLOR=#1111CC># Read message:</FONT>
+    msg = mb.getMsg(msgNo, seen=false)
+    msg = mb.getMsg(msgNo)
+    <FONT COLOR=#3333CC><B>print</B></FONT> msg
+    <FONT COLOR=#3333CC><B>if</B></FONT> msg.From[1] != From <FONT COLOR=#3333CC><B>or</B></FONT> msg.To[1] != To <FONT COLOR=#3333CC><B>or</B></FONT> msg.Subject != subject:
+        <FONT COLOR=#3333CC><B>raise</B></FONT> Exception(<FONT COLOR=#115511>'Mail received is corrupted (from, to or subject)'</FONT>)
+    <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>'From=%s'</FONT> % str(msg.From)
+    <FONT COLOR=#1111CC>#print </FONT><FONT COLOR=#115511>'To=%s'</FONT> % str(msg.To)
+
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'Removing test message...'</FONT>,
+    mb.removeMsg(msgNo)
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'OK.'</FONT>
+    
+    <FONT COLOR=#1111CC># Commit changes & quit:</FONT>
+    mb.quit()
+    <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>'=&gt; Tests passed.'</FONT>
+    <FONT COLOR=#3333CC><B>return</B></FONT> mb
+
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#1111CC>#                               M A I N</FONT>
+<FONT COLOR=#1111CC>#-----------------------------------------------------------------------------</FONT>
+<FONT COLOR=#3333CC><B>if</B></FONT> __name__ == <FONT COLOR=#115511>"__main__"</FONT>:
+    
+    smtpServer = MailBoxSession.MAIL_SERVER
+    mb = testMailBox(smtpServer)
+</PRE>
+                  <!--footer-->
+                  </BODY>

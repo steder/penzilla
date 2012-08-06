@@ -1,0 +1,47 @@
+<html>
+<title>Introduction to Python:  Control Structures</title>
+<body>
+<h2>An Introduction to Python:  Control Structures</h2>
+<h3>Control Structures</h3>
+<a href="../index.html">Table of Contents</a>
+<hr>
+<h4><font color="green">...If, While, For, Try...</font></h4>
+<!--^Header^-->
+<P>This is just going to be some boring examples of control structures.  I don't have a lot to say about this stuff, but it would be a bad form not to at least mention them.  So here we go.
+
+<h4><font color="green">If</font></h4>
+<ul><!--#include virtual="if.py.html"--></ul>
+<P>Notice the new keywords <font color="green">if, elif, else, and, or, and not.</font>  That's pretty much all there is to it.  
+
+<h4><font color="green">While</font></h4>
+<P>...zzzzzzzz...
+<p>Oh, yes, "While" loops!  
+<p>Here's another example:
+<ul><!--#include virtual="while.py.html"--></ul>
+
+<h4><font color="green">For</font></h4>
+<P>For loops are actually very interesting because they don't behave just like C for loops, although they can.  For loops in Python iterate over <b>Lists</b> instead of just incrementing integers.  They are probably my favorite constructs in Python, because the syntax is very intuitive and just downright <u>pleasant</u>.  
+<ul><!--#include virtual="for.py.html"--></ul>
+<p> Aren't they just lovely?
+
+<h4><font color="green">Control Statements</font></h4>
+<ul>Basically, just like C/C++, Python has:
+  <li>pass</li>
+  <li>continue</li>
+  <li>break</li>
+</ul>
+<P>They work in pretty much the exact same way.  Here's some quick examples:
+<ul><!--#include virtual="statements.py.html"--></ul>
+
+<h4><font color="green">What about... ?</font></h4>
+<p>Case structures?
+<ul><!--#include virtual="case.py.html"--></ul>
+
+<h4><font color="green">Try</font></h4>
+<P>These are really quite a bit more complicated, try and except are going to be handled later under the topic of "Exceptions", so check it out there if you're interested.
+
+<!--\/Footer\/-->
+<hr>
+<a href="../index.html">Table of Contents</a>
+</body>
+</html>

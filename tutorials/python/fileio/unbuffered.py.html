@@ -1,6 +1,4 @@
-<div class="syntax"><pre><span class="c"># Hackish way of avoiding having to call file.close()</span>
-
-<span class="sd">&quot;&quot;&quot;</span>
+<div class="syntax"><pre><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd"> 0 means buffer size of 0</span>
 <span class="sd"> or unbuffered:</span>
 
@@ -13,9 +11,9 @@
 <span class="sd"> Defaults to -1, which indicates the platform</span>
 <span class="sd"> default</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="n">FILE</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> 
+<span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> 
 
-<span class="n">FILE</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">namelist</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">namelist</span><span class="p">)</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Now when your program exits without</span>

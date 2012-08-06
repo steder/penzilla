@@ -12,15 +12,14 @@ interesting, except when you actually want to make sure that your code works whe
 Anytime you've had a program crash while you were using it you've probably wished there was a way
 to prevent that crash from happening.
 
-<P>That's exactly what extensions do!  
+<P>That's exactly what exceptions do!  
 
 <P>Don't get your hopes up too much just yet.  Exception handling code cannot prevent all crashes 
 for a number of reaons.  For instance, not all problems can be predicted and checked for, and sometimes
 the user does something that you couldn't prepare for, such as kill your program while it is running.
 Sometimes the best you can do with exception handling is just exit <i>gracefully</i>.  And that's what they
-are really there for.  Exceptions aren't the magic bullet that makes all design problems with your program 
-disappear, or prevent your program from ever crashing, but they enable your code to exit cleanly if errors
-occur, and help your code become a nice digital denizen.
+are really there for.  Exceptions enable your code to exit cleanly if errors
+occur and help your program become a good digital denizen.
 
 <h4><font color="green">Enough!  Show us some code!</font></h4>
 
@@ -39,7 +38,7 @@ crash when it attempts to allocate a Numeric array of negative size.  There are 
 important problems like what happens if the Numeric library isn't available or isn't working on 
 your users system?
 
-<P>This next version uses exception handling to fix some of these problems.  Notice that we havne't gotten
+<P>This next version uses exception handling to fix some of these problems.  Notice that we haven't gotten
 into raising our own exceptions yet.  That's something we'll do a little later.
 
 <ul><!--#include virtual="safesieve.py.html"--></ul>

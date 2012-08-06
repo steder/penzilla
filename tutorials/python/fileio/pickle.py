@@ -7,13 +7,7 @@ class Student:
         self.year = year
         self.gpa = gpa
 
-    def __repr__(self):
-        """
-        Return official string representation of object
-
-        Called by repr() builtin function and
-        by print if __str__ is not defined.
-        """
+    def __str__(self):
         string = ["++++++++++++++++++++++", 
                  "+" + name,
                  "+" + school,
@@ -24,15 +18,6 @@ class Student:
                  
         return "\n".join(string)
 
-    def __str__(self):
-        """
-        Return unofficial string representation of an object.
-
-        Called by print
-        """
-        return self.__repr__()
-
-    
 # Now I'll create a student:
 Mike = Student("Mike", "UIUC", "CS", "Senior", 0.6)
 

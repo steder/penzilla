@@ -1,24 +1,22 @@
-# Let's create a file and write it to disk.
-filename = "test.dat"
-# Let's create some data:
-done = 0
-namelist = []
-while not done:
-    name = raw_input("Enter a name:")
-    if type(name) == type(""):
-        namelist.append(name)
+"""
+Let's create a file and write it to disk.
+"""
+
+# Let's create a file containing a list of names:
+names = []
+
+# prompt for names, stop on the first blank line:
+while True:
+    line = raw_input("Enter a name: ")
+    if line:
+        names.append(line)
     else:
         break
     
-# Create a file object:
-# in "write" mode
-FILE = open(filename,"w")
-
-# Write all the lines at once:
-FILE.writelines(namelist)
-    
-# Alternatively write them one by one:
-for name in namelist:
-    FILE.write(name)
-    
-FILE.close()
+# write the names to your file:
+filename = "test.dat"
+print "Writing names to %s..."%(filename,)
+f = open(filename,"w")
+for name in names:
+    f.write("%s\n"%(name,))
+f.close()

@@ -1,95 +1,93 @@
-<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
-                  <BODY BGCOLOR=#FFFFFF>
-                  <!--header-->
-                  <!--script--><PRE><FONT COLOR=#1111CC>#############</FONT>
-<FONT COLOR=#1111CC># Arithmetic</FONT>
-<FONT COLOR=#1111CC>#############</FONT>
-4 + 4 == 8 
-3 - 5 == -2
-16 / 2 == 8
-16 * 4 == 64
-3 % 2 == 1 <FONT COLOR=#1111CC># Modulus</FONT>
+<div class="syntax"><pre><span class="c">#############</span>
+<span class="c"># Arithmetic</span>
+<span class="c">#############</span>
+<span class="mf">4</span> <span class="o">+</span> <span class="mf">4</span> <span class="o">==</span> <span class="mf">8</span> 
+<span class="mf">3</span> <span class="o">-</span> <span class="mf">5</span> <span class="o">==</span> <span class="o">-</span><span class="mf">2</span>
+<span class="mf">16</span> <span class="o">/</span> <span class="mf">2</span> <span class="o">==</span> <span class="mf">8</span>
+<span class="mf">16</span> <span class="o">*</span> <span class="mf">4</span> <span class="o">==</span> <span class="mf">64</span>
+<span class="mf">3</span> <span class="o">%</span> <span class="mf">2</span> <span class="o">==</span> <span class="mf">1</span> <span class="c"># Modulus</span>
 
-<FONT COLOR=#1111CC># Long Int Conversion - Useful for function type mismatches - Not needed here.</FONT>
-100000000000000000000L + long(100) == 100000000000000000100L
+<span class="c"># Long Int Conversion - Useful for function type mismatches - Not needed here.</span>
+<span class="mf">100000000000000000000</span><span class="n">L</span> <span class="o">+</span> <span class="nb">long</span><span class="p">(</span><span class="mf">100</span><span class="p">)</span> <span class="o">==</span> <span class="mf">100000000000000000100</span><span class="n">L</span>
 
-<FONT COLOR=#1111CC>##########</FONT>
-<FONT COLOR=#1111CC># Strings</FONT>
-<FONT COLOR=#1111CC>##########</FONT>
-a = <FONT COLOR=#115511>"Hello"</FONT>
-b = <FONT COLOR=#115511>"World!"</FONT>
+<span class="c">##########</span>
+<span class="c"># Strings</span>
+<span class="c">##########</span>
+<span class="n">a</span> <span class="o">=</span> <span class="s">&quot;Hello&quot;</span>
+<span class="n">b</span> <span class="o">=</span> <span class="s">&quot;World!&quot;</span>
 
-<FONT COLOR=#1111CC># Concatenation</FONT>
-a + <FONT COLOR=#115511>" "</FONT> + b == <FONT COLOR=#115511>"Hello World!"</FONT>
-<FONT COLOR=#1111CC># Repetition and Concatenation</FONT>
-a * 3 + <FONT COLOR=#115511>" "</FONT> + b == <FONT COLOR=#115511>"HelloHelloHello World!"</FONT>
-(a + <FONT COLOR=#115511>" "</FONT>) * 3 + b == <FONT COLOR=#115511>"Hello Hello Hello World!"</FONT>
-<FONT COLOR=#1111CC># Indexing</FONT>
-b[2] == <FONT COLOR=#115511>"r"</FONT>
-<FONT COLOR=#1111CC># Conversion of data to string - Sesame Street:</FONT>
-c = 7 <FONT COLOR=#1111CC># Backquote ` ` or str() operations</FONT>
-( a + <FONT COLOR=#115511>" number "</FONT> + `c` ) <FONT COLOR=#3333CC><B>and</B></FONT> ( a + <FONT COLOR=#115511>" number "</FONT> + str(c) ) == <FONT COLOR=#115511>"Hello number 7"</FONT>
+<span class="c"># Concatenation</span>
+<span class="n">a</span> <span class="o">+</span> <span class="s">&quot; &quot;</span> <span class="o">+</span> <span class="n">b</span> <span class="o">==</span> <span class="s">&quot;Hello World!&quot;</span>
+<span class="c"># Repetition and Concatenation</span>
+<span class="n">a</span> <span class="o">*</span> <span class="mf">3</span> <span class="o">+</span> <span class="s">&quot; &quot;</span> <span class="o">+</span> <span class="n">b</span> <span class="o">==</span> <span class="s">&quot;HelloHelloHello World!&quot;</span>
+<span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="s">&quot; &quot;</span><span class="p">)</span> <span class="o">*</span> <span class="mf">3</span> <span class="o">+</span> <span class="n">b</span> <span class="o">==</span> <span class="s">&quot;Hello Hello Hello World!&quot;</span>
+<span class="c"># Indexing</span>
+<span class="n">b</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;r&quot;</span>
+<span class="c"># Conversion of data to string - Sesame Street:</span>
+<span class="n">c</span> <span class="o">=</span> <span class="mf">7</span> <span class="c"># Backquote ` ` or str() operations</span>
+<span class="p">(</span> <span class="n">a</span> <span class="o">+</span> <span class="s">&quot; number &quot;</span> <span class="o">+</span> <span class="sb">`c`</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">a</span> <span class="o">+</span> <span class="s">&quot; number &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="p">)</span> <span class="o">==</span> <span class="s">&quot;Hello number 7&quot;</span>
 
-<FONT COLOR=#1111CC>########</FONT>
-<FONT COLOR=#1111CC># Lists</FONT>
-<FONT COLOR=#1111CC>########</FONT>
-x = [1, 2, 3, 4, 5]
-y = [1, 2.0, (3,4), [5], {<FONT COLOR=#115511>"Hello"</FONT>:<FONT COLOR=#115511>"World!"</FONT>}]
+<span class="c">########</span>
+<span class="c"># Lists</span>
+<span class="c">########</span>
+<span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">5</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="p">(</span><span class="mf">3</span><span class="p">,</span><span class="mf">4</span><span class="p">),</span> <span class="p">[</span><span class="mf">5</span><span class="p">],</span> <span class="p">{</span><span class="s">&quot;Hello&quot;</span><span class="p">:</span><span class="s">&quot;World!&quot;</span><span class="p">}]</span>
 
-<FONT COLOR=#1111CC># Append </FONT>
-x.append(y) == [ 1, 2, 3, 4, 5, [1, 2.0, (3,4), [5], {<FONT COLOR=#115511>"Hello"</FONT>:<FONT COLOR=#115511>"World!"</FONT>}] ]
-<FONT COLOR=#1111CC># Concatenate - Notice the similarity to Strings</FONT>
-[1,2,3] + [4,5] == [1,2,3,4,5]
-<FONT COLOR=#1111CC># Multiply/Repeat - Again, strings are similar</FONT>
-[1,2] * 3 == [1,2,1,2,1,2]
-<FONT COLOR=#1111CC># Delete</FONT>
-<FONT COLOR=#3333CC><B>del</B></FONT> y[2] == [1, 2.0, [5], {<FONT COLOR=#115511>"Hello"</FONT>:<FONT COLOR=#115511>"World!"</FONT>}]
-<FONT COLOR=#1111CC># Or</FONT>
-y[2] = None
-y == [1, 2.0, {<FONT COLOR=#115511>"Hello"</FONT>:<FONT COLOR=#115511>"World!"</FONT>}]
-<FONT COLOR=#1111CC># Pop - Remove and delete the last element of a list</FONT>
-x.pop() == 5
-x == [1,2,3,4]
-<FONT COLOR=#1111CC># Length of a list</FONT>
-len(x) == 4
+<span class="c"># Append </span>
+<span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">5</span><span class="p">,</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="p">(</span><span class="mf">3</span><span class="p">,</span><span class="mf">4</span><span class="p">),</span> <span class="p">[</span><span class="mf">5</span><span class="p">],</span> <span class="p">{</span><span class="s">&quot;Hello&quot;</span><span class="p">:</span><span class="s">&quot;World!&quot;</span><span class="p">}]</span> <span class="p">]</span>
+<span class="c"># Concatenate - Notice the similarity to Strings</span>
+<span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="mf">3</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mf">4</span><span class="p">,</span><span class="mf">5</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="mf">3</span><span class="p">,</span><span class="mf">4</span><span class="p">,</span><span class="mf">5</span><span class="p">]</span>
+<span class="c"># Multiply/Repeat - Again, strings are similar</span>
+<span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">]</span> <span class="o">*</span> <span class="mf">3</span> <span class="o">==</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">]</span>
 
-<FONT COLOR=#1111CC>##########</FONT>
-<FONT COLOR=#1111CC># Slicing </FONT>
-<FONT COLOR=#1111CC>##########</FONT>
-z = range(100) <FONT COLOR=#1111CC># [0, 99]</FONT>
-z.reverse()
-z[10:19] == [89, 88, 87, 86, 85, 84, 83, 82, 81]
-z.reverse()
-z[:10] == [0,1,2,3,4,5,6,7,8,9]
-z[5:10] == [5,6,7,8,9]
+<span class="c"># Delete</span>
+<span class="k">del</span> <span class="n">y</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span>
+<span class="n">y2</span> <span class="o">==</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="p">[</span><span class="mf">5</span><span class="p">],</span> <span class="p">{</span><span class="s">&quot;Hello&quot;</span><span class="p">:</span><span class="s">&quot;World!&quot;</span><span class="p">}]</span>
+<span class="c"># Or</span>
+<span class="n">y</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">y</span> <span class="o">==</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;Hello&quot;</span><span class="p">:</span><span class="s">&quot;World!&quot;</span><span class="p">}]</span>
+
+<span class="c"># Pop - Remove and delete the last element of a list</span>
+<span class="n">x</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span> <span class="o">==</span> <span class="mf">5</span>
+<span class="n">x</span> <span class="o">==</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="mf">3</span><span class="p">,</span><span class="mf">4</span><span class="p">]</span>
+<span class="c"># Length of a list</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mf">4</span>
+
+<span class="c">##########</span>
+<span class="c"># Slicing </span>
+<span class="c">##########</span>
+<span class="n">z</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mf">100</span><span class="p">)</span> <span class="c"># [0, 99]</span>
+<span class="n">z</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+<span class="n">z</span><span class="p">[</span><span class="mf">10</span><span class="p">:</span><span class="mf">19</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="mf">89</span><span class="p">,</span> <span class="mf">88</span><span class="p">,</span> <span class="mf">87</span><span class="p">,</span> <span class="mf">86</span><span class="p">,</span> <span class="mf">85</span><span class="p">,</span> <span class="mf">84</span><span class="p">,</span> <span class="mf">83</span><span class="p">,</span> <span class="mf">82</span><span class="p">,</span> <span class="mf">81</span><span class="p">]</span>
+<span class="n">z</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+<span class="n">z</span><span class="p">[:</span><span class="mf">10</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="mf">3</span><span class="p">,</span><span class="mf">4</span><span class="p">,</span><span class="mf">5</span><span class="p">,</span><span class="mf">6</span><span class="p">,</span><span class="mf">7</span><span class="p">,</span><span class="mf">8</span><span class="p">,</span><span class="mf">9</span><span class="p">]</span>
+<span class="n">z</span><span class="p">[</span><span class="mf">5</span><span class="p">:</span><span class="mf">10</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="mf">5</span><span class="p">,</span><span class="mf">6</span><span class="p">,</span><span class="mf">7</span><span class="p">,</span><span class="mf">8</span><span class="p">,</span><span class="mf">9</span><span class="p">]</span>
 
 
-<FONT COLOR=#1111CC>###############</FONT>
-<FONT COLOR=#1111CC># Dictionaries</FONT>
-<FONT COLOR=#1111CC>###############</FONT>
-alpha = { <FONT COLOR=#115511>"Red Fish"</FONT>:<FONT COLOR=#115511>"Blue Fish"</FONT>, <FONT COLOR=#115511>"One Fish"</FONT>:<FONT COLOR=#115511>"Two Fish"</FONT>}
-beta = { <FONT COLOR=#115511>"Bob"</FONT>:<FONT COLOR=#115511>"(555)555-5575"</FONT>, <FONT COLOR=#115511>"Carol"</FONT>:<FONT COLOR=#115511>"(555)555-7757"</FONT> }
+<span class="c">###############</span>
+<span class="c"># Dictionaries</span>
+<span class="c">###############</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;Red Fish&quot;</span><span class="p">:</span><span class="s">&quot;Blue Fish&quot;</span><span class="p">,</span> <span class="s">&quot;One Fish&quot;</span><span class="p">:</span><span class="s">&quot;Two Fish&quot;</span><span class="p">}</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;Bob&quot;</span><span class="p">:</span><span class="s">&quot;(555)555-5575&quot;</span><span class="p">,</span> <span class="s">&quot;Carol&quot;</span><span class="p">:</span><span class="s">&quot;(555)555-7757&quot;</span> <span class="p">}</span>
 
-<FONT COLOR=#1111CC># Keys</FONT>
-alpha.keys() == [<FONT COLOR=#115511>"Red Fish"</FONT>, <FONT COLOR=#115511>"One Fish"</FONT>]
-beta.keys() == [<FONT COLOR=#115511>"Bob"</FONT>, <FONT COLOR=#115511>"Carol"</FONT>]
-<FONT COLOR=#1111CC># Values</FONT>
-alpha.values() == [<FONT COLOR=#115511>"Blue Fish"</FONT>, <FONT COLOR=#115511>"Two Fish"</FONT>]
-<FONT COLOR=#1111CC># Indexing</FONT>
-alpha[<FONT COLOR=#115511>"Red Fish"</FONT>] == <FONT COLOR=#115511>"Blue Fish"</FONT>
-beta[<FONT COLOR=#115511>"Carol"</FONT>] == <FONT COLOR=#115511>"(555)555-7757"</FONT>
-<FONT COLOR=#1111CC># Adding to a Dictionary</FONT>
-beta[<FONT COLOR=#115511>"Dave"</FONT>] = <FONT COLOR=#115511>"100"</FONT>
-beta == { <FONT COLOR=#115511>"Bob"</FONT>:<FONT COLOR=#115511>"(555)555-5575"</FONT>, <FONT COLOR=#115511>"Carol"</FONT>:<FONT COLOR=#115511>"(555)555-7757"</FONT>, <FONT COLOR=#115511>"Dave"</FONT>:<FONT COLOR=#115511>"100"</FONT> }
-<FONT COLOR=#1111CC># Deleting an entry</FONT>
-beta[<FONT COLOR=#115511>"Dave"</FONT>] = None
-<FONT COLOR=#1111CC># Or</FONT>
-<FONT COLOR=#3333CC><B>del</B></FONT> beta[<FONT COLOR=#115511>"Dave"</FONT>]
-beta == { <FONT COLOR=#115511>"Bob"</FONT>:<FONT COLOR=#115511>"(555)555-5575"</FONT>, <FONT COLOR=#115511>"Carol"</FONT>:<FONT COLOR=#115511>"(555)555-7757"</FONT> }
-<FONT COLOR=#1111CC># Length (Size) Of a dictionary</FONT>
-len(alpha) == 2
-<FONT COLOR=#1111CC># Checking for membership in a dictionary</FONT>
-beta.has_key(<FONT COLOR=#115511>"Carol"</FONT>) == 1
-</PRE>
-                  <!--footer-->
-                  </BODY>
+<span class="c"># Keys</span>
+<span class="n">alpha</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="s">&quot;Red Fish&quot;</span><span class="p">,</span> <span class="s">&quot;One Fish&quot;</span><span class="p">]</span>
+<span class="n">beta</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="s">&quot;Bob&quot;</span><span class="p">,</span> <span class="s">&quot;Carol&quot;</span><span class="p">]</span>
+<span class="c"># Values</span>
+<span class="n">alpha</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="s">&quot;Blue Fish&quot;</span><span class="p">,</span> <span class="s">&quot;Two Fish&quot;</span><span class="p">]</span>
+<span class="c"># Indexing</span>
+<span class="n">alpha</span><span class="p">[</span><span class="s">&quot;Red Fish&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;Blue Fish&quot;</span>
+<span class="n">beta</span><span class="p">[</span><span class="s">&quot;Carol&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;(555)555-7757&quot;</span>
+<span class="c"># Adding to a Dictionary</span>
+<span class="n">beta</span><span class="p">[</span><span class="s">&quot;Dave&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;100&quot;</span>
+<span class="n">beta</span> <span class="o">==</span> <span class="p">{</span> <span class="s">&quot;Bob&quot;</span><span class="p">:</span><span class="s">&quot;(555)555-5575&quot;</span><span class="p">,</span> <span class="s">&quot;Carol&quot;</span><span class="p">:</span><span class="s">&quot;(555)555-7757&quot;</span><span class="p">,</span> <span class="s">&quot;Dave&quot;</span><span class="p">:</span><span class="s">&quot;100&quot;</span> <span class="p">}</span>
+<span class="c"># Deleting an entry</span>
+<span class="n">beta</span><span class="p">[</span><span class="s">&quot;Dave&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="c"># Or</span>
+<span class="k">del</span> <span class="n">beta</span><span class="p">[</span><span class="s">&quot;Dave&quot;</span><span class="p">]</span>
+<span class="n">beta</span> <span class="o">==</span> <span class="p">{</span> <span class="s">&quot;Bob&quot;</span><span class="p">:</span><span class="s">&quot;(555)555-5575&quot;</span><span class="p">,</span> <span class="s">&quot;Carol&quot;</span><span class="p">:</span><span class="s">&quot;(555)555-7757&quot;</span> <span class="p">}</span>
+<span class="c"># Length (Size) Of a dictionary</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">==</span> <span class="mf">2</span>
+<span class="c"># Checking for membership in a dictionary</span>
+<span class="n">beta</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="s">&quot;Carol&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1</span>
+</pre></div>

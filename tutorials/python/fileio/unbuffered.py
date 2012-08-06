@@ -1,5 +1,3 @@
-# Hackish way of avoiding having to call file.close()
-
 """
  0 means buffer size of 0
  or unbuffered:
@@ -13,9 +11,9 @@
  Defaults to -1, which indicates the platform
  default
 """
-FILE = open(filename, "w", 0) 
+f = open(filename, "w", 0) 
 
-FILE.writelines(namelist)
+f.writelines(namelist)
 
 """
 Now when your program exits without

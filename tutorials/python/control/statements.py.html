@@ -1,36 +1,30 @@
-<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
-                  <BODY BGCOLOR=#FFFFFF>
-                  <!--header-->
-                  <!--script--><PRE><FONT COLOR=#1111CC># Continue</FONT>
-nlist = []
-<FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> xrange(0,100):
-    <FONT COLOR=#3333CC><B>if</B></FONT> i == 0:
-        <FONT COLOR=#3333CC><B>continue</B></FONT>
-    nlist.append( 7 / i )
+<div class="syntax"><pre><span class="c"># Continue</span>
+<span class="n">nlist</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="mf">100</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mf">0</span><span class="p">:</span>
+        <span class="k">continue</span>
+    <span class="n">nlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="mf">7</span> <span class="o">/</span> <span class="n">i</span> <span class="p">)</span>
 
-<FONT COLOR=#1111CC># Break</FONT>
-<FONT COLOR=#1111CC># How many heads can we flip in a row?</FONT>
-heads = 0
-<FONT COLOR=#3333CC><B>while</B></FONT> 1:
-    <FONT COLOR=#3333CC><B>if</B></FONT> x = 0:
-        <FONT COLOR=#3333CC><B>break</B></FONT>
-    <FONT COLOR=#3333CC><B>else</B></FONT>:
-        x = random.rand(0,1)
-        heads += 1
+<span class="c"># Break</span>
+<span class="c"># How many heads can we flip in a row?</span>
+<span class="n">heads</span> <span class="o">=</span> <span class="mf">0</span>
+<span class="k">while</span> <span class="mf">1</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mf">0</span><span class="p">:</span>
+        <span class="k">break</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="mf">1</span><span class="p">)</span>
+        <span class="n">heads</span> <span class="o">+=</span> <span class="mf">1</span>
 
-<FONT COLOR=#1111CC># Pass</FONT>
-<FONT COLOR=#1111CC># If you don't want to do anything in a case</FONT>
-x = 0
-<FONT COLOR=#3333CC><B>while</B></FONT> 1:
-    <FONT COLOR=#3333CC><B>if</B></FONT> x &lt;= 100:
-        <FONT COLOR=#3333CC><B>pass</B></FONT>
-    <FONT COLOR=#3333CC><B>elif</B></FONT> x = 101:
-        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Just enough Dalmations!"</FONT>
-    <FONT COLOR=#3333CC><B>else</B></FONT>:
-        <FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Argh!  Too many Dalmations!"</FONT>
-        <FONT COLOR=#3333CC><B>break</B></FONT>
-    x += 1
-    
-</PRE>
-                  <!--footer-->
-                  </BODY>
+<span class="c"># Pass</span>
+<span class="c"># If you don&#39;t want to do anything in a case</span>
+<span class="n">x</span> <span class="o">=</span> <span class="mf">0</span>
+<span class="k">while</span> <span class="mf">1</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="mf">100</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">elif</span> <span class="n">x</span> <span class="o">==</span> <span class="mf">101</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;Just enough Dalmations!&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;Argh!  Too many Dalmations!&quot;</span>
+        <span class="k">break</span>
+    <span class="n">x</span> <span class="o">+=</span> <span class="mf">1</span>
+</pre></div>

@@ -1,12 +1,14 @@
 """
 Context managers provide a much nicer way to
-handle book keeping around your file objects:
+handle book keeping around your file objects.
+
+For example context managers will automatically
+close the file when the block ends.
 """
 
-with open(filename, "w") as FILE:
+with open(filename, "w") as f:
     for name in namelist:
-        FILE.write(name)
+        f.write("%s\n"%(name,))
 
-# As soon as execution gets here
-# outside the 'with' block
-# your file is closed.
+
+

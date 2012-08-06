@@ -44,17 +44,6 @@
 <P>Now let's go over some useful utility functions:
 <ul><!--#include virtual="useful.py.html"--></ul>
 
-<P>Here is a more advanced example, which reads in the following file, "hw0grades.txt", which contains the current grades for the first (Zeroth) cs373 homework:
-<ul><!--#include virtual="hw0grades.txt"--></ul>
-<P>Now, since we know some basics of files, we can go ahead and read them a bit, and go ahead and compute somethings about my grade:
-<ul><!--#include virtual="grades.py.html"--></ul>
-<P>This example is a little more complicated, but it's definitely more real world.  A very common use for Python is doing file and string parsing tasks like this.  It's not as well known for this task as Perl, although it really is quite suitable for this sort of thing (and your chances of being able to maintain this code in the future is better).  
-<P>Finally, I want to talk about <font color="olive">pickling</font> things.  Python has a facility for compressing native objects into strings for transmission across the network, or to write to disk.  
-<P>You might refer to this technique as a method of "Object Persistance" or something similar, and you'd be right.  If you have data you'd like to save between sessions, like an objects personal state, just pickle it.  This could be a simple way to create a basic file format for your programs datafiles, or it could enable faster crash recovery for a large program.  You might even use it while playing at the commandline to save something temporarily.  
-<P>There are quite a few modules besides Pickle that can be used to do this in Python, but Pickle is the fundamental building block for many of them.  Larger projects with more data might decide to use Shelves, which are a lot like dictionaries that store pickled objects.  
-<P>Follow along with this simple example, and remember that there is more to Pickling then what I've got below.
-<ul><!--#include virtual="pickle.py.html"--></ul>
-
 <!--\/Footer\/-->
 <hr>
 <a href="hello.py">hello.py</a><br>

@@ -1,26 +1,21 @@
-<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
-                  <BODY BGCOLOR=#FFFFFF>
-                  <!--header-->
-                  <!--script--><PRE><FONT COLOR=#1111CC># myexception.py</FONT>
+<div class="syntax"><pre><span class="c"># myexception.py</span>
 
-<FONT COLOR=#3333CC><B>import</B></FONT> exceptions
-<FONT COLOR=#3333CC><B>class</B></FONT><A NAME="Expletive"><FONT COLOR=#CC0000><B> Expletive</B></FONT></A>(exceptions.Exception):
-	<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__init__"><FONT COLOR=#CC0000><B> __init__</B></FONT></A>(self):
-		<FONT COLOR=#3333CC><B>return</B></FONT>
+<span class="kn">import</span> <span class="nn">exceptions</span>
+<span class="k">class</span> <span class="nc">Expletive</span><span class="p">(</span><span class="n">exceptions</span><span class="o">.</span><span class="n">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span>
 		
-	<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="__str__"><FONT COLOR=#CC0000><B> __str__</B></FONT></A>(self):
-		<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>""</FONT>,<FONT COLOR=#115511>"An Expletive occured!"</FONT>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;Oh, expletive!&quot;</span>
 	
-<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="main"><FONT COLOR=#CC0000><B> main</B></FONT></A>():
-	<FONT COLOR=#3333CC><B>raise</B></FONT> Expletive
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">raise</span> <span class="n">Expletive</span>
 	
-<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
-	<FONT COLOR=#3333CC><B>try</B></FONT>:
-		main()
-	<FONT COLOR=#3333CC><B>except</B></FONT> ImportError:
-		<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"Unable to import something..."</FONT>
-	<FONT COLOR=#3333CC><B>except</B></FONT> Exception, e:
-		<FONT COLOR=#3333CC><B>raise</B></FONT> e
-</PRE>
-                  <!--footer-->
-                  </BODY>
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+	<span class="n">main</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;Unable to import something...&quot;</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+	<span class="k">raise</span> <span class="n">e</span>
+</pre></div>

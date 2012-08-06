@@ -7,31 +7,28 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">year</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gpa</span> <span class="o">=</span> <span class="n">gpa</span>
 
-    <span class="k">def</span> <span class="nf">_Print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">string</span> <span class="o">=</span> <span class="s">&quot;++++++++++++++++++++++&quot;</span> <span class="o">+</span> \
-                 <span class="s">&quot;+&quot;</span><span class="o">+</span><span class="n">name</span> \
-                 <span class="s">&quot;+&quot;</span><span class="o">+</span><span class="n">school</span> \
-                 <span class="s">&quot;+&quot;</span><span class="o">+</span><span class="n">major</span> \
-                 <span class="s">&quot;+&quot;</span><span class="o">+</span><span class="n">year</span> \
-                 <span class="s">&quot;+&quot;</span><span class="o">+</span><span class="n">gpa</span> \
-                 <span class="s">&quot;++++++++++++++++++++++&quot;</span>
-        <span class="k">return</span> <span class="n">string</span>
-
-    <span class="k">def</span> <span class="nf">Print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Print</span><span class="p">()</span>
-
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Print</span><span class="p">()</span>
-    
+        <span class="n">string</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;++++++++++++++++++++++&quot;</span><span class="p">,</span> 
+                 <span class="s">&quot;+&quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">,</span>
+                 <span class="s">&quot;+&quot;</span> <span class="o">+</span> <span class="n">school</span><span class="p">,</span>
+                 <span class="s">&quot;+&quot;</span> <span class="o">+</span> <span class="n">major</span><span class="p">,</span>
+                 <span class="s">&quot;+&quot;</span> <span class="o">+</span> <span class="n">year</span><span class="p">,</span>
+                 <span class="s">&quot;+&quot;</span> <span class="o">+</span> <span class="n">gpa</span><span class="p">,</span>
+                 <span class="s">&quot;++++++++++++++++++++++&quot;</span><span class="p">]</span>
+                 
+        <span class="k">return</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+
 <span class="c"># Now I&#39;ll create a student:</span>
-<span class="n">Mike</span> <span class="o">=</span> <span class="n">Student</span><span class="p">(</span><span class="s">&quot;Mike&quot;</span><span class="p">,</span><span class="s">&quot;UIUC&quot;</span><span class="p">,</span><span class="s">&quot;CS&quot;</span><span class="p">,</span><span class="s">&quot;Senior&quot;</span><span class="p">,</span><span class="mf">0.6</span><span class="p">)</span>
+<span class="n">Mike</span> <span class="o">=</span> <span class="n">Student</span><span class="p">(</span><span class="s">&quot;Mike&quot;</span><span class="p">,</span> <span class="s">&quot;UIUC&quot;</span><span class="p">,</span> <span class="s">&quot;CS&quot;</span><span class="p">,</span> <span class="s">&quot;Senior&quot;</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">)</span>
+
 <span class="c"># Now, let&#39;s Pickle Mike</span>
 <span class="n">mike_the_pickle</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">Mike</span><span class="p">)</span>
 <span class="k">print</span> <span class="n">mike_the_pickle</span>
+
 <span class="c"># Now let&#39;s clone mike!</span>
 <span class="n">Mike2</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">mike_the_pickle</span><span class="p">)</span>
 <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">Mike</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="n">Mike2</span><span class="p">):</span>
-    <span class="k">print</span> <span class="s">&quot;Mike and Mike2 are of type:&quot;</span><span class="p">,(</span><span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">Mike</span><span class="p">)))</span>
+    <span class="k">print</span> <span class="s">&quot;Mike and Mike2 are of type:&quot;</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">Mike</span><span class="p">)))</span>
 
 <span class="c"># Create A Pickler</span>
 <span class="n">P</span><span class="o">.</span><span class="n">pickle</span><span class="o">.</span><span class="n">Pickler</span><span class="p">(</span><span class="s">&quot;pickle.dat&quot;</span><span class="p">)</span>

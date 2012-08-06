@@ -1,53 +1,47 @@
-<HTML><HEAD><TITLE>/home/steder/Projects/Tutorials/python/BobChat-v0.3/BobClient.py</TITLE></HEAD>
-                  <BODY BGCOLOR=#FFFFFF>
-                  <!--header-->
-                  <!--script--><PRE><FONT COLOR=#1111CC>#simplesieve.py</FONT>
-<FONT COLOR=#3333CC><B>import</B></FONT> Numeric
+<div class="syntax"><pre><span class="c">#simplesieve.py</span>
+<span class="kn">import</span> <span class="nn">Numeric</span>
 
-<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="sieve"><FONT COLOR=#CC0000><B> sieve</B></FONT></A>( n ):
-	<FONT COLOR=#1111CC># Let's start at array index 1 instead of 0</FONT>
-	array = Numeric.zeros(n+1)
-	<FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> xrange(1,n+1):
-		array[i] = i
-	
-	done = False
-	prime = array[2] <FONT COLOR=#1111CC># The number, as well as the index.</FONT>
-	<FONT COLOR=#3333CC><B>while</B></FONT>( prime &lt; n ):
-		<FONT COLOR=#1111CC># Index 2 corresponds to the number 2 for this indexing scheme</FONT>
-		index = prime
-		index += prime
-		<FONT COLOR=#1111CC># Mark multiples of prime</FONT>
-		<FONT COLOR=#3333CC><B>while</B></FONT>( index &lt;= n ):
-			array[index]=-1
-			index += prime
-		<FONT COLOR=#1111CC># Get a new prime</FONT>
-		prime+=1
-		<FONT COLOR=#3333CC><B>while</B></FONT>( prime &lt; n ):
-			<FONT COLOR=#3333CC><B>if</B></FONT> (array[prime]==-1):
-				prime+=1
-			<FONT COLOR=#3333CC><B>elif</B></FONT> (prime &lt; n ):
-				<FONT COLOR=#3333CC><B>break</B></FONT>
-		<FONT COLOR=#1111CC>#print </FONT>prime,n,array
+<span class="k">def</span> <span class="nf">sieve</span><span class="p">(</span> <span class="n">n</span> <span class="p">):</span>
+    <span class="c"># Let&#39;s start at array index 1 instead of 0</span>
+    <span class="n">array</span> <span class="o">=</span> <span class="n">Numeric</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
 
-	<FONT COLOR=#1111CC># Grab all the primes</FONT>
-	primes = []
-	<FONT COLOR=#3333CC><B>for</B></FONT> i <FONT COLOR=#3333CC><B>in</B></FONT> xrange(1,n+1):
-		<FONT COLOR=#3333CC><B>if</B></FONT>( array[i] != -1):
-			primes.append(array[i])
-			
-	<FONT COLOR=#3333CC><B>return</B></FONT> primes
+    <span class="n">done</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">prime</span> <span class="o">=</span> <span class="n">array</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="c"># The number, as well as the index.</span>
+    <span class="k">while</span> <span class="n">prime</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+        <span class="c"># Index 2 corresponds to the number 2 for this indexing scheme</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">prime</span>
+        <span class="n">index</span> <span class="o">+=</span> <span class="n">prime</span>
+	<span class="c"># Mark multiples of prime</span>
+        <span class="k">while</span> <span class="n">index</span> <span class="o">&lt;=</span> <span class="n">n</span><span class="p">:</span>
+	    <span class="n">array</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">=-</span><span class="mi">1</span>
+            <span class="n">index</span> <span class="o">+=</span> <span class="n">prime</span>
+        <span class="c"># Get a new prime</span>
+	<span class="n">prime</span> <span class="o">+=</span> <span class="mi">1</span>
+	<span class="k">while</span> <span class="n">prime</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+	    <span class="k">if</span> <span class="n">array</span><span class="p">[</span><span class="n">prime</span><span class="p">]</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
+		<span class="n">prime</span><span class="o">+=</span><span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">prime</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+		<span class="k">break</span>
 
-<FONT COLOR=#3333CC><B>def</B></FONT><A NAME="main"><FONT COLOR=#CC0000><B> main</B></FONT></A>():
-	<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"This program computes the number of primes between 1 and n\nusing the Sieve of Erastothenes."</FONT>
-	input = raw_input(<FONT COLOR=#115511>"Enter (n):"</FONT>)
-	n = int(input)
-	primes = sieve( n )
-	<FONT COLOR=#3333CC><B>print</B></FONT> <FONT COLOR=#115511>"There are %d primes between 1 and %d.  They are:"</FONT> % (len(primes),n)
-	<FONT COLOR=#3333CC><B>print</B></FONT> primes
-	<FONT COLOR=#3333CC><B>return</B></FONT>
-	
-<FONT COLOR=#3333CC><B>if</B></FONT> __name__==<FONT COLOR=#115511>"__main__"</FONT>:
-	main()
-</PRE>
-                  <!--footer-->
-                  </BODY>
+    <span class="c"># Grab all the primes</span>
+    <span class="n">primes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">primes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">primes</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">print</span> <span class="s">&quot;This program computes the number of primes between 1 and n</span><span class="se">\n</span><span class="s">using the Sieve of Erastothenes.&quot;</span>
+    <span class="nb">input</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&quot;Enter (n):&quot;</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+    <span class="n">primes</span> <span class="o">=</span> <span class="n">sieve</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&quot;There are </span><span class="si">%d</span><span class="s"> primes between 1 and </span><span class="si">%d</span><span class="s">.  They are:&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">primes</span><span class="p">),</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">primes</span>
+    <span class="k">return</span>
+
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
